@@ -6,10 +6,13 @@ import type { CartItem } from '@/types/cart'
 
 interface CartState {
   items: CartItem[]
+  isCartOpen: boolean
   addItem: (item: CartItem) => void
   removeItem: (variantId: number) => void
   updateQuantity: (variantId: number, quantity: number) => void
   clearCart: () => void
+  openCart: () => void
+  closeCart: () => void
   total: () => number
   itemCount: () => number
 }
@@ -18,6 +21,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      isCartOpen: false,
 
       addItem: (item) => {
         const existing = get().items.find((i) => i.variantId === item.variantId)
@@ -54,6 +58,10 @@ export const useCartStore = create<CartState>()(
 
       clearCart: () => set({ items: [] }),
 
+      openCart: () => set({ isCartOpen: true }),
+
+      closeCart: () => set({ isCartOpen: false }),
+
       total: () => {
         return get().items.reduce(
           (sum, item) => sum + (parseFloat(item.price) || 0) * item.quantity,
@@ -65,6 +73,10 @@ export const useCartStore = create<CartState>()(
         return get().items.reduce((sum, item) => sum + item.quantity, 0)
       },
     }),
-    { name: '7eno-cart', skipHydration: true }
+    {
+      name: '7eno-cart',
+      skipHydration: true,
+      partialize: (state) => ({ items: state.items }),
+    }
   )
 )

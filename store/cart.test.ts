@@ -47,4 +47,13 @@ describe('cart store', () => {
     const total = useCartStore.getState().total()
     expect(total).toBeCloseTo(99.98, 2)
   })
+
+  it('opens and closes cart', () => {
+    const { openCart, closeCart } = useCartStore.getState()
+    expect(useCartStore.getState().isCartOpen).toBe(false)
+    openCart()
+    expect(useCartStore.getState().isCartOpen).toBe(true)
+    closeCart()
+    expect(useCartStore.getState().isCartOpen).toBe(false)
+  })
 })
