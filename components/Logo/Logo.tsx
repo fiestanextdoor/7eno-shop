@@ -1,4 +1,4 @@
-interface LogoProps {
+export interface LogoProps {
   fg?: string
   height?: number
   showKeraunos?: boolean
@@ -10,6 +10,7 @@ export function SevenWordmark({ fg = 'currentColor', height = 40 }: { fg?: strin
 
   return (
     <svg
+      role="img"
       width={290 * unit}
       height={h}
       viewBox="0 0 290 100"

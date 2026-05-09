@@ -1,7 +1,7 @@
 export interface SyncProduct {
   id: number
   name: string
-  thumbnail_url: string
+  thumbnail_url: string | null
   variants: number
   synced: number
 }
@@ -25,7 +25,7 @@ export interface PrintfulFile {
   type: string
   id: number
   url: string
-  options: unknown[]
+  options: Array<{ id: string; value: string }>
   hash: string
   filename: string
   mime_type: string
@@ -35,8 +35,8 @@ export interface PrintfulFile {
   dpi: number
   status: string
   created: number
-  thumbnail_url: string
-  preview_url: string
+  thumbnail_url: string | null
+  preview_url: string | null
   visible: boolean
 }
 
@@ -58,4 +58,10 @@ export interface PrintfulListResponse<T> {
 export interface PrintfulDetailResponse<T> {
   code: number
   result: T
+}
+
+export interface PrintfulError {
+  code: number
+  result: string
+  error: { reason: string; message: string }
 }

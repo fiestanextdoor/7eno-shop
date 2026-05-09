@@ -6,5 +6,5 @@ export interface CartItem {
   price: string
   currency: string
   quantity: number
-  imageUrl: string
+  imageUrl: string | null
 }
