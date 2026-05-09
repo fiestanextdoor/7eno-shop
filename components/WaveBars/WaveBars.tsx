@@ -12,7 +12,7 @@ export default function WaveBars({ color = 'currentColor', scale = 1 }: WaveBars
     <div className={styles.wrap} style={{ color }} aria-hidden="true">
       {HEIGHTS.map((h, i) => (
         <div
-          key={i}
+          key={`bar-${i}`}
           className={styles.bar}
           style={{ height: h * scale }}
         />
