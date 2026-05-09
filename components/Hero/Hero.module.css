@@ -1,0 +1,53 @@
+.hero {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px var(--gutter);
+  gap: 40px;
+}
+
+.keraunos {
+  animation: keraun-pulse 3s ease-in-out infinite;
+}
+
+.wordmark {
+  animation: fadeInUp 1s ease 0.3s both;
+}
+
+.tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--stone);
+  letter-spacing: 2px;
+  animation: fadeInUp 1s ease 0.6s both;
+}
+
+.cta {
+  display: inline-block;
+  border: 1px solid rgba(246, 243, 236, 0.3);
+  color: var(--bone);
+  padding: 14px 36px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  transition: border-color 0.2s, background 0.2s;
+  animation: fadeInUp 1s ease 0.9s both;
+}
+
+.cta:hover {
+  border-color: var(--bone);
+  background: rgba(246, 243, 236, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keraunos { animation: none; }
+  .wordmark { animation: none; }
+  .tagline  { animation: none; }
+  .cta      { animation: none; transition: none; }
+}

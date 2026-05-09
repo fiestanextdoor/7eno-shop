@@ -1,9 +1,34 @@
-import Logo from '@/components/Logo/Logo'
+import Hero from '@/components/Hero/Hero'
+import ProductCard from '@/components/ProductCard/ProductCard'
+import { getProducts } from '@/lib/printful'
+import type { SyncProduct } from '@/types/printful'
+import styles from './page.module.css'
 
-export default function Page() {
+export default async function HomePage() {
+  let products: SyncProduct[] = []
+  try {
+    const all = await getProducts()
+    products = all.slice(0, 3)
+  } catch {
+    // Printful unreachable on build/dev without connected store
+  }
+
   return (
-    <main style={{ padding: 40, background: '#111', minHeight: '100vh' }}>
-      <Logo fg="#F6F3EC" height={48} showKeraunos />
+    <main>
+      <Hero />
+      {products.length > 0 && (
+        <section className={styles.featured}>
+          <div className={styles.featuredHeader}>
+            <p className={styles.featuredLabel}>Latest Drops</p>
+            <h2 className={styles.featuredTitle}>The Collection</h2>
+          </div>
+          <div className={styles.featuredGrid}>
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }
