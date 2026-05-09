@@ -1,0 +1,146 @@
+/* components/ShopSidebar/ShopSidebar.module.css */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink);
+  border-right: 1px solid rgba(246, 243, 236, 0.06);
+  overflow-y: auto;
+}
+
+.logoSection {
+  background: var(--oxblood);
+  padding: 20px 16px 16px;
+  flex-shrink: 0;
+  text-decoration: none;
+  display: block;
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.5);
+  margin-top: 4px;
+  display: block;
+}
+
+.nav {
+  padding: 24px 0;
+  flex: 1;
+}
+
+.genderRow {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 16px;
+  gap: 4px;
+  border-bottom: 1px solid rgba(246, 243, 236, 0.08);
+  margin-bottom: 16px;
+}
+
+.genderLink {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--stone);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.genderLink:hover,
+.genderLinkActive {
+  color: var(--bone);
+}
+
+.genderDivider {
+  width: 1px;
+  height: 20px;
+  background: rgba(246, 243, 236, 0.2);
+  margin: 0 6px;
+}
+
+.categoryGroup {
+  padding: 0 16px 16px;
+}
+
+.categoryLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.subLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subLink {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--stone);
+  text-decoration: none;
+  padding: 3px 0;
+  transition: color 0.15s;
+}
+
+.subLink:hover,
+.subLinkActive {
+  color: var(--bone);
+}
+
+.cartSection {
+  padding: 16px;
+  border-top: 1px solid rgba(246, 243, 236, 0.08);
+  flex-shrink: 0;
+}
+
+.cartBtn {
+  background: none;
+  border: 1px solid rgba(246, 243, 236, 0.2);
+  color: var(--bone);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.cartBtn:hover {
+  border-color: var(--bone);
+}
+
+.cartBtn:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genderLink, .subLink, .cartBtn { transition: none; }
+}
