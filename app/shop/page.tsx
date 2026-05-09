@@ -13,8 +13,8 @@ export default async function ShopPage() {
   let products: SyncProduct[] = []
   try {
     products = await getProducts()
-  } catch {
-    // Printful unreachable
+  } catch (err) {
+    console.error('[Printful] getProducts failed:', err)
   }
 
   return (

@@ -2,15 +2,21 @@ import Hero from '@/components/Hero/Hero'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import { getProducts } from '@/lib/printful'
 import type { SyncProduct } from '@/types/printful'
+import type { Metadata } from 'next'
 import styles from './page.module.css'
+
+export const metadata: Metadata = {
+  title: '7ENO — Divine Authority',
+  description: 'Premium streetwear. Divine Authority.',
+}
 
 export default async function HomePage() {
   let products: SyncProduct[] = []
   try {
     const all = await getProducts()
     products = all.slice(0, 3)
-  } catch {
-    // Printful unreachable on build/dev without connected store
+  } catch (err) {
+    console.error('[Printful] getProducts failed:', err)
   }
 
   return (
