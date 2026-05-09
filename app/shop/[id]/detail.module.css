@@ -1,0 +1,145 @@
+.page {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bone);
+  padding: 40px var(--gutter);
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.mainImg {
+  aspect-ratio: 1;
+  width: 100%;
+  object-fit: cover;
+  background: var(--paper);
+}
+
+.imgPlaceholder {
+  aspect-ratio: 1;
+  width: 100%;
+  background: var(--paper);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+.breadcrumb a:hover {
+  color: var(--ink);
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.price {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.sizeLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 10px;
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sizeBtn {
+  border: 1px solid var(--rule);
+  background: none;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.sizeBtn:hover {
+  border-color: var(--ink);
+}
+
+.sizeBtn.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bone);
+}
+
+.sizeBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.addBtn {
+  background: var(--ink);
+  color: var(--bone);
+  border: none;
+  padding: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  transition: background 0.2s;
+  width: 100%;
+  cursor: pointer;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: var(--oxblood);
+}
+
+.addBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.addBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.added {
+  background: var(--oxblood);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sizeBtn { transition: none; }
+  .addBtn  { transition: none; }
+}
