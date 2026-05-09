@@ -84,7 +84,7 @@ export default function CheckoutPage() {
           <span className={styles.totalAmount}>&euro;{total().toFixed(2)}</span>
         </div>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error} aria-live="polite">{error}</p>}
 
         <button
           className={styles.payBtn}

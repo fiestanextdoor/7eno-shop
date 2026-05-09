@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { SyncVariant, PrintfulFile } from '@/types/printful'
@@ -42,8 +42,13 @@ export default function ProductDetail({
       imageUrl,
     })
     setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
   }
+
+  useEffect(() => {
+    if (!added) return
+    const id = setTimeout(() => setAdded(false), 2000)
+    return () => clearTimeout(id)
+  }, [added])
 
   const imageUrl = previewFile?.preview_url ?? previewFile?.url ?? null
 
