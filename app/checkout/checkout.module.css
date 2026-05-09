@@ -1,0 +1,157 @@
+.page {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bone);
+  padding: 60px var(--gutter);
+}
+
+.inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 40px;
+  display: block;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.itemImg {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  background: var(--paper);
+}
+
+.itemImgPlaceholder {
+  width: 72px;
+  height: 72px;
+  background: var(--paper);
+}
+
+.itemName {
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+.itemVariant {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--stone);
+  margin-top: 4px;
+}
+
+.itemPrice {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+  padding-top: 8px;
+}
+
+.totalLabel {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+.totalAmount {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.payBtn {
+  background: var(--ink);
+  color: var(--bone);
+  border: none;
+  padding: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.payBtn:hover:not(:disabled) {
+  background: var(--oxblood);
+}
+
+.payBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.payBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.error {
+  color: var(--oxblood);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.empty {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--stone);
+  padding: 60px 0;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .payBtn { transition: none; }
+}
