@@ -1,44 +1,80 @@
-.page {
-  min-height: calc(100vh - var(--nav-height));
+/* app/shop/shop.module.css */
+.layout {
+  display: flex;
+  min-height: 100vh;
   background: var(--bone);
-  padding: 60px var(--gutter);
 }
 
-.header {
-  max-width: var(--max-width);
-  margin: 0 auto 48px;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 24px;
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
 }
 
-.label {
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 28px;
+  background: var(--bone);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid rgba(17,17,17,0.1);
+  padding-bottom: 0;
+}
+
+.tab {
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--stone);
-  margin-bottom: 8px;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
 }
 
-.title {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 600;
+.tab:hover {
   color: var(--ink);
 }
 
-.grid {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.tabActive {
+  color: var(--ink);
+  border-bottom-color: var(--oxblood);
 }
 
-@media (min-width: 768px) {
+.tabDivider {
+  width: 1px;
+  background: rgba(17,17,17,0.1);
+  margin: 8px 0;
+  align-self: stretch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -50,4 +86,8 @@
   font-size: 1.2rem;
   color: var(--stone);
   padding: 60px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab { transition: none; }
 }
