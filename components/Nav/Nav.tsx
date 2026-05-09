@@ -2,30 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { LogoWordmark } from '@/components/Logo/Logo'
 import { useCartStore } from '@/store/cart'
-import Logo from '@/components/Logo/Logo'
 import styles from './Nav.module.css'
 
-interface NavProps {
-  onCartOpen: () => void
-}
-
-export default function Nav({ onCartOpen }: NavProps) {
+export default function Nav() {
   const [mounted, setMounted] = useState(false)
   const itemCount = useCartStore((s) => s.itemCount())
+  const openCart = useCartStore((s) => s.openCart)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
 
   return (
-    <nav className={styles.nav}>
-      <Link href="/" aria-label="7ENO home">
-        <Logo fg="#F6F3EC" height={24} />
+    <>
+      <Link href="/" aria-label="7ENO home" className={styles.logoBox}>
+        <LogoWordmark variant="wit" height={28} priority />
+        <span className={styles.sub}>by ultra entertainment</span>
       </Link>
-      <div className={styles.links}>
-        <Link href="/shop" className={styles.link}>Shop</Link>
-        <button className={styles.cartBtn} onClick={onCartOpen} aria-label="Open cart">
+
+      <div className={styles.actions}>
+        <button className={styles.cartBtn} onClick={openCart} aria-label="Open cart">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
@@ -36,6 +32,6 @@ export default function Nav({ onCartOpen }: NavProps) {
           )}
         </button>
       </div>
-    </nav>
+    </>
   )
 }
