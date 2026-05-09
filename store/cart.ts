@@ -56,7 +56,7 @@ export const useCartStore = create<CartState>()(
 
       total: () => {
         return get().items.reduce(
-          (sum, item) => sum + parseFloat(item.price) * item.quantity,
+          (sum, item) => sum + (parseFloat(item.price) || 0) * item.quantity,
           0
         )
       },
@@ -65,6 +65,6 @@ export const useCartStore = create<CartState>()(
         return get().items.reduce((sum, item) => sum + item.quantity, 0)
       },
     }),
-    { name: '7eno-cart' }
+    { name: '7eno-cart', skipHydration: true }
   )
 )
