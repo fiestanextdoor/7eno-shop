@@ -1,4 +1,5 @@
-.overlay {
+.overlayVisible,
+.overlayHidden {
   position: fixed;
   inset: 0;
   background: rgba(17, 17, 17, 0.6);
@@ -10,7 +11,8 @@
 .overlayVisible { opacity: 1; pointer-events: auto; }
 .overlayHidden  { opacity: 0; pointer-events: none; }
 
-.drawer {
+.drawerOpen,
+.drawerClosed {
   position: fixed;
   top: 0;
   right: 0;
@@ -27,8 +29,10 @@
 .drawerClosed { transform: translateX(100%); }
 
 @media (prefers-reduced-motion: reduce) {
-  .overlay { transition: none; }
-  .drawer  { transition: none; }
+  .overlayVisible,
+  .overlayHidden { transition: none; }
+  .drawerOpen,
+  .drawerClosed  { transition: none; }
 }
 
 .header {
@@ -96,6 +100,63 @@
   width: 72px;
   height: 72px;
   background: var(--paper);
+}
+
+/* Aliases used by the store-connected CartDrawer */
+.thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.thumbPlaceholder {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  background: var(--paper);
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qtyRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.qtyBtn {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: border-color 0.2s;
+}
+
+.qtyBtn:hover {
+  border-color: var(--ink);
+}
+
+.qty {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  min-width: 20px;
+  text-align: center;
 }
 
 .itemName {
