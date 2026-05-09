@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
+import CartProvider from '@/components/CartProvider/CartProvider'
 import '@/styles/globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -33,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl" className={`${cormorant.variable} ${spaceMono.variable}`}>
-      <body>{children}</body>
+      <body><CartProvider>{children}</CartProvider></body>
     </html>
   )
 }
