@@ -11,15 +11,17 @@ export default function Footer() {
           <p className={styles.tagline}>Divine Authority</p>
         </div>
         <nav className={styles.navGroup} aria-label="Shop navigation">
-          <h4>Shop</h4>
-          <ul>
-            <li><Link href="/shop">All Products</Link></li>
+          <h4 className={styles.navTitle}>Shop</h4>
+          <ul className={styles.navList}>
+            <li><Link href="/shop" className={styles.navLink}>All Products</Link></li>
+            <li><Link href="/shop?gender=men" className={styles.navLink}>Men</Link></li>
+            <li><Link href="/shop?gender=women" className={styles.navLink}>Women</Link></li>
           </ul>
         </nav>
         <nav className={styles.navGroup} aria-label="Info navigation">
-          <h4>Info</h4>
-          <ul>
-            <li><a href="mailto:info@7eno.nl">Contact</a></li>
+          <h4 className={styles.navTitle}>Info</h4>
+          <ul className={styles.navList}>
+            <li><a href="mailto:info@7eno.nl" className={styles.navLink}>Contact</a></li>
           </ul>
         </nav>
       </div>
