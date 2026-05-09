@@ -1,0 +1,13 @@
+/* components/WaveBars/WaveBars.module.css */
+.wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.bar {
+  width: 3px;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 0.5;
+}
