@@ -22,9 +22,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         ) : (
           <div className={styles.placeholder} />
         )}
-        <div className={styles.overlay}>
-          <span className={styles.overlayText}>View Product</span>
-        </div>
       </div>
       <div className={styles.info}>
         <div className={styles.name}>{product.name}</div>
