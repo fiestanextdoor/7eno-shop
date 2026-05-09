@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/store/cart'
@@ -12,13 +13,30 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, removeItem, total } = useCartStore()
+  const [visible, setVisible] = useState(false)
 
-  if (!isOpen) return null
+  useEffect(() => {
+    if (isOpen) {
+      setVisible(true)
+    } else {
+      const timer = setTimeout(() => setVisible(false), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
+
+  if (!visible && !isOpen) return null
 
   return (
     <>
-      <div className={styles.overlay} onClick={onClose} />
-      <aside className={styles.drawer}>
+      <div
+        className={`${styles.overlay} ${isOpen ? styles.overlayVisible : styles.overlayHidden}`}
+        onClick={onClose}
+        role="button"
+        aria-label="Close cart"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' || e.key === ' ' ? onClose() : undefined}
+      />
+      <aside className={`${styles.drawer} ${isOpen ? styles.drawerOpen : styles.drawerClosed}`}>
         <div className={styles.header}>
           <span className={styles.title}>Your Cart</span>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close cart">

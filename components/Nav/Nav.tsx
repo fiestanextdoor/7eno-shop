@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
 import Logo from '@/components/Logo/Logo'
@@ -10,7 +11,12 @@ interface NavProps {
 }
 
 export default function Nav({ onCartOpen }: NavProps) {
+  const [mounted, setMounted] = useState(false)
   const itemCount = useCartStore((s) => s.itemCount())
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <nav className={styles.nav}>
@@ -25,7 +31,7 @@ export default function Nav({ onCartOpen }: NavProps) {
             <line x1="3" y1="6" x2="21" y2="6"/>
             <path d="M16 10a4 4 0 0 1-8 0"/>
           </svg>
-          {itemCount > 0 && (
+          {mounted && itemCount > 0 && (
             <span className={styles.cartCount}>{itemCount}</span>
           )}
         </button>
