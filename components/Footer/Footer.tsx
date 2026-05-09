@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { SevenWordmark } from '@/components/Logo/Logo'
+import { LogoWordmark } from '@/components/Logo/Logo'
 import styles from './Footer.module.css'
 
 export default function Footer() {
@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.brand}>
-          <SevenWordmark fg="#F6F3EC" height={28} />
+          <LogoWordmark variant="wit" height={28} />
           <p className={styles.tagline}>Divine Authority</p>
         </div>
         <nav className={styles.navGroup} aria-label="Shop navigation">

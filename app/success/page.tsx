@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Keraunos } from '@/components/Logo/Logo'
+import { LogoBadge } from '@/components/Logo/Logo'
 import { useCartStore } from '@/store/cart'
 import styles from './success.module.css'
 
@@ -19,7 +19,7 @@ function SuccessContent() {
   return (
     <div className={styles.inner}>
       <div className={styles.mark}>
-        <Keraunos fg="#F6F3EC" width={100} />
+        <LogoBadge variant="wit" size={100} />
       </div>
       <h1 className={styles.title}>Order Confirmed</h1>
       <p className={styles.body}>
