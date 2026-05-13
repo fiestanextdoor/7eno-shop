@@ -23,7 +23,8 @@ export function LogoBadge({ variant = 'wit', size = 64, priority = false }: Badg
       <Image
         src={`/logos/beeldmerk-${variant}.png`}
         alt=""
-        fill
+        width={size}
+        height={size}
         style={{ objectFit: 'contain' }}
         priority={priority}
       />
@@ -32,14 +33,14 @@ export function LogoBadge({ variant = 'wit', size = 64, priority = false }: Badg
 }
 
 export function LogoWordmark({ variant = 'wit', height = 36, priority = false }: WordmarkProps) {
-  // Woordmerk aspect ratio is approximately 3.5:1 (width:height)
   const width = Math.round(height * WORDMARK_ASPECT_RATIO)
   return (
     <div className={styles.wrap} style={{ width, height }}>
       <Image
         src={`/logos/woordmerk-${variant}.png`}
         alt="7ENO"
-        fill
+        width={width}
+        height={height}
         style={{ objectFit: 'contain', objectPosition: 'left center' }}
         priority={priority}
       />

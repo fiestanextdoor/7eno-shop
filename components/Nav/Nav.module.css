@@ -1,54 +1,77 @@
-/* components/Nav/Nav.module.css */
-.logoBox {
+.nav {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
-  background: var(--oxblood);
-  padding: 20px 20px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-decoration: none;
+  right: 0;
+  z-index: 200;
+  height: var(--nav-height);
+  background: var(--ink);
+  border-bottom: 1px solid rgba(246, 243, 236, 0.07);
 }
 
-.sub {
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.links {
+  list-style: none;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.link {
   font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 2px;
+  font-size: 0.62rem;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.5);
-  margin-top: 4px;
+  color: rgba(246, 243, 236, 0.6);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: var(--bone);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 4px;
 }
 
 .actions {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 150;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  padding: 16px;
 }
 
 .cartBtn {
   background: none;
   border: 1px solid rgba(246, 243, 236, 0.2);
   color: var(--bone);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
   position: relative;
+  transition: border-color 0.2s;
 }
 
 .cartBtn:hover {
-  border-color: var(--bone);
-  background: rgba(246, 243, 236, 0.08);
+  border-color: rgba(246, 243, 236, 0.6);
 }
 
 .cartBtn:focus-visible {
@@ -58,12 +81,12 @@
 
 .cartCount {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--ink);
+  top: -6px;
+  right: -6px;
+  background: var(--oxblood);
   color: var(--bone);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -73,5 +96,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cartBtn { transition: none; }
+  .link,
+  .cartBtn {
+    transition: none;
+  }
 }

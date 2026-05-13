@@ -20,9 +20,26 @@ function getApiKey(): string {
   return key
 }
 
+function buildHeaders(apiKey: string): Record<string, string> {
+  const headers: Record<string, string> = buildPrintfulHeaders(apiKey)
+  const storeId = process.env.PRINTFUL_STORE_ID
+  if (storeId) headers['X-PF-Store-Id'] = storeId
+  return headers
+}
+
+export async function getStores(): Promise<{ id: number; name: string; type: string }[]> {
+  const res = await fetch(`${PRINTFUL_BASE}/stores`, {
+    headers: buildPrintfulHeaders(getApiKey()),
+    next: { revalidate: 3600 },
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  return data.result ?? []
+}
+
 export async function getProducts(): Promise<SyncProduct[]> {
   const res = await fetch(`${PRINTFUL_BASE}/store/products`, {
-    headers: buildPrintfulHeaders(getApiKey()),
+    headers: buildHeaders(getApiKey()),
     next: { revalidate: 3600 },
   })
   if (!res.ok) throw new Error(`Printful error: ${res.status}`)
@@ -32,7 +49,7 @@ export async function getProducts(): Promise<SyncProduct[]> {
 
 export async function getProduct(id: string): Promise<PrintfulProductDetail> {
   const res = await fetch(`${PRINTFUL_BASE}/store/products/${id}`, {
-    headers: buildPrintfulHeaders(getApiKey()),
+    headers: buildHeaders(getApiKey()),
     next: { revalidate: 3600 },
   })
   if (!res.ok) throw new Error(`Printful error: ${res.status}`)

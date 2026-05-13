@@ -1,72 +1,103 @@
-/* app/shop/shop.module.css */
-.layout {
-  display: flex;
+.page {
   min-height: 100vh;
   background: var(--bone);
+  padding-top: var(--nav-height);
 }
 
-.sidebar {
-  width: 200px;
-  flex-shrink: 0;
+/* ── Header ── */
+.header {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 52px var(--gutter) 36px;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+  margin-bottom: 0;
 }
 
-@media (max-width: 767px) {
-  .sidebar {
-    display: none;
-  }
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
-  padding: 32px 28px;
-  background: var(--bone);
-}
-
-.tabs {
+.headerTop {
   display: flex;
-  gap: 2px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid rgba(17,17,17,0.1);
-  padding-bottom: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
-.tab {
+.headerLabel {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.58rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  margin-bottom: 8px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--stone);
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+
+/* ── Filter tabs ── */
+.filters {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.filter {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stone);
+  padding: 8px 20px;
+  border: 1px solid transparent;
   text-decoration: none;
-  padding: 10px 20px;
-  border-bottom: 2px solid transparent;
   transition: color 0.2s, border-color 0.2s;
-  margin-bottom: -1px;
 }
 
-.tab:hover {
+.filter:hover {
   color: var(--ink);
+  border-color: rgba(17, 17, 17, 0.18);
 }
 
-.tabActive {
-  color: var(--ink);
-  border-bottom-color: var(--oxblood);
+.filter:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
 }
 
-.tabDivider {
-  width: 1px;
-  background: rgba(17,17,17,0.1);
-  margin: 8px 0;
-  align-self: stretch;
+.filterActive {
+  color: var(--bone);
+  background: var(--oxblood);
+  border-color: var(--oxblood);
 }
 
+.filterActive:hover {
+  color: var(--bone);
+  border-color: var(--oxblood);
+}
+
+/* ── Product grid ── */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 3px;
+  padding: 3px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -78,16 +109,32 @@
   }
 }
 
-.empty {
-  grid-column: 1 / -1;
+/* ── Empty state ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 120px var(--gutter);
   text-align: center;
+}
+
+.emptyTitle {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.2rem;
+  font-size: 2rem;
+  font-weight: 600;
   color: var(--stone);
-  padding: 60px 0;
+}
+
+.emptySub {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(138, 130, 117, 0.6);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tab { transition: none; }
+  .filter { transition: none; }
 }

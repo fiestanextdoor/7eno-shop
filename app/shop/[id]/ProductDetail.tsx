@@ -12,6 +12,7 @@ interface ProductDetailProps {
   productName: string
   variants: SyncVariant[]
   previewFile: PrintfulFile | null
+  productThumbnail?: string | null
 }
 
 export default function ProductDetail({
@@ -19,6 +20,7 @@ export default function ProductDetail({
   productName,
   variants,
   previewFile,
+  productThumbnail,
 }: ProductDetailProps) {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
     variants.length === 1 ? variants[0].id : null
@@ -46,66 +48,142 @@ export default function ProductDetail({
 
   useEffect(() => {
     if (!added) return
-    const id = setTimeout(() => setAdded(false), 2000)
-    return () => clearTimeout(id)
+    const t = setTimeout(() => setAdded(false), 2200)
+    return () => clearTimeout(t)
   }, [added])
 
-  const imageUrl = previewFile?.preview_url ?? previewFile?.url ?? null
+  // Gebruik preview_url van het bestand, dan thumbnail van het product als fallback
+  const imageUrl =
+    previewFile?.preview_url ??
+    previewFile?.url ??
+    productThumbnail ??
+    null
+
+  // Manual stores tracken geen voorraad — als alle varianten in_stock: false zijn,
+  // behandel ze als beschikbaar (anders zijn alle maten disabled)
+  const allOutOfStock = variants.every((v) => v.in_stock === false)
+  const isAvailable = (v: SyncVariant) => allOutOfStock ? true : v.in_stock !== false
+
+  const uniqueSizes = Array.from(
+    new Map(variants.map((v) => [v.size || v.name, v])).values()
+  )
+
+  const currency = variants[0]?.currency ?? 'EUR'
+  const currencySymbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency
 
   return (
     <div className={styles.inner}>
-      <div>
+
+      {/* ── Left: image ── */}
+      <div className={styles.imagePanel}>
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={productName}
-            width={600}
-            height={600}
+            fill
             className={styles.mainImg}
             priority
+            sizes="(max-width: 900px) 100vw, 55vw"
           />
         ) : (
           <div className={styles.imgPlaceholder} />
         )}
       </div>
 
-      <div className={styles.info}>
-        <p className={styles.breadcrumb}>
-          <Link href="/shop">Shop</Link> / {productName}
-        </p>
+      {/* ── Right: info ── */}
+      <div className={styles.infoPanel}>
 
+        {/* Breadcrumb */}
+        <div className={styles.breadcrumb}>
+          <Link href="/shop" className={styles.backLink}>
+            ← Shop
+          </Link>
+          <span className={styles.breadcrumbSep}>/</span>
+          <span className={styles.breadcrumbCurrent}>{productName}</span>
+        </div>
+
+        {/* Name */}
+        <p className={styles.label}>7ENO Collection</p>
         <h1 className={styles.name}>{productName}</h1>
+        <div className={styles.divider} />
 
-        {selectedVariant && (
-          <p className={styles.price}>€{selectedVariant.retail_price}</p>
-        )}
+        {/* Price */}
+        <div className={styles.priceRow}>
+          <span className={styles.price}>
+            {selectedVariant
+              ? `${currencySymbol}${selectedVariant.retail_price}`
+              : `${currencySymbol}${variants[0]?.retail_price ?? '—'}`}
+          </span>
+          <span className={styles.priceNote}>incl. btw</span>
+        </div>
 
-        {variants.length > 1 && (
-          <div>
-            <p className={styles.sizeLabel}>Select Size</p>
+        {/* Sizes */}
+        {uniqueSizes.length > 1 && (
+          <>
+            <div className={styles.sizeLabelRow}>
+              <span className={styles.sizeLabel}>Selecteer maat</span>
+              <span className={styles.sizeCount}>{uniqueSizes.length} maten</span>
+            </div>
             <div className={styles.sizes}>
-              {variants.map((v) => (
+              {uniqueSizes.map((v) => (
                 <button
                   key={v.id}
-                  className={`${styles.sizeBtn} ${selectedVariantId === v.id ? styles.selected : ''}`}
-                  onClick={() => setSelectedVariantId(v.id)}
+                  className={[
+                    styles.sizeBtn,
+                    selectedVariantId === v.id ? styles.selected : '',
+                    !isAvailable(v) ? styles.outOfStock : '',
+                  ].join(' ')}
+                  onClick={() => isAvailable(v) && setSelectedVariantId(v.id)}
                   aria-pressed={selectedVariantId === v.id}
+                  disabled={!isAvailable(v)}
                 >
                   {v.size || v.name}
                 </button>
               ))}
             </div>
-          </div>
+          </>
         )}
 
+        {/* CTA */}
         <button
-          className={`${styles.addBtn} ${added ? styles.added : ''}`}
+          className={[styles.addBtn, added ? styles.added : ''].join(' ')}
           onClick={handleAddToCart}
           disabled={!selectedVariantId}
-          aria-label={added ? 'Added to cart' : 'Add to cart'}
         >
-          {added ? 'Added to Cart' : 'Add to Cart'}
+          {added
+            ? '✓ Toegevoegd aan winkelwagen'
+            : !selectedVariantId
+            ? 'Kies een maat'
+            : 'Toevoegen aan winkelwagen'}
         </button>
+
+        <p className={styles.addHint}>Gratis verzending · Print on demand via Printful</p>
+
+        {/* Details */}
+        <div className={styles.details}>
+          <div className={styles.detailRow}>
+            <span className={styles.detailKey}>Merk</span>
+            <span className={styles.detailVal}>7ENO Clothing</span>
+          </div>
+          <div className={styles.detailRow}>
+            <span className={styles.detailKey}>Collectie</span>
+            <span className={styles.detailVal}>SS 2026</span>
+          </div>
+          <div className={styles.detailRow}>
+            <span className={styles.detailKey}>Levering</span>
+            <span className={styles.detailVal}>5–10 werkdagen</span>
+          </div>
+          <div className={styles.detailRow}>
+            <span className={styles.detailKey}>Productie</span>
+            <span className={styles.detailVal}>Print on demand</span>
+          </div>
+          {variants[0]?.color && (
+            <div className={styles.detailRow}>
+              <span className={styles.detailKey}>Kleur</span>
+              <span className={styles.detailVal}>{variants[0].color}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

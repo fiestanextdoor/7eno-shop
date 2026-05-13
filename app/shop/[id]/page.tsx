@@ -38,10 +38,18 @@ export default async function ProductPage({ params }: Props) {
 
   const { sync_product, sync_variants } = detail!
 
+  // Zoek de beste afbeelding: prefereer een bestand met preview_url (product mockup).
+  // 'default' type bestanden zijn het design artwork, niet de product foto.
+  // Fallback: thumbnail van het product zelf.
+  const allFiles = sync_variants.flatMap((v) => v.files ?? [])
   const previewFile =
-    sync_variants[0]?.files?.find((f) => f.type === 'preview') ??
-    sync_variants[0]?.files?.[0] ??
+    allFiles.find((f) => f.type === 'preview' && f.preview_url) ??
+    allFiles.find((f) => f.preview_url) ??
+    allFiles.find((f) => f.type !== 'default') ??
+    allFiles[0] ??
     null
+
+  const productThumbnail = sync_product.thumbnail_url ?? null
 
   return (
     <main className={styles.page}>
@@ -50,6 +58,7 @@ export default async function ProductPage({ params }: Props) {
         productName={sync_product.name}
         variants={sync_variants}
         previewFile={previewFile}
+        productThumbnail={productThumbnail}
       />
     </main>
   )

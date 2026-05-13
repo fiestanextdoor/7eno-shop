@@ -18,7 +18,13 @@
 
   --nav-height: 64px;
   --max-width: 1280px;
-  --gutter: 24px;
+  --gutter: 32px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 20px;
+  }
 }
 
 html {
@@ -63,13 +69,8 @@ button {
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes keraun-pulse {
-  0%, 100% { opacity: 0.6; }
-  50%       { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

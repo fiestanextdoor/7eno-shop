@@ -1,8 +1,6 @@
-// app/shop/page.tsx
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard/ProductCard'
-import ShopSidebar from '@/components/ShopSidebar/ShopSidebar'
 import { getProducts } from '@/lib/printful'
 import type { SyncProduct } from '@/types/printful'
 import styles from './shop.module.css'
@@ -26,7 +24,6 @@ export default async function ShopPage({ searchParams }: Props) {
     console.error('[Printful] getProducts failed:', err)
   }
 
-  // Filter by gender
   let products = allProducts
   if (gender === 'men') {
     const filtered = allProducts.filter((p) =>
@@ -40,7 +37,6 @@ export default async function ShopPage({ searchParams }: Props) {
     products = filtered.length > 0 ? filtered : allProducts
   }
 
-  // Filter by line
   if (line === 'daily') {
     const filtered = products.filter((p) => p.name.toLowerCase().includes('daily'))
     products = filtered.length > 0 ? filtered : products
@@ -49,49 +45,49 @@ export default async function ShopPage({ searchParams }: Props) {
     products = filtered.length > 0 ? filtered : products
   }
 
-  const genderParam = gender ? `?gender=${gender}` : ''
-  const dailyHref = `/shop?line=daily${gender ? `&gender=${gender}` : ''}`
-  const sportHref = `/shop?line=sport${gender ? `&gender=${gender}` : ''}`
-  const allHref = `/shop${genderParam}`
+  const filters = [
+    { label: 'All',   href: '/shop',                                                  active: !gender && !line },
+    { label: 'Men',   href: '/shop?gender=men',                                       active: gender === 'men' },
+    { label: 'Women', href: '/shop?gender=women',                                     active: gender === 'women' },
+    { label: 'Daily', href: `/shop?line=daily${gender ? `&gender=${gender}` : ''}`,   active: line === 'daily' },
+    { label: 'Sport', href: `/shop?line=sport${gender ? `&gender=${gender}` : ''}`,   active: line === 'sport' },
+  ]
 
   return (
-    <div className={styles.layout}>
-      <div className={styles.sidebar}>
-        <ShopSidebar gender={gender} line={line} />
-      </div>
-
-      <main className={styles.main}>
-        <div className={styles.tabs}>
-          <Link
-            href={allHref}
-            className={!line ? `${styles.tab} ${styles.tabActive}` : styles.tab}
-          >
-            All
-          </Link>
-          <div className={styles.tabDivider} />
-          <Link
-            href={dailyHref}
-            className={line === 'daily' ? `${styles.tab} ${styles.tabActive}` : styles.tab}
-          >
-            7ENO Daily
-          </Link>
-          <div className={styles.tabDivider} />
-          <Link
-            href={sportHref}
-            className={line === 'sport' ? `${styles.tab} ${styles.tabActive}` : styles.tab}
-          >
-            7ENO Sport
-          </Link>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <div className={styles.headerTop}>
+          <div>
+            <p className={styles.headerLabel}>SS 2026</p>
+            <h1 className={styles.title}>The Collection</h1>
+          </div>
+          <span className={styles.count}>{products.length} {products.length === 1 ? 'product' : 'products'}</span>
         </div>
+        <nav className={styles.filters} aria-label="Filter products">
+          {filters.map((f) => (
+            <Link
+              key={f.label}
+              href={f.href}
+              className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}
+            >
+              {f.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
 
+      {products.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>No products yet.</p>
+          <p className={styles.emptySub}>The collection is being assembled. Check back soon.</p>
+        </div>
+      ) : (
         <div className={styles.grid}>
-          {products.length === 0 ? (
-            <p className={styles.empty}>No products found. Check back soon.</p>
-          ) : (
-            products.map((p) => <ProductCard key={p.id} product={p} />)
-          )}
+          {products.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
+          ))}
         </div>
-      </main>
-    </div>
+      )}
+    </main>
   )
 }
