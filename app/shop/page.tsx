@@ -10,12 +10,28 @@ export const metadata: Metadata = {
   description: 'Browse the full 7ENO collection.',
 }
 
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  tees:      ['tee', 't-shirt', 'tshirt', 'shirt'],
+  shorts:    ['short'],
+  swimwear:  ['swim', 'swimwear', 'trunk', 'bikini'],
+  headwear:  ['hat', 'cap', 'beanie', 'headwear', 'bucket'],
+  footwear:  ['sock', 'shoe', 'sneaker', 'footwear', 'sandal'],
+}
+
+function buildHref(params: { gender?: string; line?: string; category?: string }) {
+  const parts: string[] = []
+  if (params.gender)   parts.push(`gender=${params.gender}`)
+  if (params.line)     parts.push(`line=${params.line}`)
+  if (params.category) parts.push(`category=${params.category}`)
+  return `/shop${parts.length ? `?${parts.join('&')}` : ''}`
+}
+
 interface Props {
-  searchParams: Promise<{ gender?: string; line?: string }>
+  searchParams: Promise<{ gender?: string; line?: string; category?: string }>
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { gender = '', line = '' } = await searchParams
+  const { gender = '', line = '', category = '' } = await searchParams
 
   let allProducts: SyncProduct[] = []
   try {
@@ -25,6 +41,7 @@ export default async function ShopPage({ searchParams }: Props) {
   }
 
   let products = allProducts
+
   if (gender === 'men') {
     const filtered = allProducts.filter((p) =>
       p.name.toLowerCase().includes('men') && !p.name.toLowerCase().includes('women')
@@ -45,12 +62,33 @@ export default async function ShopPage({ searchParams }: Props) {
     products = filtered.length > 0 ? filtered : products
   }
 
-  const filters = [
-    { label: 'All',   href: '/shop',                                                  active: !gender && !line },
-    { label: 'Men',   href: '/shop?gender=men',                                       active: gender === 'men' },
-    { label: 'Women', href: '/shop?gender=women',                                     active: gender === 'women' },
-    { label: 'Daily', href: `/shop?line=daily${gender ? `&gender=${gender}` : ''}`,   active: line === 'daily' },
-    { label: 'Sport', href: `/shop?line=sport${gender ? `&gender=${gender}` : ''}`,   active: line === 'sport' },
+  if (category && CATEGORY_KEYWORDS[category]) {
+    const keywords = CATEGORY_KEYWORDS[category]
+    const filtered = products.filter((p) =>
+      keywords.some((kw) => p.name.toLowerCase().includes(kw))
+    )
+    products = filtered.length > 0 ? filtered : products
+  }
+
+  const genderFilters = [
+    { label: 'All',   href: buildHref({ line, category }),                  active: !gender },
+    { label: 'Men',   href: buildHref({ gender: 'men',   line, category }), active: gender === 'men' },
+    { label: 'Women', href: buildHref({ gender: 'women', line, category }), active: gender === 'women' },
+  ]
+
+  const lineFilters = [
+    { label: 'All lines', href: buildHref({ gender, category }),                   active: !line },
+    { label: 'Daily',     href: buildHref({ gender, line: 'daily', category }),    active: line === 'daily' },
+    { label: 'Sport',     href: buildHref({ gender, line: 'sport', category }),    active: line === 'sport' },
+  ]
+
+  const categoryFilters = [
+    { label: 'All',       href: buildHref({ gender, line }),                              active: !category },
+    { label: 'Tees',      href: buildHref({ gender, line, category: 'tees' }),            active: category === 'tees' },
+    { label: 'Shorts',    href: buildHref({ gender, line, category: 'shorts' }),          active: category === 'shorts' },
+    { label: 'Swimwear',  href: buildHref({ gender, line, category: 'swimwear' }),        active: category === 'swimwear' },
+    { label: 'Headwear',  href: buildHref({ gender, line, category: 'headwear' }),        active: category === 'headwear' },
+    { label: 'Footwear',  href: buildHref({ gender, line, category: 'footwear' }),        active: category === 'footwear' },
   ]
 
   return (
@@ -63,17 +101,30 @@ export default async function ShopPage({ searchParams }: Props) {
           </div>
           <span className={styles.count}>{products.length} {products.length === 1 ? 'product' : 'products'}</span>
         </div>
-        <nav className={styles.filters} aria-label="Filter products">
-          {filters.map((f) => (
-            <Link
-              key={f.label}
-              href={f.href}
-              className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}
-            >
-              {f.label}
-            </Link>
-          ))}
-        </nav>
+
+        <div className={styles.filterGroups}>
+          <nav className={styles.filters} aria-label="Filter by gender">
+            {genderFilters.map((f) => (
+              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                {f.label}
+              </Link>
+            ))}
+            <span className={styles.filterDivider} />
+            {lineFilters.map((f) => (
+              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                {f.label}
+              </Link>
+            ))}
+          </nav>
+
+          <nav className={styles.filters} aria-label="Filter by category">
+            {categoryFilters.map((f) => (
+              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                {f.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </header>
 
       {products.length === 0 ? (
