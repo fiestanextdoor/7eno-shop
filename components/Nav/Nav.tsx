@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { LogoWordmark } from '@/components/Logo/Logo'
+import ShopDropdown from '@/components/ShopDropdown/ShopDropdown'
 import { useCartStore } from '@/store/cart'
 import styles from './Nav.module.css'
 
@@ -17,12 +18,12 @@ export default function Nav() {
     <nav className={styles.nav} aria-label="Main navigation">
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="7ENO home">
-          <LogoWordmark variant="wit" height={34} />
+          <LogoWordmark variant="wit" height={44} />
         </Link>
 
-        <ul className={styles.links}>
-          <li><Link href="/shop" className={styles.link}>Shop</Link></li>
-        </ul>
+        <div className={styles.center}>
+          <ShopDropdown />
+        </div>
 
         <div className={styles.actions}>
           <button

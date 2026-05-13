@@ -5,8 +5,8 @@
   right: 0;
   z-index: 200;
   height: var(--nav-height);
-  background: var(--ink);
-  border-bottom: 1px solid rgba(246, 243, 236, 0.07);
+  background: var(--oxblood);
+  border-bottom: 1px solid rgba(246, 243, 236, 0.1);
 }
 
 .inner {
@@ -22,38 +22,24 @@
 .brand {
   display: flex;
   align-items: center;
+  transform: scale(1.55);
+  transform-origin: left center;
 }
 
-.links {
-  list-style: none;
+.center {
   display: flex;
-  gap: 40px;
   align-items: center;
-}
-
-.link {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.6);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.link:hover {
-  color: var(--bone);
-}
-
-.link:focus-visible {
-  outline: 2px solid var(--bone);
-  outline-offset: 4px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .cartBtn {

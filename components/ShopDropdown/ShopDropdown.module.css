@@ -1,0 +1,162 @@
+.wrapper {
+  position: relative;
+}
+
+/* ── Trigger button ── */
+.trigger {
+  background: none;
+  border: none;
+  color: rgba(246, 243, 236, 0.75);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 4px;
+  transition: color 0.2s;
+}
+
+.trigger:hover,
+.trigger[aria-expanded="true"] {
+  color: var(--bone);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 4px;
+}
+
+.caret {
+  font-size: 0.5rem;
+  opacity: 0.6;
+}
+
+/* ── Dropdown panel ── */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  background: var(--oxblood);
+  border: 1px solid rgba(246, 243, 236, 0.1);
+  padding: 36px 40px 40px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 300;
+}
+
+.dropdownOpen {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Two-column grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 40px;
+}
+
+/* ── Column ── */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Gender heading (MEN / WOMEN) */
+.genderLink {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-decoration: none;
+  line-height: 1;
+  margin-bottom: 28px;
+  display: block;
+  transition: opacity 0.15s;
+}
+
+.genderLink:hover {
+  opacity: 0.75;
+}
+
+/* Line group (7ENO Daily / 7ENO Sport) */
+.lineGroup {
+  margin-bottom: 28px;
+}
+
+.lineGroup:last-child {
+  margin-bottom: 0;
+}
+
+/* Line title */
+.lineTitle {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.5);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 12px;
+  transition: color 0.15s;
+}
+
+.lineTitle:hover {
+  color: var(--bone);
+}
+
+/* Sub-item list */
+.itemList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: rgba(246, 243, 236, 0.8);
+  text-decoration: none;
+  display: block;
+  transition: color 0.15s, padding-left 0.15s;
+}
+
+.item:hover {
+  color: var(--bone);
+  padding-left: 6px;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+/* Vertical divider between columns */
+.column:first-child {
+  border-right: 1px solid rgba(246, 243, 236, 0.1);
+  padding-right: 40px;
+}
+
+.column:last-child {
+  padding-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown   { transition: none; }
+  .trigger    { transition: none; }
+  .item       { transition: none; }
+  .lineTitle  { transition: none; }
+  .genderLink { transition: none; }
+}

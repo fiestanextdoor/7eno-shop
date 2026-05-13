@@ -32,10 +32,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <Hero
-        productName={hero?.name ?? null}
-        productImage={hero?.thumbnail_url ?? null}
-      />
+      <Hero />
 
       <Marquee />
 

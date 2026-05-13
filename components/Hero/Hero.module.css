@@ -13,17 +13,23 @@
 .image {
   object-fit: cover;
   object-position: center top;
-  opacity: 0.45;
+  transform: scale(1.12);
+  transform-origin: center top;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to bottom, rgba(17,17,17,0.5) 0%, rgba(17,17,17,0.1) 40%, rgba(17,17,17,0.7) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 17, 17, 0.72) 0%,
+    rgba(17, 17, 17, 0.45) 40%,
+    rgba(17, 17, 17, 0.82) 100%
+  );
   pointer-events: none;
 }
 
+/* Gecentreerde content */
 .content {
   position: relative;
   z-index: 10;
@@ -32,7 +38,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   animation: fadeInUp 1s ease both;
 }
 
@@ -41,7 +47,7 @@
   font-size: 0.62rem;
   letter-spacing: 5px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.6);
+  color: rgba(246, 243, 236, 0.7);
 }
 
 .heading {
@@ -52,38 +58,49 @@
   color: var(--bone);
   line-height: 0.88;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 40px rgba(17, 17, 17, 0.4);
 }
 
 .rule {
   width: 48px;
   height: 1px;
-  background: rgba(246, 243, 236, 0.35);
+  background: rgba(246, 243, 236, 0.4);
 }
 
-.cta {
+/* Man / Woman knoppen naast elkaar */
+.buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.btn {
   display: inline-flex;
   align-items: center;
-  padding: 14px 40px;
-  border: 1px solid rgba(246, 243, 236, 0.4);
+  justify-content: center;
+  min-width: 140px;
+  padding: 15px 36px;
+  background: var(--oxblood);
   color: var(--bone);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 3px;
+  font-size: 0.68rem;
+  letter-spacing: 4px;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.25s, border-color 0.25s;
+  border: 1px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.cta:hover {
-  background: var(--oxblood);
-  border-color: var(--oxblood);
+.btn:hover {
+  background: rgba(92, 26, 27, 0.75);
+  border-color: rgba(246, 243, 236, 0.4);
 }
 
-.cta:focus-visible {
+.btn:focus-visible {
   outline: 2px solid var(--bone);
   outline-offset: 4px;
 }
 
+/* Scroll indicator rechtsonder */
 .scrollHint {
   position: absolute;
   bottom: 32px;
@@ -106,17 +123,17 @@
 .scrollLine {
   width: 1px;
   height: 40px;
-  background: rgba(246, 243, 236, 0.2);
+  background: rgba(246, 243, 236, 0.25);
   animation: scrollPulse 2s ease-in-out infinite;
 }
 
 @keyframes scrollPulse {
-  0%, 100% { opacity: 0.2; transform: scaleY(1); }
-  50%       { opacity: 0.6; transform: scaleY(1.2); }
+  0%, 100% { opacity: 0.25; transform: scaleY(1); }
+  50%       { opacity: 0.7;  transform: scaleY(1.15); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .content { animation: none; }
-  .cta     { transition: none; }
+  .content    { animation: none; }
+  .btn        { transition: none; }
   .scrollLine { animation: none; }
 }
