@@ -23,7 +23,7 @@ function SuccessContent() {
       </div>
       <h1 className={styles.title}>Order Confirmed</h1>
       <p className={styles.body}>
-        Your order has been placed and will be fulfilled by Printful.
+        Your order has been placed successfully.
         You will receive a confirmation email shortly.
       </p>
       {sessionId && (

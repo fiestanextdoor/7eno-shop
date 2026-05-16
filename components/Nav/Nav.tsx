@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { LogoWordmark } from '@/components/Logo/Logo'
 import ShopDropdown from '@/components/ShopDropdown/ShopDropdown'
@@ -10,16 +11,27 @@ import styles from './Nav.module.css'
 
 export default function Nav() {
   const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHome = pathname === '/'
   const itemCount = useCartStore((s) => s.itemCount())
   const openCart = useCartStore((s) => s.openCart)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const visible = !isHome || scrolled
 
   return (
-    <nav className={styles.nav} aria-label="Main navigation">
+    <nav className={`${styles.nav} ${visible ? styles.navVisible : ''}`} aria-label="Main navigation">
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="7ENO home">
-          <LogoWordmark variant="wit" height={44} />
+          <LogoWordmark variant="butter" height={44} />
         </Link>
 
         <div className={styles.center}>

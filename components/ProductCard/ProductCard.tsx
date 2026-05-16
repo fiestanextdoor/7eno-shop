@@ -6,23 +6,26 @@ import styles from './ProductCard.module.css'
 interface ProductCardProps {
   product: SyncProduct
   index?: number
+  imageUrl?: string | null
 }
 
-export default function ProductCard({ product, index = 0 }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, imageUrl }: ProductCardProps) {
   const num = String(index + 1).padStart(2, '0')
+  const src = imageUrl ?? product.thumbnail_url
 
   return (
     <Link href={`/shop/${product.id}`} className={styles.card}>
 
       {/* Image */}
       <div className={styles.imageWrap}>
-        {product.thumbnail_url ? (
+        {src ? (
           <Image
-            src={product.thumbnail_url}
+            src={src}
             alt={product.name}
             fill
             className={styles.image}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized={!!imageUrl}
           />
         ) : (
           <div className={styles.placeholder} />

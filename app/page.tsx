@@ -1,8 +1,8 @@
 import Hero from '@/components/Hero/Hero'
 import Marquee from '@/components/Marquee/Marquee'
-import ProductCard from '@/components/ProductCard/ProductCard'
-import { getProducts } from '@/lib/printful'
-import type { SyncProduct } from '@/types/printful'
+import LatestDrop from '@/components/LatestDrop/LatestDrop'
+import { getProducts, getProduct } from '@/lib/printful'
+import { removeBackground } from '@/lib/remove-bg'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -13,20 +13,23 @@ export const metadata: Metadata = {
 }
 
 const CATEGORIES = [
-  { num: '01', name: '7ENO Daily', href: '/shop?line=daily' },
-  { num: '02', name: '7ENO Sport', href: '/shop?line=sport' },
+  { num: '01', name: '7ENO Daily', href: '/shop?line=daily', logo: '/logos/7eno-daily.png' },
+  { num: '02', name: '7ENO Sport', href: '/shop?line=sport', logo: '/logos/7eno-sport.png' },
 ]
 
 export default async function HomePage() {
-  let products: SyncProduct[] = []
+  let hero = null
   try {
     const all = await getProducts()
-    products = all.slice(0, 7)
+    hero = all[0] ?? null
   } catch (err) {
     console.error('[Printful] getProducts failed:', err)
   }
 
-  const hero = products[0] ?? null
+  const [heroBgRemoved, heroDetail] = await Promise.all([
+    hero?.thumbnail_url ? removeBackground(hero.thumbnail_url) : Promise.resolve(null),
+    hero ? getProduct(String(hero.id)).catch(() => null) : Promise.resolve(null),
+  ])
 
   return (
     <main>
@@ -34,53 +37,31 @@ export default async function HomePage() {
 
       <Marquee />
 
-      {products.length > 1 && (
-        <section className={styles.featured}>
-          <div className={styles.featuredInner}>
-            <header className={styles.featuredHeader}>
-              <div className={styles.featuredHeadings}>
-                <p className={styles.featuredLabel}>Latest Drops</p>
-                <h2 className={styles.featuredTitle}>The Collection</h2>
-              </div>
-            </header>
-
-            <div className={styles.featuredGrid}>
-              {products.slice(1).map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
-              ))}
-            </div>
-
-            <div className={styles.featuredFooter}>
-              <Link href="/shop" className={styles.viewAll}>
-                View all products
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
       <section className={styles.categoryStrip}>
         <div className={styles.categoryStripInner}>
           {CATEGORIES.map((cat) => (
             <Link key={cat.num} href={cat.href} className={styles.categoryCard}>
               <span className={styles.categoryNum}>{cat.num}</span>
-              <span className={styles.categoryName}>{cat.name}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cat.logo} alt={cat.name} className={styles.categoryLogo} />
               <span className={styles.categoryArrow}>Shop →</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className={styles.manifesto}>
-        <div className={styles.manifestoInner}>
-          <div className={styles.manifestoRule} />
-          <blockquote className={styles.manifestoQuote}>
-            "No gradients. No shadows.<br />No mortals."
-          </blockquote>
-          <p className={styles.manifestoSub}>Divine Authority · MMXXVI</p>
-          <div className={styles.manifestoRule} />
-        </div>
-      </section>
+      {hero && heroDetail && (
+        <section className={styles.latestDrop}>
+          <div className={styles.latestDropInner}>
+            <LatestDrop
+              productId={hero.id}
+              productName={hero.name}
+              imageUrl={heroBgRemoved ?? hero.thumbnail_url}
+              variants={heroDetail.sync_variants}
+            />
+          </div>
+        </section>
+      )}
     </main>
   )
 }

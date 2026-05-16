@@ -2,32 +2,73 @@ import Link from 'next/link'
 import { LogoWordmark } from '@/components/Logo/Logo'
 import styles from './Footer.module.css'
 
+const LINKS = {
+  shop: [
+    { label: 'Men', href: '/shop?gender=men' },
+    { label: 'Women', href: '/shop?gender=women' },
+    { label: '7ENO Daily', href: '/shop?line=daily' },
+    { label: '7ENO Sport', href: '/shop?line=sport' },
+  ],
+  account: [
+    { label: 'Inloggen', href: '/account/login' },
+    { label: 'Registreren', href: '/account/register' },
+    { label: 'Bestellingen', href: '/account/orders' },
+    { label: 'Profiel', href: '/account/profile' },
+  ],
+  info: [
+    { label: 'Contact', href: 'mailto:info@7eno.nl' },
+  ],
+}
+
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={styles.inner}>
-        <div className={styles.brand}>
-          <LogoWordmark variant="wit" height={28} />
-          <p className={styles.tagline}>Divine Authority</p>
-        </div>
-        <nav className={styles.navGroup} aria-label="Shop navigation">
-          <h4 className={styles.navTitle}>Shop</h4>
-          <ul className={styles.navList}>
-            <li><Link href="/shop" className={styles.navLink}>All Products</Link></li>
-            <li><Link href="/shop?gender=men" className={styles.navLink}>Men</Link></li>
-            <li><Link href="/shop?gender=women" className={styles.navLink}>Women</Link></li>
-          </ul>
-        </nav>
-        <nav className={styles.navGroup} aria-label="Info navigation">
-          <h4 className={styles.navTitle}>Info</h4>
-          <ul className={styles.navList}>
-            <li><a href="mailto:info@7eno.nl" className={styles.navLink}>Contact</a></li>
-          </ul>
-        </nav>
+      {/* Top: wordmark centered */}
+      <div className={styles.top}>
+        <Link href="/" aria-label="7ENO home">
+          <LogoWordmark variant="butter" height={36} />
+        </Link>
+        <p className={styles.tagline}>Divine Authority · MMXXVI</p>
       </div>
+
+      {/* Links grid */}
+      <div className={styles.grid}>
+        <div className={styles.col}>
+          <p className={styles.colTitle}>Shop</p>
+          <ul className={styles.list}>
+            {LINKS.shop.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className={styles.link}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.col}>
+          <p className={styles.colTitle}>Account</p>
+          <ul className={styles.list}>
+            {LINKS.account.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className={styles.link}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.col}>
+          <p className={styles.colTitle}>Info</p>
+          <ul className={styles.list}>
+            {LINKS.info.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className={styles.link}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
       <div className={styles.bottom}>
-        <span className={styles.copy}>© 2026 7ENO. Fulfilled by Printful.</span>
-        <span className={styles.copy}>Divine Authority · MMXXVI</span>
+        <span className={styles.copy}>© 2026 7ENO.</span>
+        <span className={styles.copy}>Alle rechten voorbehouden.</span>
       </div>
     </footer>
   )

@@ -89,10 +89,10 @@
 
 /* ── Category strip (oxblood) ── */
 .categoryStrip {
-  background: var(--ink);
+  background: var(--bone);
   padding: 64px var(--gutter);
-  border-top: 1px solid rgba(246, 243, 236, 0.06);
-  border-bottom: 1px solid rgba(246, 243, 236, 0.06);
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .categoryStripInner {
@@ -104,26 +104,30 @@
 }
 
 .categoryCard {
-  background: var(--stone);
-  padding: 32px 28px;
+  background: var(--bone);
+  padding: 40px 36px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   text-decoration: none;
   color: var(--ink);
-  border: 1px solid transparent;
-  transition: background 0.2s, border-color 0.2s;
+  border: 1px solid var(--ink);
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .categoryCard:hover {
-  background: var(--oxblood);
+  background: var(--ink);
   color: var(--bone);
-  border-color: var(--oxblood);
+  border-color: var(--ink);
 }
 
 .categoryCard:hover .categoryNum,
 .categoryCard:hover .categoryArrow {
-  color: rgba(246, 243, 236, 0.6);
+  color: rgba(246, 243, 236, 0.5);
+}
+
+.categoryCard:hover .categoryLogo {
+  filter: invert(1);
 }
 
 .categoryCard:focus-visible {
@@ -131,22 +135,21 @@
   outline-offset: 2px;
 }
 
+.categoryLogo {
+  width: 160px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.25s;
+}
+
 .categoryNum {
   font-family: var(--font-mono);
   font-size: 0.55rem;
   letter-spacing: 3px;
-  color: rgba(17, 17, 17, 0.5);
+  color: rgba(17, 17, 17, 0.4);
 }
 
-.categoryName {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.4rem;
-  font-weight: 600;
-  line-height: 1.1;
-  font-variant-numeric: lining-nums;
-  font-feature-settings: "lnum" 1;
-}
 
 .categoryArrow {
   font-family: var(--font-mono);
@@ -157,44 +160,14 @@
   padding-top: 16px;
 }
 
-/* ── Manifesto ── */
-.manifesto {
+/* ── Latest Drop ── */
+.latestDrop {
   background: var(--oxblood);
-  padding: 100px var(--gutter);
 }
 
-.manifestoInner {
-  max-width: 600px;
+.latestDropInner {
+  max-width: var(--max-width);
   margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-}
-
-.manifestoRule {
-  width: 1px;
-  height: 48px;
-  background: rgba(246, 243, 236, 0.25);
-}
-
-.manifestoQuote {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 600;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  color: var(--bone);
-  line-height: 1.25;
-  quotes: none;
-}
-
-.manifestoSub {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

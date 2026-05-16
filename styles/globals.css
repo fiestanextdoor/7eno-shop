@@ -17,7 +17,7 @@
   --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
   --font-mono:  'Space Mono', ui-monospace, monospace;
 
-  --nav-height: 104px;
+  --nav-height: 110px;
   --max-width: 1280px;
   --gutter: 32px;
 }
@@ -31,6 +31,7 @@
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
 body {

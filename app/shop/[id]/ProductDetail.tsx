@@ -157,7 +157,6 @@ export default function ProductDetail({
             : 'Toevoegen aan winkelwagen'}
         </button>
 
-        <p className={styles.addHint}>Gratis verzending · Print on demand via Printful</p>
 
         {/* Details */}
         <div className={styles.details}>
@@ -173,10 +172,7 @@ export default function ProductDetail({
             <span className={styles.detailKey}>Levering</span>
             <span className={styles.detailVal}>5–10 werkdagen</span>
           </div>
-          <div className={styles.detailRow}>
-            <span className={styles.detailKey}>Productie</span>
-            <span className={styles.detailVal}>Print on demand</span>
-          </div>
+
           {variants[0]?.color && (
             <div className={styles.detailRow}>
               <span className={styles.detailKey}>Kleur</span>

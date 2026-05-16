@@ -10,11 +10,23 @@
   overflow: hidden;
 }
 
-.image {
-  object-fit: cover;
-  object-position: center top;
-  transform: scale(1.12);
-  transform-origin: center top;
+.videoWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 177.78vh; /* 16:9 ratio */
+  height: 100%;
+  min-width: 100%;
+  min-height: 56.25vw; /* 16:9 ratio */
+  transform: translate(-50%, -50%);
+  border: none;
 }
 
 .overlay {
@@ -22,9 +34,9 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(17, 17, 17, 0.72) 0%,
-    rgba(17, 17, 17, 0.45) 40%,
-    rgba(17, 17, 17, 0.82) 100%
+    rgba(17, 17, 17, 0.35) 0%,
+    rgba(17, 17, 17, 0.15) 40%,
+    rgba(17, 17, 17, 0.45) 100%
   );
   pointer-events: none;
 }
@@ -38,7 +50,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  gap: 16px;
   animation: fadeInUp 1s ease both;
 }
 
@@ -48,6 +60,8 @@
   letter-spacing: 5px;
   text-transform: uppercase;
   color: rgba(246, 243, 236, 0.7);
+  text-shadow: 0 1px 12px rgba(17, 17, 17, 0.9);
+  margin-bottom: 16px;
 }
 
 .heading {
@@ -58,7 +72,9 @@
   color: var(--bone);
   line-height: 0.88;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 40px rgba(17, 17, 17, 0.4);
+  text-shadow:
+    0 2px 20px rgba(17, 17, 17, 0.5),
+    0 4px 40px rgba(17, 17, 17, 0.3);
 }
 
 /* Staggered bars — 3 verticale afgeronde balken op verschillende hoogte */

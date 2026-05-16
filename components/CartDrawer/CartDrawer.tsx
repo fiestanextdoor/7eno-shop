@@ -13,19 +13,6 @@ export default function CartDrawer() {
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const total = useCartStore((s) => s.total())
 
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    if (isOpen) {
-      setVisible(true)
-    } else {
-      const t = setTimeout(() => setVisible(false), 300)
-      return () => clearTimeout(t)
-    }
-  }, [isOpen])
-
-  if (!visible && !isOpen) return null
-
   return (
     <>
       <div
@@ -39,6 +26,7 @@ export default function CartDrawer() {
       <aside
         className={isOpen ? styles.drawerOpen : styles.drawerClosed}
         aria-label="Shopping cart"
+        aria-hidden={!isOpen}
       >
         <div className={styles.header}>
           <h2 className={styles.title}>Cart</h2>

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import styles from './Logo.module.css'
 
-type Variant = 'wit' | 'zwart'
+type Variant = 'wit' | 'zwart' | 'butter' | 'ink' | 'blood' | 'stone'
 
 const WORDMARK_ASPECT_RATIO = 3.5
 

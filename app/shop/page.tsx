@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import { getProducts } from '@/lib/printful'
+import { removeBackground } from '@/lib/remove-bg'
 import type { SyncProduct } from '@/types/printful'
 import styles from './shop.module.css'
 
@@ -69,6 +70,13 @@ export default async function ShopPage({ searchParams }: Props) {
     )
     products = filtered.length > 0 ? filtered : products
   }
+
+  // Remove.bg parallel op alle gefilterde producten
+  const bgRemovedUrls = await Promise.all(
+    products.map((p) =>
+      p.thumbnail_url ? removeBackground(p.thumbnail_url) : Promise.resolve(null)
+    )
+  )
 
   const genderFilters = [
     { label: 'All',   href: buildHref({ line, category }),                  active: !gender },
@@ -146,7 +154,7 @@ export default async function ShopPage({ searchParams }: Props) {
       ) : (
         <div className={styles.grid}>
           {products.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
+            <ProductCard key={p.id} product={p} index={i} imageUrl={bgRemovedUrls[i]} />
           ))}
         </div>
       )}

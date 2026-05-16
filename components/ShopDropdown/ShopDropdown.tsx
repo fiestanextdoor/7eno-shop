@@ -4,29 +4,36 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import styles from './ShopDropdown.module.css'
 
-const ITEMS = ['Tees', 'Shorts', 'Swimwear', 'Headwear', 'Footwear']
-
-const MENU = [
+const LINES = [
   {
-    gender: 'Men',
-    genderHref: '/shop?gender=men',
-    lines: [
-      { name: '7ENO Daily', href: '/shop?gender=men&line=daily' },
-      { name: '7ENO Sport', href: '/shop?gender=men&line=sport' },
-    ],
+    id: 'men-daily',
+    label: 'Men Daily',
+    href: '/shop?gender=men&line=daily',
+    items: ['Tees', 'Shorts', 'Swimwear', 'Headwear', 'Footwear'],
   },
   {
-    gender: 'Women',
-    genderHref: '/shop?gender=women',
-    lines: [
-      { name: '7ENO Daily', href: '/shop?gender=women&line=daily' },
-      { name: '7ENO Sport', href: '/shop?gender=women&line=sport' },
-    ],
+    id: 'men-sport',
+    label: 'Men Sport',
+    href: '/shop?gender=men&line=sport',
+    items: ['Tees', 'Shorts'],
+  },
+  {
+    id: 'women-daily',
+    label: 'Women Daily',
+    href: '/shop?gender=women&line=daily',
+    items: ['Tees', 'Shorts', 'Swimwear', 'Headwear', 'Footwear'],
+  },
+  {
+    id: 'women-sport',
+    label: 'Women Sport',
+    href: '/shop?gender=women&line=sport',
+    items: ['Tees', 'Shorts'],
   },
 ]
 
 export default function ShopDropdown() {
   const [open, setOpen] = useState(false)
+  const [activeLine, setActiveLine] = useState<string | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleEnter = () => {
@@ -35,10 +42,18 @@ export default function ShopDropdown() {
   }
 
   const handleLeave = () => {
-    closeTimer.current = setTimeout(() => setOpen(false), 120)
+    closeTimer.current = setTimeout(() => {
+      setOpen(false)
+      setActiveLine(null)
+    }, 120)
   }
 
-  const close = () => setOpen(false)
+  const close = () => {
+    setOpen(false)
+    setActiveLine(null)
+  }
+
+  const activeLineData = LINES.find((l) => l.id === activeLine)
 
   return (
     <div
@@ -59,31 +74,45 @@ export default function ShopDropdown() {
         className={`${styles.dropdown} ${open ? styles.dropdownOpen : ''}`}
         role="menu"
       >
-        <div className={styles.grid}>
-          {MENU.map((section) => (
-            <div key={section.gender} className={styles.column}>
-              <Link href={section.genderHref} className={styles.genderLink} onClick={close}>
-                {section.gender}
-              </Link>
+        {/* Row 1: Gender links */}
+        <div className={styles.genderRow}>
+          <Link href="/shop?gender=men" className={styles.genderLink} onClick={close}>
+            Men
+          </Link>
+          <span className={styles.genderDivider} aria-hidden="true" />
+          <Link href="/shop?gender=women" className={styles.genderLink} onClick={close}>
+            Women
+          </Link>
+        </div>
 
-              {section.lines.map((line) => (
-                <div key={line.name} className={styles.lineGroup}>
-                  <Link href={line.href} className={styles.lineTitle} onClick={close}>
-                    {line.name}
-                  </Link>
-                  <ul className={styles.itemList}>
-                    {ITEMS.map((item) => (
-                      <li key={item}>
-                        <Link href={line.href} className={styles.item} onClick={close}>
-                          {item}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+        {/* Row 2: 4 line tiles */}
+        <div className={styles.tilesRow}>
+          {LINES.map((line) => (
+            <button
+              key={line.id}
+              className={`${styles.tile} ${activeLine === line.id ? styles.tileActive : ''}`}
+              onMouseEnter={() => setActiveLine(line.id)}
+              onClick={() => setActiveLine(activeLine === line.id ? null : line.id)}
+            >
+              {line.label}
+            </button>
           ))}
+        </div>
+
+        {/* Row 3: Subcategories */}
+        <div className={`${styles.subRow} ${activeLineData ? styles.subRowVisible : ''}`}>
+          {activeLineData
+            ? activeLineData.items.map((item) => (
+                <Link
+                  key={item}
+                  href={`${activeLineData.href}&category=${item.toLowerCase()}`}
+                  className={styles.subItem}
+                  onClick={close}
+                >
+                  {item}
+                </Link>
+              ))
+            : null}
         </div>
       </div>
     </div>

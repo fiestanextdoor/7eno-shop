@@ -1,18 +1,17 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import styles from './Hero.module.css'
 
 export default function Hero() {
   return (
     <section className={styles.hero}>
-      <Image
-        src="/hero-model.png"
-        alt="7ENO — Divine Authority"
-        fill
-        className={styles.image}
-        priority
-        sizes="100vw"
-      />
+      <div className={styles.videoWrap} aria-hidden="true">
+        <iframe
+          src="https://player.vimeo.com/video/1192830777?background=1&autoplay=1&loop=1&muted=1&playsinline=1"
+          className={styles.video}
+          allow="autoplay; fullscreen"
+          title=""
+        />
+      </div>
       <div className={styles.overlay} />
 
       <div className={styles.content}>
@@ -20,11 +19,6 @@ export default function Hero() {
         <h1 className={styles.heading}>
           Divine<br />Authority
         </h1>
-        <div className={styles.bars} aria-hidden="true">
-          <span className={`${styles.bar} ${styles.barA}`} />
-          <span className={`${styles.bar} ${styles.barB}`} />
-          <span className={`${styles.bar} ${styles.barC}`} />
-        </div>
         <div className={styles.buttons}>
           <Link href="/shop?gender=men" className={styles.btn}>
             Men

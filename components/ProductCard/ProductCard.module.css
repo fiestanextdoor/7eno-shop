@@ -12,12 +12,12 @@
   outline-offset: 3px;
 }
 
-/* ── Image area (dark bg so cream products pop) ── */
+/* ── Image area ── */
 .imageWrap {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: #1a1814;
+  background: var(--oxblood);
 }
 
 .image {
@@ -34,7 +34,7 @@
 .placeholder {
   position: absolute;
   inset: 0;
-  background: #1a1814;
+  background: var(--oxblood);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +67,7 @@
   left: 0;
   right: 0;
   padding: 14px 16px;
-  background: var(--oxblood);
+  background: var(--bone);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -85,24 +85,24 @@
   font-size: 0.58rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--bone);
+  color: var(--ink);
 }
 
 .hoverArrow {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: rgba(246, 243, 236, 0.7);
+  color: rgba(17, 17, 17, 0.7);
 }
 
 /* ── Info strip below image ── */
 .info {
   padding: 16px 16px 20px;
-  background: var(--ink);
+  background: var(--bone);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  border-top: 1px solid rgba(246, 243, 236, 0.07);
+  border-top: 1px solid rgba(17, 17, 17, 0.07);
 }
 
 .name {
@@ -110,7 +110,7 @@
   font-style: italic;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--bone);
+  color: var(--ink);
   line-height: 1.2;
   flex: 1;
 }
@@ -120,7 +120,7 @@
   font-size: 0.52rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--stone);
+  color: var(--ink);
   white-space: nowrap;
   flex-shrink: 0;
 }

@@ -1,11 +1,17 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import Nav from '@/components/Nav/Nav'
 import CartDrawer from '@/components/CartDrawer/CartDrawer'
 import Footer from '@/components/Footer/Footer'
 import StoreHydration from '@/components/StoreHydration/StoreHydration'
 
+const HIDE_FOOTER = ['/account/login', '/account/register']
+
 export default function CartProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const showFooter = !HIDE_FOOTER.some((p) => pathname.startsWith(p))
+
   return (
     <>
       <StoreHydration />
@@ -15,7 +21,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
         <div style={{ flex: 1 }}>
           {children}
         </div>
-        <Footer />
+        {showFooter && <Footer />}
       </div>
     </>
   )
