@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
           product_data: {
             name: item.productName,
             description: item.variantName,
-            ...(item.imageUrl ? { images: [item.imageUrl] } : {}),
+            ...(item.imageUrl && item.imageUrl.startsWith('http') ? { images: [item.imageUrl] } : {}),
           },
           unit_amount: Math.round(parseFloat(item.price) * 100),
         },
