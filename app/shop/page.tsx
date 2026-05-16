@@ -102,28 +102,39 @@ export default async function ShopPage({ searchParams }: Props) {
           <span className={styles.count}>{products.length} {products.length === 1 ? 'product' : 'products'}</span>
         </div>
 
-        <div className={styles.filterGroups}>
-          <nav className={styles.filters} aria-label="Filter by gender">
-            {genderFilters.map((f) => (
-              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                {f.label}
-              </Link>
-            ))}
-            <span className={styles.filterDivider} />
-            {lineFilters.map((f) => (
-              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                {f.label}
-              </Link>
-            ))}
-          </nav>
+        <div className={styles.filterBar} role="navigation" aria-label="Filters">
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Gender</span>
+            <div className={styles.filterLinks}>
+              {genderFilters.map((f) => (
+                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                  {f.label}
+                </Link>
+              ))}
+            </div>
+          </div>
 
-          <nav className={styles.filters} aria-label="Filter by category">
-            {categoryFilters.map((f) => (
-              <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                {f.label}
-              </Link>
-            ))}
-          </nav>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Line</span>
+            <div className={styles.filterLinks}>
+              {lineFilters.map((f) => (
+                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                  {f.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Category</span>
+            <div className={styles.filterLinks}>
+              {categoryFilters.map((f) => (
+                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
+                  {f.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </header>
 

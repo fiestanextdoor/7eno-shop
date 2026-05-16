@@ -144,6 +144,8 @@
   font-size: 1.4rem;
   font-weight: 600;
   line-height: 1.1;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
 }
 
 .categoryArrow {

@@ -49,43 +49,64 @@
   padding-bottom: 4px;
 }
 
-/* ── Filter tabs ── */
-.filterGroups {
+/* ── Filter bar ── */
+.filterBar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterBar::-webkit-scrollbar {
+  display: none;
+}
+
+.filterGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  flex-shrink: 0;
 }
 
-.filters {
+.filterGroup + .filterGroup {
+  border-left: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.filterGroupLabel {
+  font-family: var(--font-mono);
+  font-size: 0.42rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.3);
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+  white-space: nowrap;
+}
+
+.filterLinks {
   display: flex;
-  gap: 2px;
-  flex-wrap: wrap;
   align-items: center;
-}
-
-.filterDivider {
-  display: inline-block;
-  width: 1px;
-  height: 14px;
-  background: rgba(17, 17, 17, 0.15);
-  margin: 0 10px;
+  gap: 0;
+  padding: 8px 8px;
 }
 
 .filter {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 3px;
+  font-size: 0.55rem;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--stone);
-  padding: 8px 20px;
+  padding: 7px 14px;
   border: 1px solid transparent;
   text-decoration: none;
-  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
 
 .filter:hover {
   color: var(--ink);
-  border-color: rgba(17, 17, 17, 0.18);
+  border-color: rgba(17, 17, 17, 0.15);
 }
 
 .filter:focus-visible {
