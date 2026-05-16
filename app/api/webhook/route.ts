@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createOrder, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
+import { createServiceClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing shipping information' }, { status: 400 })
     }
 
-    let cartItems: { variantId: number; quantity: number }[]
+    let cartItems: { variantId: number; quantity: number; productName?: string; variantName?: string; price?: string }[]
     try {
       cartItems = JSON.parse(session.metadata?.cart ?? '[]')
     } catch {
@@ -66,13 +67,54 @@ export async function POST(req: NextRequest) {
       quantity: i.quantity,
     }))
 
+    let printfulOrderId: string | null = null
     try {
-      await createOrder(recipient, items)
+      const printfulOrder = await createOrder(recipient, items) as unknown as { id?: number | string } | null
+      printfulOrderId = String(printfulOrder?.id ?? '')
       console.log('[Webhook] Printful order created for session', session.id)
     } catch (err) {
       console.error('[Webhook] Printful order creation failed:', err)
-      // Return 500 so Stripe retries the webhook
       return NextResponse.json({ error: 'Printful order creation failed' }, { status: 500 })
+    }
+
+    // Save order to Supabase
+    try {
+      const supabase = await createServiceClient()
+      const userId = session.metadata?.user_id ?? null
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('orders') as any).upsert({
+        user_id: userId,
+        stripe_session_id: session.id,
+        printful_order_id: printfulOrderId,
+        status: 'processing',
+        total_amount: session.amount_total ?? 0,
+        currency: session.currency ?? 'eur',
+        items: cartItems.map((i) => ({
+          variantId: i.variantId,
+          quantity: i.quantity,
+          productName: i.productName ?? '',
+          variantName: i.variantName ?? '',
+        })),
+        shipping_address: {
+          name: recipient.name,
+          line1: recipient.address1,
+          city: recipient.city,
+          postal_code: recipient.zip,
+          country: recipient.country_code,
+        },
+      }, { onConflict: 'stripe_session_id' })
+
+      // Save Stripe customer ID to profile if user is logged in
+      if (userId && session.customer) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from('profiles') as any)
+          .update({ stripe_customer_id: String(session.customer) })
+          .eq('id', userId)
+      }
+    } catch (err) {
+      console.error('[Webhook] Failed to save order to Supabase:', err)
+      // Non-fatal: Printful order was already created
     }
   }
 

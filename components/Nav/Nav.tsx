@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { LogoWordmark } from '@/components/Logo/Logo'
 import ShopDropdown from '@/components/ShopDropdown/ShopDropdown'
+import AccountButton from '@/components/AccountButton/AccountButton'
 import { useCartStore } from '@/store/cart'
 import styles from './Nav.module.css'
 
@@ -26,6 +27,7 @@ export default function Nav() {
         </div>
 
         <div className={styles.actions}>
+          <AccountButton />
           <button
             className={styles.cartBtn}
             onClick={openCart}

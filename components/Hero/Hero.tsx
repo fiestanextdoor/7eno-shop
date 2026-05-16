@@ -16,11 +16,15 @@ export default function Hero() {
       <div className={styles.overlay} />
 
       <div className={styles.content}>
-        <p className={styles.label}>SS 2026 Collection</p>
+        <p className={styles.label}>Immortality is not a gift. It is a refusal</p>
         <h1 className={styles.heading}>
           Divine<br />Authority
         </h1>
-        <div className={styles.rule} />
+        <div className={styles.bars} aria-hidden="true">
+          <span className={`${styles.bar} ${styles.barA}`} />
+          <span className={`${styles.bar} ${styles.barB}`} />
+          <span className={`${styles.bar} ${styles.barC}`} />
+        </div>
         <div className={styles.buttons}>
           <Link href="/shop?gender=men" className={styles.btn}>
             Men

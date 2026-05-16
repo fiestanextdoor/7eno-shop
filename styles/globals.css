@@ -7,6 +7,7 @@
 :root {
   --ink:     #111111;
   --bone:    #F6F3EC;
+  --butter:  #F6F3EC;
   --paper:   #EDE8DD;
   --oxblood: #5C1A1B;
   --stone:   #8A8275;
@@ -16,7 +17,7 @@
   --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
   --font-mono:  'Space Mono', ui-monospace, monospace;
 
-  --nav-height: 64px;
+  --nav-height: 104px;
   --max-width: 1280px;
   --gutter: 32px;
 }
@@ -33,7 +34,7 @@ html {
 }
 
 body {
-  background: var(--bone);
+  background: var(--butter);
   color: var(--ink);
   font-family: var(--font-serif);
   font-size: 1rem;

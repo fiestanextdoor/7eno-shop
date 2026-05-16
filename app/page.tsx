@@ -13,10 +13,8 @@ export const metadata: Metadata = {
 }
 
 const CATEGORIES = [
-  { num: '01', name: 'Men', href: '/shop?gender=men' },
-  { num: '02', name: 'Women', href: '/shop?gender=women' },
-  { num: '03', name: '7ENO Daily', href: '/shop?line=daily' },
-  { num: '04', name: '7ENO Sport', href: '/shop?line=sport' },
+  { num: '01', name: '7ENO Daily', href: '/shop?line=daily' },
+  { num: '02', name: '7ENO Sport', href: '/shop?line=sport' },
 ]
 
 export default async function HomePage() {

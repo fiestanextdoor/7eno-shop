@@ -1,0 +1,145 @@
+.page {
+  max-width: 800px;
+}
+
+.pageTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 40px;
+}
+
+.emptyState {
+  background: var(--ink);
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: var(--bone);
+  margin-bottom: 12px;
+}
+
+.emptySub {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  color: var(--stone);
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orderCard {
+  background: var(--ink);
+  padding: 28px 32px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.orderDate {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--bone);
+  margin-bottom: 4px;
+}
+
+.orderId {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--stone);
+  text-transform: uppercase;
+}
+
+.orderMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.statusBadge {
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+
+.statusDefault {
+  background: rgba(138, 130, 117, 0.2);
+  color: var(--stone);
+}
+
+.statusGreen {
+  background: rgba(34, 100, 55, 0.2);
+  color: #6fcf97;
+}
+
+.statusRed {
+  background: rgba(92, 26, 27, 0.3);
+  color: #eb5757;
+}
+
+.orderTotal {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--bone);
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(246, 243, 236, 0.07);
+}
+
+.orderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.itemName {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.itemVariant {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+.shippingLine {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(246, 243, 236, 0.07);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 1px;
+  color: rgba(246, 243, 236, 0.35);
+}

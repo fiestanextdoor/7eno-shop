@@ -103,27 +103,27 @@
   gap: 2px;
 }
 
-@media (min-width: 640px) {
-  .categoryStripInner {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 .categoryCard {
-  background: rgba(246, 243, 236, 0.04);
+  background: var(--stone);
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   text-decoration: none;
-  color: var(--bone);
-  border: 1px solid rgba(246, 243, 236, 0.07);
+  color: var(--ink);
+  border: 1px solid transparent;
   transition: background 0.2s, border-color 0.2s;
 }
 
 .categoryCard:hover {
   background: var(--oxblood);
+  color: var(--bone);
   border-color: var(--oxblood);
+}
+
+.categoryCard:hover .categoryNum,
+.categoryCard:hover .categoryArrow {
+  color: rgba(246, 243, 236, 0.6);
 }
 
 .categoryCard:focus-visible {
@@ -135,7 +135,7 @@
   font-family: var(--font-mono);
   font-size: 0.55rem;
   letter-spacing: 3px;
-  color: var(--stone);
+  color: rgba(17, 17, 17, 0.5);
 }
 
 .categoryName {
@@ -150,7 +150,7 @@
   font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 2px;
-  color: var(--stone);
+  color: rgba(17, 17, 17, 0.5);
   margin-top: auto;
   padding-top: 16px;
 }

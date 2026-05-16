@@ -1,0 +1,32 @@
+.btn {
+  background: none;
+  border: 1px solid rgba(246, 243, 236, 0.2);
+  color: var(--bone);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.btn:hover {
+  border-color: rgba(246, 243, 236, 0.6);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+.dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6fcf97;
+}

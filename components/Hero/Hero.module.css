@@ -61,16 +61,40 @@
   text-shadow: 0 2px 40px rgba(17, 17, 17, 0.4);
 }
 
-.rule {
-  width: 48px;
-  height: 1px;
-  background: rgba(246, 243, 236, 0.4);
+/* Staggered bars — 3 verticale afgeronde balken op verschillende hoogte */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 72px;
+}
+
+.bar {
+  display: block;
+  width: 6px;
+  border-radius: 3px;
+  background: rgba(138, 130, 117, 0.75);
+}
+
+.barA {
+  height: 64px;
+  align-self: flex-start;
+}
+
+.barB {
+  height: 48px;
+  align-self: center;
+}
+
+.barC {
+  height: 36px;
+  align-self: flex-end;
 }
 
 /* Man / Woman knoppen naast elkaar */
 .buttons {
   display: flex;
-  gap: 3px;
+  gap: 48px;
 }
 
 .btn {
@@ -82,7 +106,7 @@
   background: var(--oxblood);
   color: var(--bone);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   letter-spacing: 4px;
   text-transform: uppercase;
   text-decoration: none;
