@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     console.error('[Auth callback] exchangeCodeForSession failed:', {
       message: error.message,
       status: error.status,
-      code: (error as Record<string, unknown>).code ?? 'n/a',
+      code: (error as unknown as Record<string, unknown>).code ?? 'n/a',
       name: error.name,
     })
     return NextResponse.redirect(
