@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard/ProductCard'
-import { getProducts } from '@/lib/printful'
+import { getProducts, getProduct } from '@/lib/printful'
 import { removeBackground } from '@/lib/remove-bg'
 import type { SyncProduct } from '@/types/printful'
 import styles from './shop.module.css'
@@ -11,12 +11,66 @@ export const metadata: Metadata = {
   description: 'Browse the full 7ENO collection.',
 }
 
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  tees:      ['tee', 't-shirt', 'tshirt', 'shirt'],
-  shorts:    ['short'],
-  swimwear:  ['swim', 'swimwear', 'trunk', 'bikini'],
-  headwear:  ['hat', 'cap', 'beanie', 'headwear', 'bucket'],
-  footwear:  ['sock', 'shoe', 'sneaker', 'footwear', 'sandal'],
+// ── Custom product catalogue (filter by Printful ID) ──────────────────────────
+
+const GENDER_IDS: Record<string, number[]> = {
+  men: [
+    433344927, 433344876, 433344735, 432343313, // Tee Men
+    433345077,                                   // Swim Shorts
+    433345518, 433345476, 433345296,             // Sport Tee Unisex
+    433351405, 433351139, 433350977, 433350867,  // Sport Shorts Unisex
+  ],
+  women: [
+    433345279, 433345190, 433345163, // Tee Women
+    433351920,                        // Bikini
+    433351254,                        // Loafers Women
+  ],
+  unisex: [
+    433345077,                        // Swim Shorts
+    433345518, 433345476, 433345296,  // Sport Tee Unisex
+    433351405, 433351139, 433350977, 433350867, // Sport Shorts Unisex
+  ],
+}
+
+const LINE_IDS: Record<string, number[]> = {
+  // Daily = normal clothing only (no sport, no accessories)
+  daily: [
+    433345279, 433345190, 433345163, // Tee Women
+    433344927, 433344876, 433344735, 432343313, // Tee Men
+    433351920,                        // Bikini
+    433345077,                        // Swim Shorts
+  ],
+  // Sport = sport clothing only (no accessories)
+  sport: [
+    433345518, 433345476, 433345296, // Sport Tee Unisex
+    433351405, 433351139, 433350977, 433350867, // Sport Shorts Unisex
+  ],
+}
+
+const CATEGORY_IDS: Record<string, number[]> = {
+  tees:     [433345279, 433345190, 433345163, 433344927, 433344876, 433344735, 432343313, 433345518, 433345476, 433345296],
+  shorts:   [433351405, 433351139, 433350977, 433350867],
+  swimwear: [433351920, 433345077],
+  headwear: [433354226, 433351639, 433351026],
+  footwear: [433351254],
+}
+
+// Default display order when no line filter is active
+const SORT_PRIORITY: Record<number, number> = {
+  // 1. Normal clothing — Women
+  433345279: 0, 433345190: 1, 433345163: 2,
+  // 1. Normal clothing — Men
+  433344927: 3, 433344876: 4, 433344735: 5, 432343313: 6,
+  // 2. Sportswear
+  433345518: 10, 433345476: 11, 433345296: 12,
+  433351405: 13, 433351139: 14, 433350977: 15, 433350867: 16,
+  // 3. Swimwear
+  433351920: 20, 433345077: 21,
+  // 4. Accessories
+  433354226: 30, 433351639: 31, 433351026: 32,
+  433351254: 33,
+  433344612: 34, // Towel
+  433353836: 40, 433353269: 41, 433352871: 42, 433352744: 43, 433352490: 44,
 }
 
 function buildHref(params: { gender?: string; line?: string; category?: string }) {
@@ -41,47 +95,55 @@ export default async function ShopPage({ searchParams }: Props) {
     console.error('[Printful] getProducts failed:', err)
   }
 
-  let products = allProducts
+  let products = [...allProducts]
 
-  if (gender === 'men') {
-    const filtered = allProducts.filter((p) =>
-      p.name.toLowerCase().includes('men') && !p.name.toLowerCase().includes('women')
-    )
-    products = filtered.length > 0 ? filtered : allProducts
-  } else if (gender === 'women') {
-    const filtered = allProducts.filter((p) =>
-      p.name.toLowerCase().includes('women') || p.name.toLowerCase().includes('unisex')
-    )
-    products = filtered.length > 0 ? filtered : allProducts
+  // 1. Gender filter
+  if (gender && GENDER_IDS[gender]) {
+    const ids = new Set(GENDER_IDS[gender])
+    products = products.filter((p) => ids.has(p.id))
   }
 
-  if (line === 'daily') {
-    const filtered = products.filter((p) => p.name.toLowerCase().includes('daily'))
-    products = filtered.length > 0 ? filtered : products
-  } else if (line === 'sport') {
-    const filtered = products.filter((p) => p.name.toLowerCase().includes('sport'))
-    products = filtered.length > 0 ? filtered : products
+  // 2. Line filter (daily / sport — mutually exclusive, clothing only)
+  if (line && LINE_IDS[line]) {
+    const ids = new Set(LINE_IDS[line])
+    products = products.filter((p) => ids.has(p.id))
   }
 
-  if (category && CATEGORY_KEYWORDS[category]) {
-    const keywords = CATEGORY_KEYWORDS[category]
-    const filtered = products.filter((p) =>
-      keywords.some((kw) => p.name.toLowerCase().includes(kw))
-    )
-    products = filtered.length > 0 ? filtered : products
+  // 3. Category filter
+  if (category && CATEGORY_IDS[category]) {
+    const ids = new Set(CATEGORY_IDS[category])
+    products = products.filter((p) => ids.has(p.id))
   }
 
-  // Remove.bg parallel op alle gefilterde producten
-  const bgRemovedUrls = await Promise.all(
-    products.map((p) =>
-      p.thumbnail_url ? removeBackground(p.thumbnail_url) : Promise.resolve(null)
-    )
+  // 4. Sort: normal clothing → sportswear → swimwear → accessories
+  products.sort((a, b) =>
+    (SORT_PRIORITY[a.id] ?? 99) - (SORT_PRIORITY[b.id] ?? 99)
   )
 
+  // Remove.bg + color count in parallel for all filtered products
+  const [bgRemovedUrls, colorCountMap] = await Promise.all([
+    Promise.all(
+      products.map((p) =>
+        p.thumbnail_url ? removeBackground(p.thumbnail_url) : Promise.resolve(null)
+      )
+    ),
+    Promise.all(
+      products.map((p) =>
+        getProduct(String(p.id))
+          .then(({ sync_variants }) => {
+            const colors = new Set(sync_variants.filter((v) => v.color).map((v) => v.color))
+            return { id: p.id, count: colors.size }
+          })
+          .catch(() => ({ id: p.id, count: 0 }))
+      )
+    ).then((entries) => Object.fromEntries(entries.map((e) => [e.id, e.count]))),
+  ])
+
   const genderFilters = [
-    { label: 'All',   href: buildHref({ line, category }),                  active: !gender },
-    { label: 'Men',   href: buildHref({ gender: 'men',   line, category }), active: gender === 'men' },
-    { label: 'Women', href: buildHref({ gender: 'women', line, category }), active: gender === 'women' },
+    { label: 'All',    href: buildHref({ line, category }),                    active: !gender },
+    { label: 'Men',    href: buildHref({ gender: 'men',    line, category }),  active: gender === 'men' },
+    { label: 'Women',  href: buildHref({ gender: 'women',  line, category }),  active: gender === 'women' },
+    { label: 'Unisex', href: buildHref({ gender: 'unisex', line, category }),  active: gender === 'unisex' },
   ]
 
   const lineFilters = [
@@ -154,7 +216,7 @@ export default async function ShopPage({ searchParams }: Props) {
       ) : (
         <div className={styles.grid}>
           {products.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} imageUrl={bgRemovedUrls[i]} />
+            <ProductCard key={p.id} product={p} index={i} imageUrl={bgRemovedUrls[i]} colorCount={colorCountMap[p.id]} />
           ))}
         </div>
       )}

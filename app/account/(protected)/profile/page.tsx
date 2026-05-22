@@ -6,11 +6,11 @@ import type { Address } from '@/lib/supabase/types'
 import styles from './profile.module.css'
 
 const COUNTRIES = [
-  { code: 'NL', name: 'Nederland' },
-  { code: 'BE', name: 'België' },
-  { code: 'DE', name: 'Duitsland' },
-  { code: 'FR', name: 'Frankrijk' },
-  { code: 'GB', name: 'Verenigd Koninkrijk' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'BE', name: 'Belgium' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'GB', name: 'United Kingdom' },
 ]
 
 export default function ProfilePage() {
@@ -82,7 +82,7 @@ export default function ProfilePage() {
     }
 
     if (err) {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError('Failed to save. Please try again.')
     } else {
       setSaved(true)
     }
@@ -91,47 +91,47 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Profiel & Adres</h1>
+      <h1 className={styles.pageTitle}>Profile & Address</h1>
       <p className={styles.subtitle}>
-        Sla je afleveradres op voor een snellere checkout.
+        Save your delivery address for faster checkout.
       </p>
 
       <form onSubmit={handleSave} className={styles.form}>
         <div className={styles.section}>
-          <p className={styles.sectionLabel}>Afleveradres</p>
+          <p className={styles.sectionLabel}>Delivery address</p>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Volledige naam</label>
-              <input className={styles.input} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Jan Janssen" />
+              <label className={styles.fieldLabel}>Full name</label>
+              <input className={styles.input} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="John Smith" />
             </div>
           </div>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Straat + huisnummer</label>
-              <input className={styles.input} value={line1} onChange={(e) => setLine1(e.target.value)} required placeholder="Keizersgracht 1" />
+              <label className={styles.fieldLabel}>Street address</label>
+              <input className={styles.input} value={line1} onChange={(e) => setLine1(e.target.value)} required placeholder="123 Main St" />
             </div>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Toevoeging (optioneel)</label>
-              <input className={styles.input} value={line2} onChange={(e) => setLine2(e.target.value)} placeholder="App. B" />
+              <label className={styles.fieldLabel}>Apartment, suite, etc. (optional)</label>
+              <input className={styles.input} value={line2} onChange={(e) => setLine2(e.target.value)} placeholder="Apt. B" />
             </div>
           </div>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Postcode</label>
+              <label className={styles.fieldLabel}>Postal code</label>
               <input className={styles.input} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required placeholder="1234 AB" />
             </div>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Stad</label>
+              <label className={styles.fieldLabel}>City</label>
               <input className={styles.input} value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Amsterdam" />
             </div>
           </div>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Land</label>
+              <label className={styles.fieldLabel}>Country</label>
               <select className={styles.input} value={country} onChange={(e) => setCountry(e.target.value)}>
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.name}</option>
@@ -142,10 +142,10 @@ export default function ProfilePage() {
         </div>
 
         {error && <p className={styles.error} role="alert">{error}</p>}
-        {saved && <p className={styles.success}>Adres opgeslagen.</p>}
+        {saved && <p className={styles.success}>Address saved.</p>}
 
         <button type="submit" className={styles.saveBtn} disabled={loading}>
-          {loading ? 'Opslaan...' : 'Adres opslaan'}
+          {loading ? 'Saving...' : 'Save address'}
         </button>
       </form>
     </div>

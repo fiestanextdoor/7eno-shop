@@ -67,7 +67,7 @@ export default function LatestDrop({ productId, productName, imageUrl, variants 
         {/* Sizes */}
         {sizes.length > 0 && (
           <div className={styles.sizeGroup}>
-            <p className={styles.sizeLabel}>Maat</p>
+            <p className={styles.sizeLabel}>Size</p>
             <div className={styles.sizes}>
               {sizes.map((size) => (
                 <button
@@ -84,7 +84,7 @@ export default function LatestDrop({ productId, productName, imageUrl, variants 
 
         {/* Quantity */}
         <div className={styles.qtyGroup}>
-          <p className={styles.sizeLabel}>Aantal</p>
+          <p className={styles.sizeLabel}>Quantity</p>
           <div className={styles.qty}>
             <button
               className={styles.qtyBtn}
@@ -109,7 +109,7 @@ export default function LatestDrop({ productId, productName, imageUrl, variants 
           className={`${styles.addBtn} ${added ? styles.addBtnDone : ''}`}
           onClick={handleAdd}
         >
-          {added ? 'Toegevoegd ✓' : 'Voeg toe aan winkelwagen'}
+          {added ? 'Added ✓' : 'Add to cart'}
         </button>
       </div>
     </div>

@@ -29,8 +29,8 @@ export default async function AccountLayout({ children }: { children: React.Reac
         </div>
         <nav className={styles.sidebarNav}>
           <Link href="/account/dashboard" className={styles.navLink}>Dashboard</Link>
-          <Link href="/account/orders" className={styles.navLink}>Bestellingen</Link>
-          <Link href="/account/profile" className={styles.navLink}>Profiel & Adres</Link>
+          <Link href="/account/orders" className={styles.navLink}>Orders</Link>
+          <Link href="/account/profile" className={styles.navLink}>Profile & Address</Link>
         </nav>
         <AccountLogout />
       </aside>

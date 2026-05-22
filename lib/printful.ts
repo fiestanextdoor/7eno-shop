@@ -38,13 +38,23 @@ export async function getStores(): Promise<{ id: number; name: string; type: str
 }
 
 export async function getProducts(): Promise<SyncProduct[]> {
-  const res = await fetch(`${PRINTFUL_BASE}/store/products`, {
-    headers: buildHeaders(getApiKey()),
-    next: { revalidate: 3600 },
-  })
-  if (!res.ok) throw new Error(`Printful error: ${res.status}`)
-  const data: PrintfulListResponse<SyncProduct> = await res.json()
-  return data.result
+  const limit = 100
+  const all: SyncProduct[] = []
+  let offset = 0
+
+  while (true) {
+    const res = await fetch(
+      `${PRINTFUL_BASE}/store/products?limit=${limit}&offset=${offset}`,
+      { headers: buildHeaders(getApiKey()), next: { revalidate: 3600 } }
+    )
+    if (!res.ok) throw new Error(`Printful error: ${res.status}`)
+    const data: PrintfulListResponse<SyncProduct> = await res.json()
+    all.push(...data.result)
+    if (all.length >= data.paging.total) break
+    offset += limit
+  }
+
+  return all
 }
 
 export async function getProduct(id: string): Promise<PrintfulProductDetail> {
@@ -75,7 +85,7 @@ export interface PrintfulOrderItem {
 export async function createOrder(
   recipient: PrintfulOrderRecipient,
   items: PrintfulOrderItem[]
-): Promise<void> {
+): Promise<{ id: number }> {
   const res = await fetch(`${PRINTFUL_BASE}/orders`, {
     method: 'POST',
     headers: buildPrintfulHeaders(getApiKey()),
@@ -85,4 +95,6 @@ export async function createOrder(
     const err = await res.text()
     throw new Error(`Printful order failed: ${res.status} ${err}`)
   }
+  const data = await res.json()
+  return data.result
 }

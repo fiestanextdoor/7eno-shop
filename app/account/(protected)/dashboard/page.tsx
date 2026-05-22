@@ -5,10 +5,10 @@ import styles from './dashboard.module.css'
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
-    processing: 'In verwerking',
-    fulfilled: 'Verzonden',
-    completed: 'Voltooid',
-    cancelled: 'Geannuleerd',
+    processing: 'Processing',
+    fulfilled: 'Shipped',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
   }
   return map[status] ?? status
 }
@@ -41,16 +41,16 @@ export default async function DashboardPage() {
 
       <div className={styles.grid}>
         <div className={styles.block}>
-          <p className={styles.blockLabel}>Recente bestellingen</p>
+          <p className={styles.blockLabel}>Recent orders</p>
           {recentOrders.length === 0 ? (
-            <p className={styles.empty}>Nog geen bestellingen.</p>
+            <p className={styles.empty}>No orders yet.</p>
           ) : (
             <div className={styles.orderList}>
               {recentOrders.map((order) => (
                 <div key={order.id} className={styles.orderRow}>
                   <div>
                     <p className={styles.orderDate}>
-                      {new Date(order.created_at).toLocaleDateString('nl-NL', {
+                      {new Date(order.created_at).toLocaleDateString('en-GB', {
                         day: 'numeric', month: 'long', year: 'numeric',
                       })}
                     </p>
@@ -64,12 +64,12 @@ export default async function DashboardPage() {
             </div>
           )}
           <Link href="/account/orders" className={styles.blockLink}>
-            Alle bestellingen bekijken
+            View all orders
           </Link>
         </div>
 
         <div className={styles.block}>
-          <p className={styles.blockLabel}>Standaard afleveradres</p>
+          <p className={styles.blockLabel}>Default delivery address</p>
           {address ? (
             <address className={styles.addressBlock}>
               <span>{address.full_name}</span>
@@ -78,17 +78,17 @@ export default async function DashboardPage() {
               <span>{address.country}</span>
             </address>
           ) : (
-            <p className={styles.empty}>Geen adres opgeslagen.</p>
+            <p className={styles.empty}>No address saved.</p>
           )}
           <Link href="/account/profile" className={styles.blockLink}>
-            {address ? 'Adres wijzigen' : 'Adres toevoegen'}
+            {address ? 'Edit address' : 'Add address'}
           </Link>
         </div>
       </div>
 
       <div className={styles.cta}>
         <Link href="/shop" className={styles.ctaBtn}>
-          Shop de collectie
+          Shop the collection
         </Link>
       </div>
     </div>

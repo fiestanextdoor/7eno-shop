@@ -113,16 +113,18 @@
   color: var(--ink);
   line-height: 1.2;
   flex: 1;
+  font-variant-numeric: lining-nums;
 }
 
 .variants {
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--oxblood);
   white-space: nowrap;
   flex-shrink: 0;
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

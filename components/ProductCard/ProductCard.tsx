@@ -7,9 +7,10 @@ interface ProductCardProps {
   product: SyncProduct
   index?: number
   imageUrl?: string | null
+  colorCount?: number
 }
 
-export default function ProductCard({ product, index = 0, imageUrl }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, imageUrl, colorCount }: ProductCardProps) {
   const num = String(index + 1).padStart(2, '0')
   const src = imageUrl ?? product.thumbnail_url
 
@@ -44,9 +45,11 @@ export default function ProductCard({ product, index = 0, imageUrl }: ProductCar
       {/* Info */}
       <div className={styles.info}>
         <p className={styles.name}>{product.name}</p>
-        <p className={styles.variants}>
-          {product.variants} {product.variants === 1 ? 'variant' : 'variants'}
-        </p>
+        {colorCount !== undefined && colorCount > 0 && (
+          <p className={styles.variants}>
+            {colorCount} {colorCount === 1 ? 'variant' : 'variants'}
+          </p>
+        )}
       </div>
     </Link>
   )

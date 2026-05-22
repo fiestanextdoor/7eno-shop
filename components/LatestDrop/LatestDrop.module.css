@@ -60,6 +60,7 @@
   color: var(--bone);
   line-height: 1.05;
   margin-bottom: 12px;
+  font-variant-numeric: lining-nums;
 }
 
 /* Price */

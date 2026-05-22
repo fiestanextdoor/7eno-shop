@@ -141,6 +141,7 @@
   color: var(--ink);
   line-height: 1.05;
   margin-bottom: 24px;
+  font-variant-numeric: lining-nums;
 }
 
 /* ── Divider ── */
@@ -197,6 +198,33 @@
   color: rgba(138, 130, 117, 0.6);
 }
 
+.colorSwatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.colorSwatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  outline: 2px solid rgba(17, 17, 17, 0.15);
+  outline-offset: 3px;
+  transition: outline-color 0.15s;
+}
+
+.colorSwatch:hover {
+  outline-color: var(--ink);
+}
+
+.colorSwatchSelected {
+  outline-color: var(--ink);
+  outline-width: 2px;
+}
+
 .sizes {
   display: flex;
   flex-wrap: wrap;
@@ -220,7 +248,8 @@
 }
 
 .sizeBtn:hover {
-  border-color: var(--ink);
+  border-color: var(--oxblood);
+  color: var(--oxblood);
 }
 
 .sizeBtn.selected {
@@ -316,6 +345,11 @@
   font-size: 0.6rem;
   letter-spacing: 1px;
   color: var(--ink);
+}
+
+.detailValAccent {
+  color: var(--oxblood);
+  letter-spacing: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

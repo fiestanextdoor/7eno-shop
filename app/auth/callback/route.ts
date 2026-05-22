@@ -27,11 +27,19 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
   if (error) {
-    console.error('[Auth callback]', error.message)
-    return NextResponse.redirect(`${origin}/account/login?error=auth_failed`)
+    console.error('[Auth callback] exchangeCodeForSession failed:', {
+      message: error.message,
+      status: error.status,
+      code: (error as Record<string, unknown>).code ?? 'n/a',
+      name: error.name,
+    })
+    return NextResponse.redirect(
+      `${origin}/account/login?error=auth_failed&reason=${encodeURIComponent(error.message)}`
+    )
   }
 
+  console.log('[Auth callback] success, user:', data.user?.email)
   return NextResponse.redirect(`${origin}${next}`)
 }

@@ -4,10 +4,10 @@ import styles from './orders.module.css'
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
-    processing: 'In verwerking',
-    fulfilled: 'Verzonden',
-    completed: 'Voltooid',
-    cancelled: 'Geannuleerd',
+    processing: 'Processing',
+    fulfilled: 'Shipped',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
   }
   return map[status] ?? status
 }
@@ -32,12 +32,12 @@ export default async function OrdersPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Bestellingen</h1>
+      <h1 className={styles.pageTitle}>Orders</h1>
 
       {orders.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyTitle}>Nog geen bestellingen</p>
-          <p className={styles.emptySub}>Jouw bestellingen verschijnen hier zodra je iets hebt besteld.</p>
+          <p className={styles.emptyTitle}>No orders yet</p>
+          <p className={styles.emptySub}>Your orders will appear here once you place one.</p>
         </div>
       ) : (
         <div className={styles.list}>
@@ -50,7 +50,7 @@ export default async function OrdersPage() {
                 <div className={styles.orderHeader}>
                   <div>
                     <p className={styles.orderDate}>
-                      {new Date(order.created_at).toLocaleDateString('nl-NL', {
+                      {new Date(order.created_at).toLocaleDateString('en-GB', {
                         day: 'numeric', month: 'long', year: 'numeric',
                       })}
                     </p>
@@ -77,7 +77,7 @@ export default async function OrdersPage() {
 
                 {shipping && (
                   <p className={styles.shippingLine}>
-                    Afleveradres: {shipping.name}, {shipping.line1}, {shipping.postal_code} {shipping.city}
+                    Delivery address: {shipping.name}, {shipping.line1}, {shipping.postal_code} {shipping.city}
                   </p>
                 )}
               </div>

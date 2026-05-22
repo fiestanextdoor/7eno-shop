@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     if (password.length < 8) {
-      setError('Wachtwoord moet minimaal 8 tekens bevatten.')
+      setError('Password must be at least 8 characters.')
       return
     }
     setLoading(true)
@@ -56,9 +56,9 @@ export default function RegisterPage() {
       <div className={styles.page}>
         <div className={styles.card}>
           <p className={styles.brand}>7ENO</p>
-          <h1 className={styles.title}>Bevestig je e-mail</h1>
+          <h1 className={styles.title}>Confirm your email</h1>
           <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--stone)', lineHeight: 1.6 }}>
-            We hebben een bevestigingslink gestuurd naar <strong>{email}</strong>. Klik op de link om je account te activeren.
+            We sent a confirmation link to <strong>{email}</strong>. Click the link to activate your account.
           </p>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function RegisterPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <p className={styles.brand}>7ENO</p>
-        <h1 className={styles.title}>Registreren</h1>
+        <h1 className={styles.title}>Register</h1>
 
         <button type="button" className={styles.googleBtn} onClick={handleGoogle}>
           <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,13 +78,13 @@ export default function RegisterPage() {
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          Doorgaan met Google
+          Continue with Google
         </button>
 
-        <div className={styles.divider}><span>of</span></div>
+        <div className={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleRegister} className={styles.form}>
-          <label className={styles.fieldLabel}>Volledige naam</label>
+          <label className={styles.fieldLabel}>Full name</label>
           <input
             type="text"
             className={styles.input}
@@ -92,10 +92,10 @@ export default function RegisterPage() {
             onChange={(e) => setFullName(e.target.value)}
             required
             autoComplete="name"
-            placeholder="Jan Janssen"
+            placeholder="John Smith"
           />
 
-          <label className={styles.fieldLabel}>E-mailadres</label>
+          <label className={styles.fieldLabel}>Email address</label>
           <input
             type="email"
             className={styles.input}
@@ -103,10 +103,10 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            placeholder="jij@voorbeeld.nl"
+            placeholder="you@example.com"
           />
 
-          <label className={styles.fieldLabel}>Wachtwoord</label>
+          <label className={styles.fieldLabel}>Password</label>
           <input
             type="password"
             className={styles.input}
@@ -114,19 +114,19 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="new-password"
-            placeholder="Minimaal 8 tekens"
+            placeholder="At least 8 characters"
           />
 
           {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? 'Bezig...' : 'Account aanmaken'}
+            {loading ? 'Loading...' : 'Create account'}
           </button>
         </form>
 
         <p className={styles.switchLink}>
-          Al een account?{' '}
-          <Link href="/account/login">Inloggen</Link>
+          Already have an account?{' '}
+          <Link href="/account/login">Sign in</Link>
         </p>
       </div>
     </div>

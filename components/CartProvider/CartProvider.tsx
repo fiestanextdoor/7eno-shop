@@ -6,16 +6,18 @@ import CartDrawer from '@/components/CartDrawer/CartDrawer'
 import Footer from '@/components/Footer/Footer'
 import StoreHydration from '@/components/StoreHydration/StoreHydration'
 
-const HIDE_FOOTER = ['/account/login', '/account/register']
+const HIDE_CHROME = ['/', '/account/login', '/account/register']
 
 export default function CartProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const showFooter = !HIDE_FOOTER.some((p) => pathname.startsWith(p))
+  const hideChrome = pathname === '/' || HIDE_CHROME.some((p) => p !== '/' && pathname.startsWith(p))
+  const showNav = !hideChrome
+  const showFooter = !hideChrome
 
   return (
     <>
       <StoreHydration />
-      <Nav />
+      {showNav && <Nav />}
       <CartDrawer />
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ flex: 1 }}>

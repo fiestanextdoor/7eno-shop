@@ -16,7 +16,7 @@ export default function AccountLogout() {
 
   return (
     <button className={styles.logoutBtn} onClick={handleLogout}>
-      Uitloggen
+      Sign out
     </button>
   )
 }

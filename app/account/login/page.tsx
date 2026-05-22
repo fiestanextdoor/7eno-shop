@@ -16,7 +16,7 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(
-    errorParam === 'auth_failed' ? 'Inloggen mislukt. Probeer opnieuw.' : null
+    errorParam === 'auth_failed' ? 'Login failed. Please try again.' : null
   )
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ function LoginForm() {
     const supabase = createClient()
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
     if (authError) {
-      setError('E-mail of wachtwoord onjuist.')
+      setError('Incorrect email or password.')
       setLoading(false)
       return
     }
@@ -48,7 +48,7 @@ function LoginForm() {
     <div className={styles.page}>
       <div className={styles.card}>
         <p className={styles.brand}>7ENO</p>
-        <h1 className={styles.title}>Inloggen</h1>
+        <h1 className={styles.title}>Sign in</h1>
 
         <button type="button" className={styles.googleBtn} onClick={handleGoogle}>
           <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,13 +57,13 @@ function LoginForm() {
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          Doorgaan met Google
+          Continue with Google
         </button>
 
-        <div className={styles.divider}><span>of</span></div>
+        <div className={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleLogin} className={styles.form}>
-          <label className={styles.fieldLabel}>E-mailadres</label>
+          <label className={styles.fieldLabel}>Email address</label>
           <input
             type="email"
             className={styles.input}
@@ -71,10 +71,10 @@ function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            placeholder="jij@voorbeeld.nl"
+            placeholder="you@example.com"
           />
 
-          <label className={styles.fieldLabel}>Wachtwoord</label>
+          <label className={styles.fieldLabel}>Password</label>
           <input
             type="password"
             className={styles.input}
@@ -88,13 +88,13 @@ function LoginForm() {
           {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? 'Bezig...' : 'Inloggen'}
+            {loading ? 'Loading...' : 'Sign in'}
           </button>
         </form>
 
         <p className={styles.switchLink}>
-          Nog geen account?{' '}
-          <Link href="/account/register">Registreer hier</Link>
+          Don&apos;t have an account?{' '}
+          <Link href="/account/register">Register</Link>
         </p>
       </div>
     </div>

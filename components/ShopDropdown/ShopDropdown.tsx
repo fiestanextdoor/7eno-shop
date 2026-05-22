@@ -29,6 +29,18 @@ const LINES = [
     href: '/shop?gender=women&line=sport',
     items: ['Tees', 'Shorts'],
   },
+  {
+    id: 'unisex-daily',
+    label: 'Unisex Daily',
+    href: '/shop?gender=unisex&line=daily',
+    items: ['Tees', 'Shorts', 'Headwear', 'Footwear'],
+  },
+  {
+    id: 'unisex-sport',
+    label: 'Unisex Sport',
+    href: '/shop?gender=unisex&line=sport',
+    items: ['Tees', 'Shorts'],
+  },
 ]
 
 export default function ShopDropdown() {
@@ -61,14 +73,10 @@ export default function ShopDropdown() {
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <button
-        className={styles.trigger}
-        aria-expanded={open}
-        aria-haspopup="true"
-      >
+      <Link href="/shop" className={styles.trigger} onClick={close} aria-expanded={open} aria-haspopup="true">
         Shop
         <span className={styles.caret} aria-hidden="true">▾</span>
-      </button>
+      </Link>
 
       <div
         className={`${styles.dropdown} ${open ? styles.dropdownOpen : ''}`}
@@ -82,6 +90,10 @@ export default function ShopDropdown() {
           <span className={styles.genderDivider} aria-hidden="true" />
           <Link href="/shop?gender=women" className={styles.genderLink} onClick={close}>
             Women
+          </Link>
+          <span className={styles.genderDivider} aria-hidden="true" />
+          <Link href="/shop?gender=unisex" className={styles.genderLink} onClick={close}>
+            Unisex
           </Link>
         </div>
 

@@ -43,7 +43,7 @@
   justify-content: center;
   gap: 10px;
   padding: 13px 20px;
-  background: var(--ink);
+  background: var(--oxblood);
   color: var(--bone);
   font-family: var(--font-mono);
   font-size: 0.6rem;
@@ -55,7 +55,7 @@
 }
 
 .googleBtn:hover {
-  background: #222;
+  background: #7a2223;
 }
 
 .divider {

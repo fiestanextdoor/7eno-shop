@@ -10,10 +10,10 @@ const LINKS = {
     { label: '7ENO Sport', href: '/shop?line=sport' },
   ],
   account: [
-    { label: 'Inloggen', href: '/account/login' },
-    { label: 'Registreren', href: '/account/register' },
-    { label: 'Bestellingen', href: '/account/orders' },
-    { label: 'Profiel', href: '/account/profile' },
+    { label: 'Sign in', href: '/account/login' },
+    { label: 'Register', href: '/account/register' },
+    { label: 'Orders', href: '/account/orders' },
+    { label: 'Profile', href: '/account/profile' },
   ],
   info: [
     { label: 'Contact', href: 'mailto:info@7eno.nl' },
@@ -68,7 +68,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className={styles.bottom}>
         <span className={styles.copy}>© 2026 7ENO.</span>
-        <span className={styles.copy}>Alle rechten voorbehouden.</span>
+        <span className={styles.copy}>All rights reserved.</span>
       </div>
     </footer>
   )
