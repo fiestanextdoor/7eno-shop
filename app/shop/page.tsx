@@ -73,6 +73,8 @@ const SORT_PRIORITY: Record<number, number> = {
   433353836: 40, 433353269: 41, 433352871: 42, 433352744: 43, 433352490: 44,
 }
 
+const NO_LINE_CATEGORIES = new Set(['swimwear', 'headwear', 'footwear'])
+
 function buildHref(params: { gender?: string; line?: string; category?: string }) {
   const parts: string[] = []
   if (params.gender)   parts.push(`gender=${params.gender}`)
@@ -103,9 +105,10 @@ export default async function ShopPage({ searchParams }: Props) {
     products = products.filter((p) => ids.has(p.id))
   }
 
-  // 2. Line filter (daily / sport — mutually exclusive, clothing only)
-  if (line && LINE_IDS[line]) {
-    const ids = new Set(LINE_IDS[line])
+  // 2. Line filter — skip for categories that have no daily/sport split
+  const effectiveLine = NO_LINE_CATEGORIES.has(category) ? '' : line
+  if (effectiveLine && LINE_IDS[effectiveLine]) {
+    const ids = new Set(LINE_IDS[effectiveLine])
     products = products.filter((p) => ids.has(p.id))
   }
 
@@ -147,18 +150,18 @@ export default async function ShopPage({ searchParams }: Props) {
   ]
 
   const lineFilters = [
-    { label: 'All lines', href: buildHref({ gender, category }),                   active: !line },
-    { label: 'Daily',     href: buildHref({ gender, line: 'daily', category }),    active: line === 'daily' },
-    { label: 'Sport',     href: buildHref({ gender, line: 'sport', category }),    active: line === 'sport' },
+    { label: 'All lines', href: buildHref({ gender, category }),                   active: !line || NO_LINE_CATEGORIES.has(category) },
+    { label: 'Daily',     href: buildHref({ gender, line: 'daily', category }),    active: line === 'daily' && !NO_LINE_CATEGORIES.has(category) },
+    { label: 'Sport',     href: buildHref({ gender, line: 'sport', category }),    active: line === 'sport' && !NO_LINE_CATEGORIES.has(category) },
   ]
 
   const categoryFilters = [
-    { label: 'All',       href: buildHref({ gender, line }),                              active: !category },
-    { label: 'Tees',      href: buildHref({ gender, line, category: 'tees' }),            active: category === 'tees' },
-    { label: 'Shorts',    href: buildHref({ gender, line, category: 'shorts' }),          active: category === 'shorts' },
-    { label: 'Swimwear',  href: buildHref({ gender, line, category: 'swimwear' }),        active: category === 'swimwear' },
-    { label: 'Headwear',  href: buildHref({ gender, line, category: 'headwear' }),        active: category === 'headwear' },
-    { label: 'Footwear',  href: buildHref({ gender, line, category: 'footwear' }),        active: category === 'footwear' },
+    { label: 'All',       href: buildHref({ gender, line }),                                       active: !category },
+    { label: 'Tees',      href: buildHref({ gender, line, category: 'tees' }),                     active: category === 'tees' },
+    { label: 'Shorts',    href: buildHref({ gender, line, category: 'shorts' }),                   active: category === 'shorts' },
+    { label: 'Swimwear',  href: buildHref({ gender, category: 'swimwear' }),                       active: category === 'swimwear' },
+    { label: 'Headwear',  href: buildHref({ gender, category: 'headwear' }),                       active: category === 'headwear' },
+    { label: 'Footwear',  href: buildHref({ gender, category: 'footwear' }),                       active: category === 'footwear' },
   ]
 
   return (

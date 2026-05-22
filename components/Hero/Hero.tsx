@@ -6,7 +6,7 @@ export default function Hero() {
     <section className={styles.hero}>
       <div className={styles.videoWrap} aria-hidden="true">
         <iframe
-          src="https://player.vimeo.com/video/1192830777?background=1&autoplay=1&loop=1&muted=1&playsinline=1"
+          src="https://player.vimeo.com/video/1193664281?background=1&autoplay=1&loop=1&muted=1&playsinline=1"
           className={styles.video}
           allow="autoplay; fullscreen"
           title=""

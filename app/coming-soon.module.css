@@ -53,10 +53,20 @@
 }
 
 .logo {
-  width: clamp(140px, 22vw, 260px);
+  width: clamp(120px, 18vw, 220px);
   height: auto;
   object-fit: contain;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.quote {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.7);
+  text-shadow: 0 1px 12px rgba(17, 17, 17, 0.9);
+  margin-bottom: 8px;
 }
 
 .heading {

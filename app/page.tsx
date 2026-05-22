@@ -20,15 +20,16 @@ export default function ComingSoonPage() {
       <div className={styles.overlay} />
       <div className={styles.content}>
         <Image
-          src="/logos/woordmerk-wit.png"
+          src="/logos/woordmerk-butter.png"
           alt="7ENO"
-          width={260}
-          height={104}
+          width={300}
+          height={86}
           priority
           className={styles.logo}
         />
+        <p className={styles.quote}>Immortality is not a gift. It is a refusal</p>
         <h1 className={styles.heading}>Divine<br />Authority</h1>
-        <p className={styles.date}>Coming June 12th</p>
+        <p className={styles.date}>Coming June 12th &nbsp;·&nbsp; 19:00</p>
       </div>
     </div>
   )
