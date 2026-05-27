@@ -31,7 +31,10 @@ export default function CartDrawer() {
         <div className={styles.header}>
           <h2 className={styles.title}>Cart</h2>
           <button className={styles.closeBtn} onClick={closeCart} aria-label="Close cart">
-            ✕
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
           </button>
         </div>
 
@@ -61,7 +64,11 @@ export default function CartDrawer() {
                       <button className={styles.qtyBtn} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>+</button>
                     </div>
                   </div>
-                  <button className={styles.removeBtn} onClick={() => removeItem(item.variantId)} aria-label="Remove item">✕</button>
+                  <button className={styles.removeBtn} onClick={() => removeItem(item.variantId)} aria-label="Remove item">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M2 4h12M5 4V2.5A.5.5 0 015.5 2h5a.5.5 0 01.5.5V4M6 7v5M10 7v5M3 4l.8 9.2A.8.8 0 003.8 14h8.4a.8.8 0 00.8-.8L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
                 </li>
               ))}
             </ul>

@@ -208,12 +208,13 @@
 .colorSwatch {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: 3px;
   border: 2px solid transparent;
   cursor: pointer;
   outline: 2px solid rgba(17, 17, 17, 0.15);
   outline-offset: 3px;
   transition: outline-color 0.15s;
+  overflow: hidden;
 }
 
 .colorSwatch:hover {
@@ -330,6 +331,13 @@
   padding: 14px 0;
   border-bottom: 1px solid rgba(17, 17, 17, 0.07);
   gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .detailRow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
 }
 
 .detailKey {

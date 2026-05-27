@@ -9,7 +9,7 @@ const LINES = [
     id: 'men-daily',
     label: 'Men Daily',
     href: '/shop?gender=men&line=daily',
-    items: ['Tees', 'Shorts', 'Swimwear', 'Headwear', 'Footwear'],
+    items: ['Tees', 'Shorts', 'Swimwear'],
   },
   {
     id: 'men-sport',
@@ -21,24 +21,12 @@ const LINES = [
     id: 'women-daily',
     label: 'Women Daily',
     href: '/shop?gender=women&line=daily',
-    items: ['Tees', 'Shorts', 'Swimwear', 'Headwear', 'Footwear'],
+    items: ['Tees', 'Shorts', 'Swimwear'],
   },
   {
     id: 'women-sport',
     label: 'Women Sport',
     href: '/shop?gender=women&line=sport',
-    items: ['Tees', 'Shorts'],
-  },
-  {
-    id: 'unisex-daily',
-    label: 'Unisex Daily',
-    href: '/shop?gender=unisex&line=daily',
-    items: ['Tees', 'Shorts', 'Headwear', 'Footwear'],
-  },
-  {
-    id: 'unisex-sport',
-    label: 'Unisex Sport',
-    href: '/shop?gender=unisex&line=sport',
     items: ['Tees', 'Shorts'],
   },
 ]
@@ -91,10 +79,6 @@ export default function ShopDropdown() {
           <Link href="/shop?gender=women" className={styles.genderLink} onClick={close}>
             Women
           </Link>
-          <span className={styles.genderDivider} aria-hidden="true" />
-          <Link href="/shop?gender=unisex" className={styles.genderLink} onClick={close}>
-            Unisex
-          </Link>
         </div>
 
         {/* Row 2: 4 line tiles */}
@@ -125,6 +109,13 @@ export default function ShopDropdown() {
                 </Link>
               ))
             : null}
+        </div>
+
+        {/* Accessories */}
+        <div className={styles.accessoriesRow}>
+          <Link href="/shop?category=accessories" className={styles.accessoriesLink} onClick={close}>
+            Accessories
+          </Link>
         </div>
       </div>
     </div>

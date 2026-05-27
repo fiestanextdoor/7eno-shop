@@ -28,7 +28,7 @@
 }
 
 .section {
-  background: var(--ink);
+  background: var(--oxblood);
   padding: 32px;
   display: flex;
   flex-direction: column;

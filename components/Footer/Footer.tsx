@@ -12,11 +12,8 @@ const LINKS = {
   account: [
     { label: 'Sign in', href: '/account/login' },
     { label: 'Register', href: '/account/register' },
-    { label: 'Orders', href: '/account/orders' },
-    { label: 'Profile', href: '/account/profile' },
-  ],
-  info: [
-    { label: 'Contact', href: 'mailto:info@7eno.nl' },
+{ label: 'Profile', href: '/account/profile' },
+    { label: 'Contact', href: 'mailto:info@7eno.shop' },
   ],
 }
 
@@ -54,21 +51,42 @@ export default function Footer() {
           </ul>
         </div>
         <div className={styles.col}>
-          <p className={styles.colTitle}>Info</p>
-          <ul className={styles.list}>
-            {LINKS.info.map((l) => (
-              <li key={l.href}>
-                <a href={l.href} className={styles.link}>{l.label}</a>
-              </li>
-            ))}
-          </ul>
+          <p className={styles.colTitle}>Location</p>
+          <div className={styles.mapWrap}>
+            <iframe
+              title="7ENO locatie"
+              src="https://maps.google.com/maps?q=Daalakkersweg+2%2C+5641+JA+Eindhoven&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              style={{ border: 0 }}
+            />
+          </div>
+          <p className={styles.addressLine}>Daalakkersweg 2</p>
+          <p className={styles.addressLine}>5641 JA Eindhoven</p>
+          <a
+            href="https://maps.app.goo.gl/QkembiXXXTGs2VkP8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.mapsLink}
+          >
+            Open in Google Maps →
+          </a>
         </div>
       </div>
 
       {/* Bottom bar */}
       <div className={styles.bottom}>
-        <span className={styles.copy}>© 2026 7ENO.</span>
-        <span className={styles.copy}>All rights reserved.</span>
+        <span className={styles.copy}>© 2026 7ENO. All rights reserved.</span>
+        <div style={{ display: 'flex', gap: '24px' }}>
+          <Link href="/terms" className={styles.copy} style={{ textDecoration: 'none' }}>
+            Terms &amp; Conditions
+          </Link>
+          <Link href="/privacy" className={styles.copy} style={{ textDecoration: 'none' }}>
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </footer>
   )

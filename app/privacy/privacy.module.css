@@ -1,0 +1,72 @@
+.page {
+  background: var(--ink);
+  min-height: 100vh;
+  padding: 120px var(--gutter) 80px;
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: var(--bone);
+  line-height: 1.1;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.3);
+  margin-top: -32px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(246, 243, 236, 0.06);
+}
+
+.heading {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.4);
+}
+
+.section p,
+.section li {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: rgba(246, 243, 236, 0.7);
+  line-height: 1.8;
+}
+
+.list {
+  padding-left: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.link {
+  color: var(--bone);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: rgba(246, 243, 236, 0.6);
+}

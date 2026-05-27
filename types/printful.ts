@@ -18,6 +18,7 @@ export interface SyncVariant {
   size: string
   color: string
   color_code: string
+  color_code2: string | null
   in_stock: boolean
 }
 

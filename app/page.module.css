@@ -137,10 +137,21 @@
 
 .categoryLogo {
   width: 160px;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
   display: block;
   transition: filter 0.25s;
+}
+
+@media (max-width: 480px) {
+  .categoryLogo {
+    width: 100px;
+  }
+
+  .categoryCard {
+    padding: 28px 20px;
+  }
 }
 
 .categoryNum {

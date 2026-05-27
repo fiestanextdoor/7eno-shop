@@ -172,6 +172,23 @@
   50%       { opacity: 0.7;  transform: scaleY(1.15); }
 }
 
+@media (max-width: 640px) {
+  .buttons {
+    gap: 16px;
+  }
+
+  .btn {
+    min-width: 0;
+    padding: 14px 24px;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+  }
+
+  .scrollHint {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .content    { animation: none; }
   .btn        { transition: none; }

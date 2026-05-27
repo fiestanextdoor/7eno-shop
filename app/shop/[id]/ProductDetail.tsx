@@ -5,34 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { SyncVariant, PrintfulFile } from '@/types/printful'
 import { useCartStore } from '@/store/cart'
+import { resolveSwatchBackground, resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite } from '@/lib/color-utils'
 import styles from './detail.module.css'
-
-// 7ENO brand color name → hex (used as fallback when Printful color_code is empty)
-const BRAND_COLORS: Record<string, string> = {
-  ink:    '#111111',
-  blood:  '#5C1A1B',
-  butter: '#F0E8C0',
-  stone:  '#8A8275',
-  bone:   '#F6F3EC',
-  carrot: '#D4622A',
-  coin:   '#C4A860',
-  clear:  '#E8E4DC',
-  white:  '#FFFFFF',
-  black:  '#111111',
-}
-
-function resolveSwatchBackground(colorCode: string, colorName: string): string {
-  const codes = (colorCode || '').trim().split(/\s+/).filter(Boolean)
-  if (codes.length >= 2) return `linear-gradient(135deg, ${codes[0]} 50%, ${codes[1]} 50%)`
-  if (codes.length === 1) return codes[0]
-
-  // Fallback: parse color name keywords (e.g. "Ink/Blood" → two colors)
-  const parts = colorName.toLowerCase().split(/[^a-z]+/).filter(Boolean)
-  const resolved = parts.map((p) => BRAND_COLORS[p]).filter(Boolean)
-  if (resolved.length >= 2) return `linear-gradient(135deg, ${resolved[0]} 50%, ${resolved[1]} 50%)`
-  if (resolved.length === 1) return resolved[0]
-  return '#cccccc'
-}
 
 const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
 
@@ -59,6 +33,17 @@ export default function ProductDetail({
     new Map(variants.filter((v) => v.color).map((v) => [v.color, v])).values()
   )
   const hasColors = uniqueColors.length > 1
+
+  // Non-near-white hexes: prevent brand override from duplicating an existing swatch color
+  const skipHexes = new Set(
+    uniqueColors.map((v) => resolveHex(v.color, v.color_code ?? '')).filter((h) => !isNearWhite(h))
+  )
+
+  const getDisplayName = (v: { color: string; color_code: string | null | undefined }) => {
+    const rawHex = resolveHex(v.color, v.color_code ?? '')
+    const finalHex = applyBrandOverride(productName, rawHex, v.color, skipHexes)
+    return resolveDisplayName(v.color, rawHex, finalHex, productName)
+  }
 
   const defaultColor = uniqueColors[0]?.color ?? ''
   const baseImageUrl =
@@ -107,6 +92,13 @@ export default function ProductDetail({
     })
     setAdded(true)
   }
+
+  // Auto-select the only variant for one-size products (e.g. caps, accessories)
+  useEffect(() => {
+    if (uniqueSizes.length === 1 && isAvailable(uniqueSizes[0])) {
+      setSelectedVariantId(uniqueSizes[0].id)
+    }
+  }, [selectedColor]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!added) return
@@ -169,7 +161,11 @@ export default function ProductDetail({
           <>
             <div className={styles.sizeLabelRow}>
               <span className={styles.sizeLabel}>Color</span>
-              <span className={styles.sizeCount}>{selectedColor}</span>
+              <span className={styles.sizeCount}>
+                {uniqueColors.find((v) => v.color === selectedColor)
+                  ? getDisplayName(uniqueColors.find((v) => v.color === selectedColor)!)
+                  : selectedColor}
+              </span>
             </div>
             <div className={styles.colorSwatches}>
               {uniqueColors.map((v) => (
@@ -179,11 +175,11 @@ export default function ProductDetail({
                     styles.colorSwatch,
                     selectedColor === v.color ? styles.colorSwatchSelected : '',
                   ].join(' ')}
-                  style={{ background: resolveSwatchBackground(v.color_code, v.color) }}
+                  style={{ background: resolveSwatchBackground(v.color, v.color_code, v.color_code2, productName, skipHexes) }}
                   onClick={() => handleColorChange(v.color)}
-                  title={v.color}
+                  title={getDisplayName(v)}
                   aria-pressed={selectedColor === v.color}
-                  aria-label={v.color}
+                  aria-label={getDisplayName(v)}
                 />
               ))}
             </div>
@@ -221,11 +217,11 @@ export default function ProductDetail({
         <button
           className={[styles.addBtn, added ? styles.added : ''].join(' ')}
           onClick={handleAddToCart}
-          disabled={!selectedVariantId}
+          disabled={!selectedVariantId && uniqueSizes.length > 1}
         >
           {added
             ? '✓ Added to cart'
-            : !selectedVariantId
+            : !selectedVariantId && uniqueSizes.length > 1
             ? 'Select a size'
             : 'Add to cart'}
         </button>
@@ -247,7 +243,11 @@ export default function ProductDetail({
           {variants[0]?.color && (
             <div className={styles.detailRow}>
               <span className={styles.detailKey}>Color</span>
-              <span className={styles.detailVal}>{selectedColor || variants[0].color}</span>
+              <span className={styles.detailVal}>
+              {uniqueColors.find((v) => v.color === (selectedColor || variants[0].color))
+                ? getDisplayName(uniqueColors.find((v) => v.color === (selectedColor || variants[0].color))!)
+                : (selectedColor || variants[0].color)}
+            </span>
             </div>
           )}
         </div>

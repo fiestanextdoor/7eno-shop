@@ -13,7 +13,7 @@
 }
 
 .emptyState {
-  background: var(--ink);
+  background: var(--oxblood);
   padding: 60px 40px;
   text-align: center;
 }
@@ -42,7 +42,7 @@
 }
 
 .orderCard {
-  background: var(--ink);
+  background: var(--oxblood);
   padding: 28px 32px;
 }
 

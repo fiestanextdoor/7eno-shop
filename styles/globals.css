@@ -25,6 +25,7 @@
 @media (max-width: 640px) {
   :root {
     --gutter: 20px;
+    --nav-height: 72px;
   }
 }
 

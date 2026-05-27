@@ -41,7 +41,7 @@
   top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
-  width: 600px;
+  width: min(600px, 96vw);
   background: var(--oxblood);
   border: 1px solid rgba(246, 243, 236, 0.1);
   padding: 32px 36px 36px;
@@ -93,9 +93,15 @@
 /* ── Row 2: 4 line tiles ── */
 .tilesRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .tilesRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .tile {
@@ -176,6 +182,28 @@
 .subItem:focus-visible {
   outline: 2px solid var(--bone);
   outline-offset: 2px;
+}
+
+/* ── Accessories row ── */
+.accessoriesRow {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(246, 243, 236, 0.1);
+  text-align: center;
+}
+
+.accessoriesLink {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.6);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.accessoriesLink:hover {
+  color: var(--bone);
 }
 
 @media (prefers-reduced-motion: reduce) {

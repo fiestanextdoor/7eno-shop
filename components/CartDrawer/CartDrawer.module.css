@@ -56,11 +56,16 @@
   background: none;
   border: none;
   color: var(--oxblood);
-  padding: 4px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--ink);
 }
 
 .items {
@@ -184,9 +189,10 @@
   background: none;
   border: none;
   color: var(--stone);
-  font-size: 1.2rem;
-  line-height: 1;
-  padding: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.2s;
   cursor: pointer;
 }

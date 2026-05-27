@@ -93,6 +93,39 @@
   user-select: none;
 }
 
+/* ── Map in locatie-kolom ── */
+.mapWrap {
+  width: 100%;
+  height: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0.75;
+  filter: grayscale(1) invert(1) brightness(0.85);
+  margin-bottom: 4px;
+}
+
+.addressLine {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: rgba(246, 243, 236, 0.65);
+  line-height: 1.4;
+}
+
+.mapsLink {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.35);
+  text-decoration: none;
+  margin-top: 6px;
+  transition: color 0.2s;
+}
+
+.mapsLink:hover {
+  color: var(--bone);
+}
+
 /* ── Bottom bar ── */
 .bottom {
   max-width: var(--max-width);
