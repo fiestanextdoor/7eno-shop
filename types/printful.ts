@@ -9,6 +9,7 @@ export interface SyncProduct {
 export interface SyncVariant {
   id: number
   sync_product_id: number
+  variant_id: number
   name: string
   retail_price: string
   currency: string
@@ -44,6 +45,15 @@ export interface PrintfulFile {
 export interface PrintfulProductDetail {
   sync_product: SyncProduct
   sync_variants: SyncVariant[]
+}
+
+export interface PrintfulShippingRate {
+  id: string
+  name: string
+  rate: string
+  currency: string
+  minDeliveryDays?: number
+  maxDeliveryDays?: number
 }
 
 export interface PrintfulListResponse<T> {

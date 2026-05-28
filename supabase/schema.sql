@@ -62,12 +62,19 @@ create policy "Eigen adressen beheren" on public.addresses
 create policy "Eigen bestellingen lezen" on public.orders
   for select using (auth.uid() = user_id);
 
--- Service role mag orders aanmaken en updaten (webhook)
+-- Verwijder oude policies die voor ALLE rollen golden (anon/authenticated konden
+-- hierdoor willekeurige orders aanmaken of wijzigen).
+drop policy if exists "Service role orders aanmaken" on public.orders;
+drop policy if exists "Service role orders updaten" on public.orders;
+
+-- Alleen de service role (Stripe webhook) mag orders aanmaken en updaten.
+-- De service role omzeilt RLS sowieso, maar we maken de bedoeling expliciet en
+-- voorkomen dat anon/authenticated rollen orders kunnen schrijven.
 create policy "Service role orders aanmaken" on public.orders
-  for insert with check (true);
+  for insert to service_role with check (true);
 
 create policy "Service role orders updaten" on public.orders
-  for update using (true);
+  for update to service_role using (true);
 
 -- =====================================================
 -- Trigger: maak profiel aan bij registratie

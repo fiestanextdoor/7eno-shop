@@ -1,8 +1,10 @@
 import type {
   SyncProduct,
+  SyncVariant,
   PrintfulProductDetail,
   PrintfulListResponse,
   PrintfulDetailResponse,
+  PrintfulShippingRate,
 } from '@/types/printful'
 
 const PRINTFUL_BASE = 'https://api.printful.com'
@@ -67,6 +69,26 @@ export async function getProduct(id: string): Promise<PrintfulProductDetail> {
   return data.result
 }
 
+/**
+ * Resolves a set of store product ids to a lookup keyed by sync variant id,
+ * carrying the authoritative variant (price, catalog variant_id, currency) and
+ * its product name. Shared by the checkout and shipping-rates routes so prices
+ * and shipping are always derived server-side, never trusted from the client.
+ */
+export async function buildVariantLookup(
+  productIds: number[]
+): Promise<Map<number, { productName: string; variant: SyncVariant }>> {
+  const unique = [...new Set(productIds)]
+  const details = await Promise.all(unique.map((id) => getProduct(String(id))))
+  const lookup = new Map<number, { productName: string; variant: SyncVariant }>()
+  for (const detail of details) {
+    for (const variant of detail.sync_variants) {
+      lookup.set(variant.id, { productName: detail.sync_product.name, variant })
+    }
+  }
+  return lookup
+}
+
 export interface PrintfulOrderRecipient {
   name: string
   email: string
@@ -82,14 +104,52 @@ export interface PrintfulOrderItem {
   quantity: number
 }
 
+export interface ShippingRateRecipient {
+  address1: string
+  city: string
+  country_code: string
+  zip: string
+  state_code?: string
+}
+
+export interface ShippingRateItem {
+  // Shipping rates require the catalog variant_id, NOT the sync_variant_id used
+  // for order creation.
+  variant_id: number
+  quantity: number
+}
+
+export async function getShippingRates(
+  recipient: ShippingRateRecipient,
+  items: ShippingRateItem[],
+  currency = 'EUR'
+): Promise<PrintfulShippingRate[]> {
+  const res = await fetch(`${PRINTFUL_BASE}/shipping/rates`, {
+    method: 'POST',
+    headers: buildHeaders(getApiKey()),
+    body: JSON.stringify({ recipient, items, currency }),
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    const reason = typeof data?.result === 'string' ? data.result : `status ${res.status}`
+    throw new Error(`Printful shipping rates failed: ${reason}`)
+  }
+  return Array.isArray(data.result) ? data.result : []
+}
+
 export async function createOrder(
   recipient: PrintfulOrderRecipient,
-  items: PrintfulOrderItem[]
+  items: PrintfulOrderItem[],
+  shippingMethodId?: string
 ): Promise<{ id: number }> {
   const res = await fetch(`${PRINTFUL_BASE}/orders`, {
     method: 'POST',
     headers: buildPrintfulHeaders(getApiKey()),
-    body: JSON.stringify({ recipient, items }),
+    body: JSON.stringify({
+      recipient,
+      items,
+      ...(shippingMethodId ? { shipping: shippingMethodId } : {}),
+    }),
   })
   if (!res.ok) {
     const err = await res.text()
