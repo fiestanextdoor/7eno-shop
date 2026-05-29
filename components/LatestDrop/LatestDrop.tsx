@@ -10,11 +10,13 @@ interface Props {
   productName: string
   imageUrl: string | null
   variants: SyncVariant[]
+  euSizeMap?: Record<string, string>
 }
 
-export default function LatestDrop({ productId, productName, imageUrl, variants }: Props) {
+export default function LatestDrop({ productId, productName, imageUrl, variants, euSizeMap = {} }: Props) {
   // Use all variants — don't filter on in_stock as the field may not be reliable
   const sizes = [...new Set(variants.map((v) => v.size).filter(Boolean))]
+  const isFootwear = Object.keys(euSizeMap).length > 0
 
   const [selectedSize, setSelectedSize] = useState<string>(sizes[0] ?? '')
   const [quantity, setQuantity] = useState(1)
@@ -67,7 +69,7 @@ export default function LatestDrop({ productId, productName, imageUrl, variants 
         {/* Sizes */}
         {sizes.length > 0 && (
           <div className={styles.sizeGroup}>
-            <p className={styles.sizeLabel}>Size</p>
+            <p className={styles.sizeLabel}>Size{isFootwear ? ' (EU)' : ''}</p>
             <div className={styles.sizes}>
               {sizes.map((size) => (
                 <button
@@ -75,7 +77,7 @@ export default function LatestDrop({ productId, productName, imageUrl, variants 
                   className={`${styles.sizeBtn} ${selectedSize === size ? styles.sizeBtnActive : ''}`}
                   onClick={() => setSelectedSize(size)}
                 >
-                  {size}
+                  {euSizeMap[size] ?? size}
                 </button>
               ))}
             </div>

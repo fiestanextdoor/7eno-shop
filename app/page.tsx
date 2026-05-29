@@ -1,7 +1,7 @@
 import Hero from '@/components/Hero/Hero'
 import Marquee from '@/components/Marquee/Marquee'
 import LatestDrop from '@/components/LatestDrop/LatestDrop'
-import { getProducts, getProduct } from '@/lib/printful'
+import { getProducts, getProduct, getEuSizeMapForProduct } from '@/lib/printful'
 import { removeBackground } from '@/lib/remove-bg'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -31,6 +31,10 @@ export default async function HomePage() {
     hero ? getProduct(String(hero.id)).catch(() => null) : Promise.resolve(null),
   ])
 
+  const heroEuSizeMap = heroDetail
+    ? await getEuSizeMapForProduct(heroDetail.sync_variants)
+    : {}
+
   return (
     <main>
       <Hero />
@@ -58,6 +62,7 @@ export default async function HomePage() {
               productName={hero.name}
               imageUrl={heroBgRemoved ?? hero.thumbnail_url}
               variants={heroDetail.sync_variants}
+              euSizeMap={heroEuSizeMap}
             />
           </div>
         </section>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
-import { getProduct, getProducts, getCatalogProductId, getEuSizeMap } from '@/lib/printful'
+import { getProduct, getProducts, getEuSizeMapForProduct } from '@/lib/printful'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
@@ -66,22 +66,16 @@ export default async function ProductPage({ params }: Props) {
   const productThumbnail = sync_product.thumbnail_url ?? null
 
   // Footwear ships with US sizes from Printful; convert to EU for display.
-  const sizeValues = sync_variants.map((v) => v.size).filter(Boolean)
-  const isFootwear = sizeValues.length > 0 && sizeValues.every((s) => /^\d+(\.5)?$/.test(s))
-  let euSizeMap: Record<string, string> = {}
-  if (isFootwear && sync_variants[0]?.variant_id) {
-    const catalogProductId = await getCatalogProductId(sync_variants[0].variant_id)
-    if (catalogProductId) euSizeMap = await getEuSizeMap(catalogProductId)
-  }
+  const euSizeMap = await getEuSizeMapForProduct(sync_variants)
 
   const bgRemovedUrl = productThumbnail
     ? await removeBackground(productThumbnail).catch(() => null)
     : null
 
   // Build color → best preview image map (first variant per color wins)
-  const colorImages: Record<string, string> = {}
+  const rawColorImages: Record<string, string> = {}
   for (const variant of sync_variants) {
-    if (!variant.color || colorImages[variant.color]) continue
+    if (!variant.color || rawColorImages[variant.color]) continue
     const files = variant.files ?? []
     const file =
       files.find((f) => f.type === 'preview' && f.preview_url) ??
@@ -90,8 +84,18 @@ export default async function ProductPage({ params }: Props) {
       files[0] ??
       null
     const url = file?.preview_url ?? file?.url ?? null
-    if (url) colorImages[variant.color] = url
+    if (url) rawColorImages[variant.color] = url
   }
+
+  // Remove backgrounds (result cached in Supabase Storage) so non-default colours
+  // on the product page — and the mini-cart thumbnail — don't show a background.
+  const colorImages: Record<string, string> = {}
+  await Promise.all(
+    Object.entries(rawColorImages).map(async ([color, url]) => {
+      const processed = await removeBackground(url).catch(() => null)
+      colorImages[color] = processed ?? url
+    })
+  )
 
   return (
     <main className={styles.page}>

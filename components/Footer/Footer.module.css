@@ -21,7 +21,7 @@
   font-size: 0.55rem;
   letter-spacing: 5px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.35);
+  color: var(--butter);
 }
 
 /* ── Links grid ── */
@@ -51,7 +51,7 @@
   font-size: 0.52rem;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.3);
+  color: var(--butter);
 }
 
 .list {
@@ -64,7 +64,7 @@
 .link {
   font-family: var(--font-serif);
   font-size: 1rem;
-  color: rgba(246, 243, 236, 0.65);
+  color: var(--butter);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -95,19 +95,36 @@
 
 /* ── Map in locatie-kolom ── */
 .mapWrap {
+  position: relative;
   width: 100%;
   height: 160px;
   border-radius: 6px;
   overflow: hidden;
+  margin-bottom: 4px;
+}
+
+/* Filter/opacity only on the map itself, so the marker keeps its true colour. */
+.mapWrap iframe {
   opacity: 0.75;
   filter: grayscale(1) invert(1) brightness(0.85);
-  margin-bottom: 4px;
+}
+
+/* Blood-red location marker centred on the map (the map is centred on the address). */
+.mapPin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -100%);
+  z-index: 2;
+  line-height: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
 }
 
 .addressLine {
   font-family: var(--font-serif);
   font-size: 0.95rem;
-  color: rgba(246, 243, 236, 0.65);
+  color: var(--butter);
   line-height: 1.4;
 }
 
@@ -116,7 +133,7 @@
   font-size: 0.52rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.35);
+  color: var(--butter);
   text-decoration: none;
   margin-top: 6px;
   transition: color 0.2s;
@@ -143,7 +160,7 @@
   font-size: 0.52rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.25);
+  color: var(--butter);
 }
 
 @media (prefers-reduced-motion: reduce) {

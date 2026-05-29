@@ -85,6 +85,19 @@ export async function getCatalogProductId(catalogVariantId: number): Promise<num
 }
 
 /**
+ * Detects footwear (numeric sizes) from a product's variants and returns its
+ * US→EU size map; {} for non-footwear. Shared by the product page and homepage.
+ */
+export async function getEuSizeMapForProduct(variants: SyncVariant[]): Promise<Record<string, string>> {
+  const sizeValues = variants.map((v) => v.size).filter(Boolean)
+  const isFootwear = sizeValues.length > 0 && sizeValues.every((s) => /^\d+(\.5)?$/.test(s))
+  if (!isFootwear || !variants[0]?.variant_id) return {}
+  const catalogProductId = await getCatalogProductId(variants[0].variant_id)
+  if (!catalogProductId) return {}
+  return getEuSizeMap(catalogProductId)
+}
+
+/**
  * Maps a footwear product's US sizes to EU sizes using Printful's official size
  * guide (the "Europe" column), e.g. { "9": "42.5", "7": "40" }. Returns {} for
  * non-footwear or on error so callers fall back to the raw size.
