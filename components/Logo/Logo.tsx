@@ -15,6 +15,7 @@ interface WordmarkProps {
   variant?: Variant
   height?: number
   priority?: boolean
+  align?: 'left' | 'center'
 }
 
 export function LogoBadge({ variant = 'wit', size = 64, priority = false }: BadgeProps) {
@@ -32,7 +33,7 @@ export function LogoBadge({ variant = 'wit', size = 64, priority = false }: Badg
   )
 }
 
-export function LogoWordmark({ variant = 'wit', height = 36, priority = false }: WordmarkProps) {
+export function LogoWordmark({ variant = 'wit', height = 36, priority = false, align = 'left' }: WordmarkProps) {
   const width = Math.round(height * WORDMARK_ASPECT_RATIO)
   return (
     <div className={styles.wrap} style={{ width, height }}>
@@ -41,7 +42,7 @@ export function LogoWordmark({ variant = 'wit', height = 36, priority = false }:
         alt="7ENO"
         width={width}
         height={height}
-        style={{ objectFit: 'contain', objectPosition: 'left center' }}
+        style={{ objectFit: 'contain', objectPosition: align === 'center' ? 'center' : 'left center' }}
         priority={priority}
       />
     </div>

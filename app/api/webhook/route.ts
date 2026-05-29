@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createOrder, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
+import { createOrder, isAutoConfirmEnabled, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
 import { createServiceClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
@@ -99,7 +99,10 @@ export async function POST(req: NextRequest) {
     try {
       const printfulOrder = await createOrder(recipient, items, shipMethod) as unknown as { id?: number | string } | null
       printfulOrderId = String(printfulOrder?.id ?? '')
-      console.log('[Webhook] Printful order created for session', session.id)
+      console.log(
+        '[Webhook] Printful order created for session', session.id,
+        isAutoConfirmEnabled() ? '(auto-submitted for fulfillment)' : '(draft, awaiting manual confirmation)'
+      )
     } catch (err) {
       fulfillmentError = err
       console.error('[Webhook] Printful order creation failed:', err)

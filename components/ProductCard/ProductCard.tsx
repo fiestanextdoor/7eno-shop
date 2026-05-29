@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import type { SyncProduct } from '@/types/printful'
+import { productSlug } from '@/lib/slug'
 import styles from './ProductCard.module.css'
 
 interface ColorSwatch {
@@ -24,12 +26,22 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index = 0, imageUrl, colorSwatches, price, currency }: ProductCardProps) {
+  const router = useRouter()
   const [hoverSrc, setHoverSrc] = useState<string | null>(null)
   const num = String(index + 1).padStart(2, '0')
   const baseSrc = imageUrl ?? product.thumbnail_url
+  const slug = productSlug(product.name)
+
+  // Clicking a swatch opens the product with that colour preselected, instead
+  // of just following the card link to the default colour.
+  const openColor = (e: React.MouseEvent, color: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    router.push(`/shop/${slug}?color=${encodeURIComponent(color)}`)
+  }
 
   return (
-    <Link href={`/shop/${product.id}`} className={styles.card}>
+    <Link href={`/shop/${slug}`} className={styles.card}>
 
       {/* Image */}
       <div className={styles.imageWrap}>
@@ -89,6 +101,9 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
                     : s.hex,
                 }}
                 title={s.displayName ?? s.color}
+                role="button"
+                aria-label={`View ${product.name} in ${s.displayName ?? s.color}`}
+                onClick={(e) => openColor(e, s.color)}
                 onMouseEnter={() => i > 0 && s.imageUrl ? setHoverSrc(s.imageUrl) : undefined}
                 onMouseLeave={() => setHoverSrc(null)}
               />

@@ -23,7 +23,7 @@ export default function Footer() {
       {/* Top: wordmark centered */}
       <div className={styles.top}>
         <Link href="/" aria-label="7ENO home">
-          <LogoWordmark variant="butter" height={36} />
+          <LogoWordmark variant="butter" height={36} align="center" />
         </Link>
         <p className={styles.tagline}>Divine Authority · MMXXVI</p>
       </div>

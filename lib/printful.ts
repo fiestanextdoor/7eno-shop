@@ -69,6 +69,51 @@ export async function getProduct(id: string): Promise<PrintfulProductDetail> {
   return data.result
 }
 
+/** Resolve the Printful catalog product id behind a sync variant's catalog variant id. */
+export async function getCatalogProductId(catalogVariantId: number): Promise<number | null> {
+  try {
+    const res = await fetch(`${PRINTFUL_BASE}/products/variant/${catalogVariantId}`, {
+      headers: buildHeaders(getApiKey()),
+      next: { revalidate: 86400 },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.result?.product?.id ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Maps a footwear product's US sizes to EU sizes using Printful's official size
+ * guide (the "Europe" column), e.g. { "9": "42.5", "7": "40" }. Returns {} for
+ * non-footwear or on error so callers fall back to the raw size.
+ */
+export async function getEuSizeMap(catalogProductId: number): Promise<Record<string, string>> {
+  try {
+    const res = await fetch(`${PRINTFUL_BASE}/products/${catalogProductId}/sizes`, {
+      headers: buildHeaders(getApiKey()),
+      next: { revalidate: 86400 },
+    })
+    if (!res.ok) return {}
+    const data = await res.json()
+    const tables: Array<{
+      measurements?: Array<{ type_label?: string; values?: Array<{ size: string | number; value: string | number }> }>
+    }> = data.result?.size_tables ?? []
+    const map: Record<string, string> = {}
+    for (const table of tables) {
+      for (const measurement of table.measurements ?? []) {
+        if (measurement.type_label === 'Europe') {
+          for (const v of measurement.values ?? []) map[String(v.size)] = String(v.value)
+        }
+      }
+    }
+    return map
+  } catch {
+    return {}
+  }
+}
+
 /**
  * Resolves a set of store product ids to a lookup keyed by sync variant id,
  * carrying the authoritative variant (price, catalog variant_id, currency) and
@@ -137,12 +182,26 @@ export async function getShippingRates(
   return Array.isArray(data.result) ? data.result : []
 }
 
+/**
+ * Whether paid orders should be auto-submitted to Printful for fulfillment
+ * (skipping the manual draft/confirm step). Off by default so orders stay as
+ * deletable drafts during testing. Requires a payment method or Printful Wallet
+ * balance configured in Printful billing, otherwise the confirmed order cannot
+ * be charged. Enable with PRINTFUL_AUTO_CONFIRM=true.
+ */
+export function isAutoConfirmEnabled(): boolean {
+  return process.env.PRINTFUL_AUTO_CONFIRM === 'true'
+}
+
 export async function createOrder(
   recipient: PrintfulOrderRecipient,
   items: PrintfulOrderItem[],
   shippingMethodId?: string
 ): Promise<{ id: number }> {
-  const res = await fetch(`${PRINTFUL_BASE}/orders`, {
+  // confirm=1 submits the order straight to fulfillment; without it Printful
+  // keeps the order as a draft awaiting manual confirmation in the dashboard.
+  const url = `${PRINTFUL_BASE}/orders${isAutoConfirmEnabled() ? '?confirm=1' : ''}`
+  const res = await fetch(url, {
     method: 'POST',
     headers: buildPrintfulHeaders(getApiKey()),
     body: JSON.stringify({

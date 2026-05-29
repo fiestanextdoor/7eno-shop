@@ -18,6 +18,7 @@ interface ProductDetailProps {
   productThumbnail?: string | null
   bgRemovedUrl?: string | null
   colorImages?: Record<string, string>
+  euSizeMap?: Record<string, string>
 }
 
 export default function ProductDetail({
@@ -28,7 +29,11 @@ export default function ProductDetail({
   productThumbnail,
   bgRemovedUrl,
   colorImages = {},
+  euSizeMap = {},
 }: ProductDetailProps) {
+  const isFootwear = Object.keys(euSizeMap).length > 0
+  const displaySize = (v: { size: string; name: string }) =>
+    euSizeMap[v.size] ?? (v.size || v.name).replace(/\b\w/g, (c) => c.toUpperCase())
   const uniqueColors = Array.from(
     new Map(variants.filter((v) => v.color).map((v) => [v.color, v])).values()
   )
@@ -93,9 +98,21 @@ export default function ProductDetail({
     setAdded(true)
   }
 
+  // Preselect a color when arriving via a swatch deep-link (/shop/{slug}?color=…)
+  useEffect(() => {
+    const colorParam = new URLSearchParams(window.location.search).get('color')
+    if (!colorParam || !uniqueColors.some((v) => v.color === colorParam)) return
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSelectedColor(colorParam)
+    setCurrentImageUrl(colorImages[colorParam] ?? baseImageUrl)
+    /* eslint-enable react-hooks/set-state-in-effect */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Auto-select the only variant for one-size products (e.g. caps, accessories)
   useEffect(() => {
     if (uniqueSizes.length === 1 && isAvailable(uniqueSizes[0])) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedVariantId(uniqueSizes[0].id)
     }
   }, [selectedColor]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -190,7 +207,7 @@ export default function ProductDetail({
         {uniqueSizes.length > 1 && (
           <>
             <div className={styles.sizeLabelRow}>
-              <span className={styles.sizeLabel}>Select size</span>
+              <span className={styles.sizeLabel}>Select size{isFootwear ? ' (EU)' : ''}</span>
               <span className={styles.sizeCount}>{uniqueSizes.length} sizes</span>
             </div>
             <div className={styles.sizes}>
@@ -206,7 +223,7 @@ export default function ProductDetail({
                   aria-pressed={selectedVariantId === v.id}
                   disabled={!isAvailable(v)}
                 >
-                  {(v.size || v.name).replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {displaySize(v)}
                 </button>
               ))}
             </div>

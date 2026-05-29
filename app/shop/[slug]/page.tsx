@@ -1,38 +1,54 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { getProduct, getProducts } from '@/lib/printful'
+import { notFound, permanentRedirect } from 'next/navigation'
+import { getProduct, getProducts, getCatalogProductId, getEuSizeMap } from '@/lib/printful'
+import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
 import styles from './detail.module.css'
 
 interface Props {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
   try {
     const products = await getProducts()
-    return products.map((p) => ({ id: String(p.id) }))
+    return products.map((p) => ({ slug: productSlug(p.name) }))
   } catch {
     return []
   }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params
-  try {
-    const { sync_product } = await getProduct(id)
-    return { title: `${sync_product.name} — 7ENO` }
-  } catch {
-    return { title: '7ENO' }
-  }
+  const { slug } = await params
+  const products = await getProducts().catch(() => [])
+  const match = products.find((p) => productSlug(p.name) === slug)
+  return { title: match ? `${match.name} — 7ENO` : '7ENO' }
 }
 
 export default async function ProductPage({ params }: Props) {
-  const { id } = await params
+  const { slug } = await params
+
+  let products: Awaited<ReturnType<typeof getProducts>> = []
+  try {
+    products = await getProducts()
+  } catch {
+    products = []
+  }
+
+  // Back-compat: old numeric-id URLs (/shop/433351254) redirect to the slug URL.
+  if (/^\d+$/.test(slug)) {
+    const byId = products.find((p) => String(p.id) === slug)
+    if (byId) permanentRedirect(`/shop/${productSlug(byId.name)}`)
+    notFound()
+  }
+
+  const match = products.find((p) => productSlug(p.name) === slug)
+  if (!match) notFound()
+
   let detail
   try {
-    detail = await getProduct(id)
+    detail = await getProduct(String(match.id))
   } catch {
     notFound()
   }
@@ -48,6 +64,15 @@ export default async function ProductPage({ params }: Props) {
     null
 
   const productThumbnail = sync_product.thumbnail_url ?? null
+
+  // Footwear ships with US sizes from Printful; convert to EU for display.
+  const sizeValues = sync_variants.map((v) => v.size).filter(Boolean)
+  const isFootwear = sizeValues.length > 0 && sizeValues.every((s) => /^\d+(\.5)?$/.test(s))
+  let euSizeMap: Record<string, string> = {}
+  if (isFootwear && sync_variants[0]?.variant_id) {
+    const catalogProductId = await getCatalogProductId(sync_variants[0].variant_id)
+    if (catalogProductId) euSizeMap = await getEuSizeMap(catalogProductId)
+  }
 
   const bgRemovedUrl = productThumbnail
     ? await removeBackground(productThumbnail).catch(() => null)
@@ -78,6 +103,7 @@ export default async function ProductPage({ params }: Props) {
         productThumbnail={productThumbnail}
         bgRemovedUrl={bgRemovedUrl}
         colorImages={colorImages}
+        euSizeMap={euSizeMap}
       />
     </main>
   )

@@ -18,6 +18,10 @@
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--oxblood);
+  /* Never let a taller info block (e.g. a longer product name in the sibling
+     card) squeeze the photo: keep the aspect ratio so photo bottoms line up
+     across the grid columns. */
+  flex-shrink: 0;
 }
 
 .image {
@@ -141,6 +145,14 @@
   color: var(--ink);
   line-height: 1.2;
   font-variant-numeric: lining-nums;
+  /* Reserve two lines for every card so names of different lengths produce
+     equal-height cards (uniform grid on mobile, tablet and desktop). */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.4em;
 }
 
 .price {
