@@ -8,6 +8,12 @@
   .wrap {
     grid-template-columns: 1fr;
   }
+
+  /* Single column: the divider belongs on top, not as a stray vertical line. */
+  .info {
+    border-left: none;
+    border-top: 1px solid rgba(246, 243, 236, 0.1);
+  }
 }
 
 /* ── Image ── */

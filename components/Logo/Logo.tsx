@@ -35,13 +35,20 @@ export function LogoBadge({ variant = 'wit', size = 64, priority = false }: Badg
 
 export function LogoWordmark({ variant = 'wit', height = 36, priority = false, align = 'left' }: WordmarkProps) {
   const width = Math.round(height * WORDMARK_ASPECT_RATIO)
+  // Size by width + aspect-ratio with max-width:100% so the wordmark can never
+  // overflow its container: on a narrow cell it shrinks proportionally (height
+  // follows the ratio) instead of spilling over neighbouring layout. This keeps
+  // the logo consistent across all device widths.
   return (
-    <div className={styles.wrap} style={{ width, height }}>
+    <div
+      className={styles.wrap}
+      style={{ width, maxWidth: '100%', aspectRatio: String(WORDMARK_ASPECT_RATIO) }}
+    >
       <Image
         src={`/logos/woordmerk-${variant}.png`}
         alt="7ENO"
-        width={width}
-        height={height}
+        fill
+        sizes={`${width}px`}
         style={{ objectFit: 'contain', objectPosition: align === 'center' ? 'center' : 'left center' }}
         priority={priority}
       />

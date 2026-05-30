@@ -1,26 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { buildVariantLookup, getShippingRates, type ShippingRateItem } from '@/lib/printful'
-import { validateShippingAddress } from '@/lib/shipping'
+import { buildVariantLookup } from '@/lib/printful'
+import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem } from '@/types/cart'
-
-// Strip characters Stripe rejects in a shipping rate display_name and cap length.
-function sanitizeDisplayName(name: string): string {
-  const clean = name.replace(/[‐-―]/g, '-').replace(/[^\x20-\x7E]/g, '').trim()
-  const trimmed = clean.length > 50 ? clean.slice(0, 50).trim() : clean
-  return trimmed || 'Shipping'
-}
 
 export async function POST(req: NextRequest) {
   let items: CartItem[]
   let address: unknown
-  let shippingRateId: unknown
   try {
     const body = await req.json()
     items = body.items
     address = body.address
-    shippingRateId = body.shippingRateId
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
@@ -29,12 +20,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
   }
 
-  if (typeof shippingRateId !== 'string' || !shippingRateId) {
-    return NextResponse.json({ error: 'No shipping option selected' }, { status: 400 })
-  }
-
   // Validate identifiers and quantities. Prices, currency and shipping cost are
-  // NEVER trusted from the client; they are resolved server-side from Printful.
+  // NEVER trusted from the client; they are resolved server-side from Printful
+  // (prices) and the flat-rate shipping rule.
   for (const item of items) {
     if (!Number.isInteger(item.variantId) || !Number.isInteger(item.productId)) {
       return NextResponse.json({ error: 'Invalid item' }, { status: 400 })
@@ -63,7 +51,8 @@ export async function POST(req: NextRequest) {
   type CheckoutParams = NonNullable<Parameters<typeof stripe.checkout.sessions.create>[0]>
   const lineItems: NonNullable<CheckoutParams['line_items']> = []
   const cartMeta: { variantId: number; quantity: number; productName: string; variantName: string }[] = []
-  const rateItems: ShippingRateItem[] = []
+  let subtotalCents = 0
+  let currency = 'eur'
 
   for (const item of items) {
     // The variant is only present if it genuinely belongs to one of the products
@@ -82,9 +71,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product price unavailable' }, { status: 502 })
     }
 
+    currency = found.variant.currency.toLowerCase()
+    subtotalCents += unitAmount * item.quantity
+
     lineItems.push({
       price_data: {
-        currency: found.variant.currency.toLowerCase(),
+        currency,
         product_data: {
           name: found.productName,
           description: found.variant.name,
@@ -101,46 +93,21 @@ export async function POST(req: NextRequest) {
       productName: found.productName,
       variantName: found.variant.name,
     })
-
-    rateItems.push({ variant_id: found.variant.variant_id, quantity: item.quantity })
   }
 
-  // Recompute shipping server-side and use the rate matching the client's choice.
-  let shippingOption: NonNullable<CheckoutParams['shipping_options']>[number]
-  try {
-    const rates = await getShippingRates(
-      { address1: addr.line1, city: addr.city, country_code: addr.country, zip: addr.postalCode },
-      rateItems
-    )
-    const rate = rates.find((r) => r.id === shippingRateId)
-    if (!rate) {
-      return NextResponse.json(
-        { error: 'The selected shipping option is no longer available' },
-        { status: 400 }
-      )
-    }
-    const shippingAmount = Math.round(parseFloat(rate.rate) * 100)
-    if (!Number.isFinite(shippingAmount) || shippingAmount < 0) {
-      return NextResponse.json({ error: 'Shipping cost unavailable' }, { status: 502 })
-    }
-    shippingOption = {
-      shipping_rate_data: {
-        type: 'fixed_amount',
-        fixed_amount: { amount: shippingAmount, currency: rate.currency.toLowerCase() },
-        display_name: sanitizeDisplayName(rate.name),
-        ...(Number.isInteger(rate.minDeliveryDays) && Number.isInteger(rate.maxDeliveryDays)
-          ? {
-              delivery_estimate: {
-                minimum: { unit: 'business_day', value: rate.minDeliveryDays! },
-                maximum: { unit: 'business_day', value: rate.maxDeliveryDays! },
-              },
-            }
-          : {}),
+  // Flat-rate shipping computed from the server-trusted subtotal: free above the
+  // threshold, otherwise the fixed fee. Never read from the client.
+  const shippingCents = computeShippingCents(subtotalCents)
+  const shippingOption: NonNullable<CheckoutParams['shipping_options']>[number] = {
+    shipping_rate_data: {
+      type: 'fixed_amount',
+      fixed_amount: { amount: shippingCents, currency },
+      display_name: shippingCents === 0 ? 'Free shipping' : 'Standard shipping',
+      delivery_estimate: {
+        minimum: { unit: 'business_day', value: 5 },
+        maximum: { unit: 'business_day', value: 10 },
       },
-    }
-  } catch (err) {
-    console.error('[Checkout] Failed to resolve shipping rate:', err)
-    return NextResponse.json({ error: 'Could not calculate shipping' }, { status: 502 })
+    },
   }
 
   const cartJson = JSON.stringify(cartMeta)
@@ -183,7 +150,6 @@ export async function POST(req: NextRequest) {
       metadata: {
         cart: cartJson,
         ship_addr: JSON.stringify(addr),
-        ship_method: shippingRateId,
         ...(user ? { user_id: user.id } : {}),
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,

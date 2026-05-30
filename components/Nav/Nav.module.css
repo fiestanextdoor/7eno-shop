@@ -28,14 +28,9 @@
 .brand {
   display: flex;
   align-items: center;
-  transform: scale(2);
-  transform-origin: left center;
-}
-
-@media (max-width: 640px) {
-  .brand {
-    transform: scale(1.4);
-  }
+  /* min-width:0 lets this grid cell shrink so the logo (max-width:100%) scales
+     down on narrow screens instead of overflowing into the centre menu. */
+  min-width: 0;
 }
 
 .center {

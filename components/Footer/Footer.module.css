@@ -38,6 +38,12 @@
   .grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  /* Location is the odd third column: let it span the full width instead of
+     sitting awkwardly in the left half of a new row. */
+  .col:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .col {

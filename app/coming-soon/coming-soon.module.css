@@ -1,0 +1,168 @@
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Background video (same source as the hero) ── */
+.videoWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 177.78vh; /* 16:9 cover */
+  height: 100%;
+  min-width: 100%;
+  min-height: 56.25vw; /* 16:9 cover */
+  transform: translate(-50%, -50%);
+  border: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 17, 17, 0.5) 0%,
+    rgba(17, 17, 17, 0.35) 45%,
+    rgba(17, 17, 17, 0.72) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Centred content column ── */
+.content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 48px var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  animation: fadeInUp 1s ease both;
+}
+
+.logo {
+  margin-bottom: 2px;
+}
+
+.quote {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.7);
+  text-shadow: 0 1px 12px rgba(17, 17, 17, 0.9);
+  max-width: 34ch;
+  line-height: 1.8;
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(3.5rem, 11vw, 9rem);
+  color: var(--bone);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  text-shadow:
+    0 2px 20px rgba(17, 17, 17, 0.5),
+    0 4px 40px rgba(17, 17, 17, 0.3);
+}
+
+/* ── Release block ── */
+.release {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.releaseLabel {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--butter);
+  opacity: 0.6;
+}
+
+.releaseDate {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.countdown {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+  min-height: 56px; /* reserve space before the client countdown mounts */
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 52px;
+}
+
+.unitValue {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.unitLabel {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.5);
+}
+
+@media (max-width: 640px) {
+  .countdown {
+    gap: 12px;
+  }
+
+  .unit {
+    min-width: 44px;
+  }
+
+  .unitValue {
+    font-size: 1.6rem;
+  }
+
+  .releaseDate {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    animation: none;
+  }
+}

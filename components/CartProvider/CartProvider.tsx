@@ -13,6 +13,12 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   const pathname = usePathname()
   const showFooter = !HIDE_FOOTER.some((p) => pathname.startsWith(p))
 
+  // The coming-soon teaser is a sealed full-screen page: no nav, cart or footer
+  // (nothing to navigate to while the shop is locked).
+  if (pathname === '/coming-soon') {
+    return <>{children}</>
+  }
+
   return (
     <>
       <StoreHydration />

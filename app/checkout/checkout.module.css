@@ -9,12 +9,41 @@
   margin: 0 auto;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--ink);
+  padding: 6px;
+  margin-left: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--oxblood);
+}
+
+.backBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
 .title {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
-  margin-bottom: 8px;
 }
 
 .label {
@@ -125,78 +154,6 @@
   outline-offset: 1px;
 }
 
-.secondaryBtn {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--ink);
-  padding: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  width: 100%;
-  cursor: pointer;
-  margin-bottom: 20px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.secondaryBtn:hover:not(:disabled) {
-  background: var(--ink);
-  color: var(--bone);
-}
-
-.secondaryBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.secondaryBtn:focus-visible {
-  outline: 2px solid var(--oxblood);
-  outline-offset: 2px;
-}
-
-.rates {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.rate {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border: 1px solid var(--rule);
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.rate:hover {
-  border-color: var(--ink);
-}
-
-.rateSelected {
-  border-color: var(--ink);
-  background: var(--paper);
-}
-
-.rateRadio {
-  accent-color: var(--oxblood);
-}
-
-.rateName {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-}
-
-.ratePrice {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-}
-
 .summary {
   display: flex;
   flex-direction: column;
@@ -222,6 +179,15 @@
 .summaryValue {
   font-family: var(--font-mono);
   font-size: 0.8rem;
+}
+
+.shippingNote {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  color: var(--stone);
+  margin-top: 4px;
 }
 
 .total {

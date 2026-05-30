@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useCartStore } from '@/store/cart'
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping'
 import styles from './CartDrawer.module.css'
 
 export default function CartDrawer() {
@@ -73,6 +73,11 @@ export default function CartDrawer() {
               ))}
             </ul>
             <div className={styles.footer}>
+              <p className={styles.shippingNote}>
+                {total >= FREE_SHIPPING_THRESHOLD
+                  ? '✓ Your order ships free.'
+                  : `Free shipping on orders over €${FREE_SHIPPING_THRESHOLD.toFixed(0)} (add €${(FREE_SHIPPING_THRESHOLD - total).toFixed(2)}).`}
+              </p>
               <div className={styles.total}>
                 <span>Total</span>
                 <span>{items[0]?.currency ?? 'EUR'} {total.toFixed(2)}</span>

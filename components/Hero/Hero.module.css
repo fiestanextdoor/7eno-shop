@@ -2,6 +2,10 @@
   position: relative;
   width: 100%;
   height: 100vh;
+  /* Dynamic viewport height: avoids the address-bar resize jump and the
+     differing 100vh behaviour between iOS Safari and Android Chrome, so the
+     hero is the same height across devices. Falls back to vh where unsupported. */
+  height: 100dvh;
   min-height: 600px;
   background: var(--ink);
   display: flex;

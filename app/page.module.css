@@ -103,6 +103,14 @@
   gap: 2px;
 }
 
+/* Stack the category cards on phones so they never get cramped on narrower
+   devices (the layout must look the same across all phone widths). */
+@media (max-width: 600px) {
+  .categoryStripInner {
+    grid-template-columns: 1fr;
+  }
+}
+
 .categoryCard {
   background: var(--bone);
   padding: 40px 36px;

@@ -209,6 +209,14 @@
   gap: 12px;
 }
 
+.shippingNote {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  color: var(--stone);
+}
+
 .total {
   display: flex;
   justify-content: space-between;

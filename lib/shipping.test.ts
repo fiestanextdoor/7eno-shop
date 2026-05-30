@@ -1,4 +1,30 @@
-import { validateShippingAddress } from './shipping'
+import {
+  validateShippingAddress,
+  computeShippingCents,
+  FREE_SHIPPING_THRESHOLD_CENTS,
+  FLAT_SHIPPING_RATE_CENTS,
+} from './shipping'
+
+describe('computeShippingCents', () => {
+  it('charges the flat rate below the free-shipping threshold', () => {
+    expect(computeShippingCents(FREE_SHIPPING_THRESHOLD_CENTS - 1)).toBe(FLAT_SHIPPING_RATE_CENTS)
+    expect(computeShippingCents(2000)).toBe(FLAT_SHIPPING_RATE_CENTS)
+  })
+
+  it('is free exactly at the threshold', () => {
+    expect(computeShippingCents(FREE_SHIPPING_THRESHOLD_CENTS)).toBe(0)
+  })
+
+  it('is free above the threshold', () => {
+    expect(computeShippingCents(FREE_SHIPPING_THRESHOLD_CENTS + 5000)).toBe(0)
+  })
+
+  it('falls back to the flat rate for an empty or invalid subtotal', () => {
+    expect(computeShippingCents(0)).toBe(FLAT_SHIPPING_RATE_CENTS)
+    expect(computeShippingCents(-100)).toBe(FLAT_SHIPPING_RATE_CENTS)
+    expect(computeShippingCents(NaN)).toBe(FLAT_SHIPPING_RATE_CENTS)
+  })
+})
 
 describe('validateShippingAddress', () => {
   const valid = {

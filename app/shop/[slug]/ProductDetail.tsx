@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { SyncVariant, PrintfulFile } from '@/types/printful'
 import { useCartStore } from '@/store/cart'
 import { resolveSwatchBackground, resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite } from '@/lib/color-utils'
+import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_RATE } from '@/lib/shipping'
 import styles from './detail.module.css'
 
 const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
@@ -256,6 +257,12 @@ export default function ProductDetail({
           <div className={styles.detailRow}>
             <span className={styles.detailKey}>Delivery</span>
             <span className={styles.detailVal}>5–10 business days</span>
+          </div>
+          <div className={styles.detailRow}>
+            <span className={styles.detailKey}>Shipping</span>
+            <span className={styles.detailVal}>
+              €{FLAT_SHIPPING_RATE.toFixed(2)} · free over €{FREE_SHIPPING_THRESHOLD.toFixed(0)}
+            </span>
           </div>
           {variants[0]?.color && (
             <div className={styles.detailRow}>

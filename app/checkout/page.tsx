@@ -3,18 +3,16 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
-import { ALLOWED_COUNTRIES, COUNTRY_NAMES } from '@/lib/shipping'
+import {
+  ALLOWED_COUNTRIES,
+  COUNTRY_NAMES,
+  computeShippingCents,
+  FREE_SHIPPING_THRESHOLD,
+  FLAT_SHIPPING_RATE,
+} from '@/lib/shipping'
 import styles from './checkout.module.css'
-
-interface Rate {
-  id: string
-  name: string
-  rate: string
-  currency: string
-  minDeliveryDays?: number
-  maxDeliveryDays?: number
-}
 
 interface AddressForm {
   name: string
@@ -35,12 +33,9 @@ const EMPTY_FORM: AddressForm = {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter()
   const { items, total } = useCartStore()
   const [form, setForm] = useState<AddressForm>(EMPTY_FORM)
-  const [rates, setRates] = useState<Rate[] | null>(null)
-  const [selectedRateId, setSelectedRateId] = useState<string | null>(null)
-  const [ratesLoading, setRatesLoading] = useState(false)
-  const [ratesError, setRatesError] = useState<string | null>(null)
   const [payLoading, setPayLoading] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
 
@@ -50,60 +45,29 @@ export default function CheckoutPage() {
     form.city.trim() !== '' &&
     form.postalCode.trim() !== ''
 
+  // Shipping is a flat fee, free above the threshold. It depends only on the
+  // subtotal, so it is known immediately, without an extra "calculate" step or
+  // a round-trip for the destination.
   const subtotal = total()
-  const selectedRate = rates?.find((r) => r.id === selectedRateId) ?? null
-  const shippingCost = selectedRate ? parseFloat(selectedRate.rate) || 0 : 0
+  const shippingCost = computeShippingCents(Math.round(subtotal * 100)) / 100
+  const freeShipping = shippingCost === 0
+  const remainingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
   const grandTotal = subtotal + shippingCost
 
-  // Changing the address invalidates previously fetched rates, since shipping
-  // depends on the destination.
   const updateField = (key: keyof AddressForm, value: string) => {
     setForm((f) => ({ ...f, [key]: value }))
-    setRates(null)
-    setSelectedRateId(null)
-    setRatesError(null)
     setPayError(null)
   }
 
-  const fetchRates = async () => {
-    if (!addressComplete) {
-      setRatesError('Please fill in your full shipping address first.')
-      return
-    }
-    setRatesLoading(true)
-    setRatesError(null)
-    try {
-      const res = await fetch('/api/shipping-rates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, address: form }),
-      })
-      const data = await res.json()
-      if (!res.ok || !Array.isArray(data.rates)) {
-        setRatesError(data.error ?? 'Could not calculate shipping.')
-        return
-      }
-      const sorted: Rate[] = [...data.rates].sort(
-        (a, b) => (parseFloat(a.rate) || 0) - (parseFloat(b.rate) || 0)
-      )
-      setRates(sorted)
-      setSelectedRateId(sorted[0]?.id ?? null)
-    } catch {
-      setRatesError('Network error. Please try again.')
-    } finally {
-      setRatesLoading(false)
-    }
-  }
-
   const handleCheckout = async () => {
-    if (!selectedRateId) return
+    if (!addressComplete) return
     setPayLoading(true)
     setPayError(null)
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, address: form, shippingRateId: selectedRateId }),
+        body: JSON.stringify({ items, address: form }),
       })
       const data = await res.json()
       if (data.url) {
@@ -132,7 +96,19 @@ export default function CheckoutPage() {
   return (
     <main className={styles.page}>
       <div className={styles.inner}>
-        <h1 className={styles.title}>Checkout</h1>
+        <div className={styles.titleRow}>
+          <button
+            type="button"
+            className={styles.backBtn}
+            onClick={() => router.back()}
+            aria-label="Go back to the previous page"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <h1 className={styles.title}>Checkout</h1>
+        </div>
         <span className={styles.label}>
           {items.length} item{items.length > 1 ? 's' : ''}
         </span>
@@ -235,42 +211,6 @@ export default function CheckoutPage() {
           </label>
         </div>
 
-        {!rates && (
-          <button
-            className={styles.secondaryBtn}
-            onClick={fetchRates}
-            disabled={!addressComplete || ratesLoading}
-          >
-            {ratesLoading ? 'Calculating...' : 'Calculate shipping'}
-          </button>
-        )}
-
-        {ratesError && <p className={styles.error} aria-live="polite">{ratesError}</p>}
-
-        {rates && rates.length > 0 && (
-          <>
-            <h2 className={styles.sectionTitle}>Shipping method</h2>
-            <div className={styles.rates}>
-              {rates.map((rate) => (
-                <label
-                  key={rate.id}
-                  className={[styles.rate, selectedRateId === rate.id ? styles.rateSelected : ''].join(' ')}
-                >
-                  <input
-                    type="radio"
-                    name="shippingRate"
-                    className={styles.rateRadio}
-                    checked={selectedRateId === rate.id}
-                    onChange={() => setSelectedRateId(rate.id)}
-                  />
-                  <span className={styles.rateName}>{rate.name}</span>
-                  <span className={styles.ratePrice}>&euro;{(parseFloat(rate.rate) || 0).toFixed(2)}</span>
-                </label>
-              ))}
-            </div>
-          </>
-        )}
-
         <div className={styles.summary}>
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Subtotal</span>
@@ -279,9 +219,14 @@ export default function CheckoutPage() {
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Shipping</span>
             <span className={styles.summaryValue}>
-              {selectedRate ? `€${shippingCost.toFixed(2)}` : '—'}
+              {freeShipping ? 'Free' : `€${shippingCost.toFixed(2)}`}
             </span>
           </div>
+          <p className={styles.shippingNote}>
+            {freeShipping
+              ? `✓ You qualify for free shipping (orders over €${FREE_SHIPPING_THRESHOLD.toFixed(0)}).`
+              : `Flat €${FLAT_SHIPPING_RATE.toFixed(2)} shipping. Add €${remainingForFree.toFixed(2)} more for free shipping.`}
+          </p>
         </div>
 
         <div className={styles.total}>
@@ -294,10 +239,13 @@ export default function CheckoutPage() {
         <button
           className={styles.payBtn}
           onClick={handleCheckout}
-          disabled={payLoading || !selectedRateId}
+          disabled={payLoading || !addressComplete}
         >
           {payLoading ? 'Redirecting...' : 'Pay with Stripe'}
         </button>
+        {!addressComplete && (
+          <p className={styles.shippingNote}>Fill in your shipping address to continue.</p>
+        )}
       </div>
     </main>
   )

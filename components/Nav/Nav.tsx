@@ -31,7 +31,7 @@ export default function Nav() {
     <nav className={`${styles.nav} ${visible ? styles.navVisible : ''}`} aria-label="Main navigation">
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="7ENO home">
-          <LogoWordmark variant="butter" height={44} />
+          <LogoWordmark variant="butter" height={88} />
         </Link>
 
         <div className={styles.center}>
