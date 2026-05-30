@@ -69,19 +69,48 @@ export async function getProduct(id: string): Promise<PrintfulProductDetail> {
   return data.result
 }
 
+/**
+ * Fetch a Printful catalog/size-guide endpoint resiliently. These power the
+ * US→EU footwear conversion shown on the homepage "Latest Drop" and the product
+ * pages. A heavy page build can rate-limit them, and a cached failure would
+ * strip the EU sizes from a footwear page for the whole cache window (this is
+ * exactly why the homepage loafers could show US sizes while the detail page
+ * showed EU). So we read a short-lived cache on the happy path and, on any
+ * failure, retry with the cache bypassed before giving up. Returns parsed JSON,
+ * or null when every attempt failed.
+ */
+async function fetchCatalogJson(path: string): Promise<unknown> {
+  try {
+    const cached = await fetch(`${PRINTFUL_BASE}${path}`, {
+      headers: buildHeaders(getApiKey()),
+      next: { revalidate: 3600 },
+    })
+    if (cached.ok) return await cached.json()
+  } catch {
+    // fall through to uncached retries
+  }
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)))
+    try {
+      const res = await fetch(`${PRINTFUL_BASE}${path}`, {
+        headers: buildHeaders(getApiKey()),
+        cache: 'no-store',
+      })
+      if (res.ok) return await res.json()
+    } catch {
+      // retry
+    }
+  }
+  return null
+}
+
 /** Resolve the Printful catalog product id behind a sync variant's catalog variant id. */
 export async function getCatalogProductId(catalogVariantId: number): Promise<number | null> {
-  try {
-    const res = await fetch(`${PRINTFUL_BASE}/products/variant/${catalogVariantId}`, {
-      headers: buildHeaders(getApiKey()),
-      next: { revalidate: 86400 },
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.result?.product?.id ?? null
-  } catch {
-    return null
-  }
+  const data = (await fetchCatalogJson(`/products/variant/${catalogVariantId}`)) as
+    | { result?: { product?: { id?: number } } }
+    | null
+  return data?.result?.product?.id ?? null
 }
 
 /**
@@ -103,28 +132,28 @@ export async function getEuSizeMapForProduct(variants: SyncVariant[]): Promise<R
  * non-footwear or on error so callers fall back to the raw size.
  */
 export async function getEuSizeMap(catalogProductId: number): Promise<Record<string, string>> {
-  try {
-    const res = await fetch(`${PRINTFUL_BASE}/products/${catalogProductId}/sizes`, {
-      headers: buildHeaders(getApiKey()),
-      next: { revalidate: 86400 },
-    })
-    if (!res.ok) return {}
-    const data = await res.json()
-    const tables: Array<{
-      measurements?: Array<{ type_label?: string; values?: Array<{ size: string | number; value: string | number }> }>
-    }> = data.result?.size_tables ?? []
-    const map: Record<string, string> = {}
-    for (const table of tables) {
-      for (const measurement of table.measurements ?? []) {
-        if (measurement.type_label === 'Europe') {
-          for (const v of measurement.values ?? []) map[String(v.size)] = String(v.value)
+  const data = (await fetchCatalogJson(`/products/${catalogProductId}/sizes`)) as
+    | {
+        result?: {
+          size_tables?: Array<{
+            measurements?: Array<{
+              type_label?: string
+              values?: Array<{ size: string | number; value: string | number }>
+            }>
+          }>
         }
       }
+    | null
+  const tables = data?.result?.size_tables ?? []
+  const map: Record<string, string> = {}
+  for (const table of tables) {
+    for (const measurement of table.measurements ?? []) {
+      if (measurement.type_label === 'Europe') {
+        for (const v of measurement.values ?? []) map[String(v.size)] = String(v.value)
+      }
     }
-    return map
-  } catch {
-    return {}
   }
+  return map
 }
 
 /**
