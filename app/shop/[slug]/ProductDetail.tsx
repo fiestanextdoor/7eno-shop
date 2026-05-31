@@ -4,12 +4,24 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { SyncVariant, PrintfulFile } from '@/types/printful'
+import type { SizeGuide } from '@/lib/printful'
 import { useCartStore } from '@/store/cart'
-import { resolveSwatchBackground, resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite } from '@/lib/color-utils'
+import { resolveSwatchBackground, resolveHex, applyBrandOverride, brandColorName, isNearWhite } from '@/lib/color-utils'
 import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_RATE } from '@/lib/shipping'
 import styles from './detail.module.css'
 
 const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
+
+// Standard care for 7ENO's printed apparel. Printful exposes no care field, so
+// this is the recommended care for DTF / all-over prints; the fabric specifics
+// come from Printful's product description (see `materials`).
+const CARE_INSTRUCTIONS = [
+  'Machine wash cold, inside out, gentle cycle',
+  'Use mild detergent, do not bleach',
+  'Tumble dry low or hang to dry',
+  'Do not iron directly on the print',
+  'Do not dry clean',
+]
 
 interface ProductDetailProps {
   productId: number
@@ -19,7 +31,10 @@ interface ProductDetailProps {
   productThumbnail?: string | null
   bgRemovedUrl?: string | null
   colorImages?: Record<string, string>
+  colorBackImages?: Record<string, string>
   euSizeMap?: Record<string, string>
+  materials?: string[]
+  sizeGuide?: SizeGuide | null
 }
 
 export default function ProductDetail({
@@ -30,7 +45,10 @@ export default function ProductDetail({
   productThumbnail,
   bgRemovedUrl,
   colorImages = {},
+  colorBackImages = {},
   euSizeMap = {},
+  materials = [],
+  sizeGuide = null,
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
   const displaySize = (v: { size: string; name: string }) =>
@@ -45,10 +63,13 @@ export default function ProductDetail({
     uniqueColors.map((v) => resolveHex(v.color, v.color_code ?? '')).filter((h) => !isNearWhite(h))
   )
 
-  const getDisplayName = (v: { color: string; color_code: string | null | undefined }) => {
-    const rawHex = resolveHex(v.color, v.color_code ?? '')
-    const finalHex = applyBrandOverride(productName, rawHex, v.color, skipHexes)
-    return resolveDisplayName(v.color, rawHex, finalHex, productName)
+  // 7ENO brand colour name (Butter/Blood/Ink/Stone/…) for a variant colour,
+  // instead of Printful's fabric name like "Vintage White".
+  const brandNameFor = (color: string) => {
+    const v = uniqueColors.find((c) => c.color === color)
+    if (!v) return color
+    const finalHex = applyBrandOverride(productName, resolveHex(v.color, v.color_code ?? ''), v.color, skipHexes)
+    return brandColorName(finalHex)
   }
 
   const defaultColor = uniqueColors[0]?.color ?? ''
@@ -59,11 +80,18 @@ export default function ProductDetail({
     productThumbnail ??
     null
 
+  const frontFor = (color: string) => colorImages[color] ?? baseImageUrl
+  const backFor = (color: string) => colorBackImages[color] ?? null
+
   const [selectedColor, setSelectedColor] = useState<string>(defaultColor)
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(baseImageUrl)
+  const [activeImageUrl, setActiveImageUrl] = useState<string | null>(baseImageUrl)
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
+
+  const frontImageUrl = frontFor(selectedColor)
+  const backImageUrl = backFor(selectedColor)
+  const gallery = [frontImageUrl, backImageUrl].filter((u): u is string => Boolean(u))
 
   const colorVariants = hasColors && selectedColor
     ? variants.filter((v) => v.color === selectedColor)
@@ -81,7 +109,7 @@ export default function ProductDetail({
   const handleColorChange = (color: string) => {
     setSelectedColor(color)
     setSelectedVariantId(null)
-    setCurrentImageUrl(colorImages[color] ?? baseImageUrl)
+    setActiveImageUrl(frontFor(color))
   }
 
   const handleAddToCart = () => {
@@ -94,7 +122,7 @@ export default function ProductDetail({
       price: selectedVariant.retail_price,
       currency: selectedVariant.currency,
       quantity: 1,
-      imageUrl: currentImageUrl,
+      imageUrl: frontImageUrl,
     })
     setAdded(true)
   }
@@ -105,7 +133,7 @@ export default function ProductDetail({
     if (!colorParam || !uniqueColors.some((v) => v.color === colorParam)) return
     /* eslint-disable react-hooks/set-state-in-effect */
     setSelectedColor(colorParam)
-    setCurrentImageUrl(colorImages[colorParam] ?? baseImageUrl)
+    setActiveImageUrl(colorImages[colorParam] ?? baseImageUrl)
     /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -126,15 +154,16 @@ export default function ProductDetail({
 
   const currency = variants[0]?.currency ?? 'EUR'
   const currencySymbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency
+  const colorLabel = brandNameFor(selectedColor || variants[0]?.color || '')
 
   return (
     <div className={styles.inner}>
 
       {/* ── Left: image ── */}
       <div className={styles.imagePanel}>
-        {currentImageUrl ? (
+        {activeImageUrl ? (
           <Image
-            src={currentImageUrl}
+            src={activeImageUrl}
             alt={productName}
             fill
             className={styles.mainImg}
@@ -144,6 +173,23 @@ export default function ProductDetail({
           />
         ) : (
           <div className={styles.imgPlaceholder} />
+        )}
+
+        {gallery.length > 1 && (
+          <div className={styles.thumbs}>
+            {gallery.map((url, i) => (
+              <button
+                key={url}
+                type="button"
+                className={[styles.thumb, activeImageUrl === url ? styles.thumbActive : ''].join(' ')}
+                onClick={() => setActiveImageUrl(url)}
+                aria-label={i === 0 ? 'Front view' : 'Back view'}
+                aria-pressed={activeImageUrl === url}
+              >
+                <Image src={url} alt="" fill className={styles.thumbImg} sizes="80px" unoptimized />
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
@@ -179,11 +225,7 @@ export default function ProductDetail({
           <>
             <div className={styles.sizeLabelRow}>
               <span className={styles.sizeLabel}>Color</span>
-              <span className={styles.sizeCount}>
-                {uniqueColors.find((v) => v.color === selectedColor)
-                  ? getDisplayName(uniqueColors.find((v) => v.color === selectedColor)!)
-                  : selectedColor}
-              </span>
+              <span className={styles.sizeCount}>{colorLabel}</span>
             </div>
             <div className={styles.colorSwatches}>
               {uniqueColors.map((v) => (
@@ -195,9 +237,9 @@ export default function ProductDetail({
                   ].join(' ')}
                   style={{ background: resolveSwatchBackground(v.color, v.color_code, v.color_code2, productName, skipHexes) }}
                   onClick={() => handleColorChange(v.color)}
-                  title={getDisplayName(v)}
+                  title={brandNameFor(v.color)}
                   aria-pressed={selectedColor === v.color}
-                  aria-label={getDisplayName(v)}
+                  aria-label={brandNameFor(v.color)}
                 />
               ))}
             </div>
@@ -244,6 +286,62 @@ export default function ProductDetail({
             : 'Add to cart'}
         </button>
 
+        {/* Size guide (apparel) */}
+        {sizeGuide && sizeGuide.sizes.length > 0 && (
+          <details className={styles.disclosure}>
+            <summary className={styles.disclosureSummary}>
+              <span>Size guide</span>
+              <span className={styles.disclosureIcon} aria-hidden="true">+</span>
+            </summary>
+            <div className={styles.sizeTableWrap}>
+              <table className={styles.sizeTable}>
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    {sizeGuide.sizes.map((s) => (
+                      <th key={s} scope="col">{euSizeMap[s] ?? s}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sizeGuide.rows.map((row) => (
+                    <tr key={row.label}>
+                      <th scope="row">{row.label}</th>
+                      {sizeGuide.sizes.map((s) => (
+                        <td key={s}>{row.values[s] || '–'}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className={styles.sizeTableNote}>Body measurements in {sizeGuide.unit}.</p>
+          </details>
+        )}
+
+        {/* Care & material */}
+        <details className={styles.disclosure}>
+          <summary className={styles.disclosureSummary}>
+            <span>Care &amp; material</span>
+            <span className={styles.disclosureIcon} aria-hidden="true">+</span>
+          </summary>
+          <ul className={styles.careList}>
+            {CARE_INSTRUCTIONS.map((c) => (
+              <li key={c} className={styles.careItem}>{c}</li>
+            ))}
+          </ul>
+          {materials.length > 0 && (
+            <>
+              <p className={styles.careSubLabel}>Material</p>
+              <ul className={styles.careList}>
+                {materials.map((m) => (
+                  <li key={m} className={styles.careItem}>{m}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </details>
+
         {/* Details */}
         <div className={styles.details}>
           <div className={styles.detailRow}>
@@ -267,11 +365,7 @@ export default function ProductDetail({
           {variants[0]?.color && (
             <div className={styles.detailRow}>
               <span className={styles.detailKey}>Color</span>
-              <span className={styles.detailVal}>
-              {uniqueColors.find((v) => v.color === (selectedColor || variants[0].color))
-                ? getDisplayName(uniqueColors.find((v) => v.color === (selectedColor || variants[0].color))!)
-                : (selectedColor || variants[0].color)}
-            </span>
+              <span className={styles.detailVal}>{colorLabel}</span>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
-import { getProduct, getProducts, getEuSizeMapForProduct } from '@/lib/printful'
+import { getProduct, getProducts, getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide } from '@/lib/printful'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
@@ -68,6 +68,21 @@ export default async function ProductPage({ params }: Props) {
   // Footwear ships with US sizes from Printful; convert to EU for display.
   const euSizeMap = await getEuSizeMapForProduct(sync_variants)
 
+  // Catalog product (for care/material bullets + the apparel size guide).
+  const catalogProductId = sync_variants[0]?.variant_id
+    ? await getCatalogProductId(sync_variants[0].variant_id)
+    : null
+  const isFootwear = Object.keys(euSizeMap).length > 0
+  const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
+  const offeredSizes = [...new Set(sync_variants.map((v) => v.size).filter(Boolean))].filter(
+    (s) => !EXCLUDED_SIZES.has(s)
+  )
+  const [materials, sizeGuide] = await Promise.all([
+    catalogProductId ? getProductMaterials(catalogProductId) : Promise.resolve([]),
+    // Size guide only for apparel (footwear uses the EU numeric label instead).
+    catalogProductId && !isFootwear ? getSizeGuide(catalogProductId, offeredSizes) : Promise.resolve(null),
+  ])
+
   const bgRemovedUrl = productThumbnail
     ? await removeBackground(productThumbnail).catch(() => null)
     : null
@@ -97,6 +112,23 @@ export default async function ProductPage({ params }: Props) {
     })
   )
 
+  // Back-view mockup per colour (shirts/shorts have a "back"/"back_dtf" file).
+  // Shown as a second photo so the back of the print is visible.
+  const rawColorBackImages: Record<string, string> = {}
+  for (const variant of sync_variants) {
+    if (!variant.color || rawColorBackImages[variant.color]) continue
+    const backFile = (variant.files ?? []).find((f) => /back/i.test(f.type) && f.preview_url)
+    const url = backFile?.preview_url ?? null
+    if (url) rawColorBackImages[variant.color] = url
+  }
+  const colorBackImages: Record<string, string> = {}
+  await Promise.all(
+    Object.entries(rawColorBackImages).map(async ([color, url]) => {
+      const processed = await removeBackground(url).catch(() => null)
+      colorBackImages[color] = processed ?? url
+    })
+  )
+
   return (
     <main className={styles.page}>
       <ProductDetail
@@ -107,7 +139,10 @@ export default async function ProductPage({ params }: Props) {
         productThumbnail={productThumbnail}
         bgRemovedUrl={bgRemovedUrl}
         colorImages={colorImages}
+        colorBackImages={colorBackImages}
         euSizeMap={euSizeMap}
+        materials={materials}
+        sizeGuide={sizeGuide}
       />
     </main>
   )

@@ -179,6 +179,13 @@
   overflow: hidden;
 }
 
+/* Touch devices have no real hover: never reveal the slide-up "View Product"
+   bar (it would stick after a tap) and don't zoom the image on tap. */
+@media (hover: none) {
+  .hoverBar { display: none; }
+  .card:hover .image { transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .image   { transition: none; }
   .hoverBar { transition: none; }

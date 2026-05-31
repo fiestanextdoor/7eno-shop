@@ -134,6 +134,39 @@ const LOGO_COLOR_HEX: Record<string, string> = {
   'ink':    '#111111', // "ink" as logo/design = dark ink
 }
 
+// 7ENO brand colour vocabulary used in product names. The detail page labels a
+// variant's colour with the nearest of these (e.g. "Butter", "Blood", "Ink",
+// "Stone") instead of Printful's fabric name like "Vintage White".
+const BRAND_PALETTE: Array<{ name: string; hex: string }> = [
+  { name: 'Ink',    hex: '#111111' },
+  { name: 'Blood',  hex: '#5C1A1B' },
+  { name: 'Stone',  hex: '#8A8275' },
+  { name: 'Butter', hex: '#EDE8DC' },
+  { name: 'Carrot', hex: '#D4622A' },
+  { name: 'Coin',   hex: '#C4A860' },
+]
+
+/** Nearest 7ENO brand colour name for a resolved hex (by RGB distance). */
+export function brandColorName(hex: string): string {
+  const c = hex.startsWith('#') && hex.length >= 7 ? hex : '#888888'
+  const r = parseInt(c.slice(1, 3), 16)
+  const g = parseInt(c.slice(3, 5), 16)
+  const b = parseInt(c.slice(5, 7), 16)
+  let best = BRAND_PALETTE[0]
+  let bestDist = Infinity
+  for (const p of BRAND_PALETTE) {
+    const pr = parseInt(p.hex.slice(1, 3), 16)
+    const pg = parseInt(p.hex.slice(3, 5), 16)
+    const pb = parseInt(p.hex.slice(5, 7), 16)
+    const d = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
+    if (d < bestDist) {
+      bestDist = d
+      best = p
+    }
+  }
+  return best.name
+}
+
 export function resolveHex(colorName: string, colorCode: string): string {
   const key = colorName.toLowerCase().trim()
   if (key && COLOR_HEX[key]) return COLOR_HEX[key]

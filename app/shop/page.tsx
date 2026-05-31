@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import ProductCard from '@/components/ProductCard/ProductCard'
+import ShopFilters from '@/components/ShopFilters/ShopFilters'
 import { getProducts, getProduct } from '@/lib/printful'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor } from '@/lib/color-utils'
@@ -12,58 +12,65 @@ export const metadata: Metadata = {
   description: 'Browse the full 7ENO collection.',
 }
 
-// ── Custom product catalogue (filter by Printful ID) ──────────────────────────
+// ── Keyword-based classification ──────────────────────────────────────────────
+// Products are filtered from keywords in their name, so a product added in
+// Printful shows up under the right filters automatically (no code change),
+// provided its name contains the relevant words (e.g. "Tee", "Shorts", "Men",
+// "Sport", "Cap").
 
-const SHARED_ACCESSORY_IDS = [
-  433354226, 433351639, 433351026, // Headwear
-  433344612,                        // Towel
-  433353836, 433353269, 433352871, 433352744, 433352490, // Other (phone cases etc.)
-]
-
-const WOMEN_ONLY_IDS = [
-  433351254, // Loafers (women's footwear)
-]
-
-const ACCESSORY_IDS = [...SHARED_ACCESSORY_IDS, ...WOMEN_ONLY_IDS]
-
-const GENDER_IDS: Record<string, number[]> = {
-  men: [
-    433344927, 433344876, 433344735, 432343313, // Tee Men
-    433345077,                                   // Swim Shorts
-    433345518, 433345476, 433345296,             // Sport Tee
-    433351405, 433351139, 433350977, 433350867,  // Sport Shorts
-    ...SHARED_ACCESSORY_IDS,
-  ],
-  women: [
-    433345279, 433345190, 433345163, // Tee Women
-    433351920,                        // Bikini
-    433345077,                        // Swim Shorts
-    433345518, 433345476, 433345296,  // Sport Tee
-    433351405, 433351139, 433350977, 433350867, // Sport Shorts
-    ...ACCESSORY_IDS,
-  ],
+interface Classification {
+  isWomen: boolean
+  isMen: boolean
+  isUnisex: boolean
+  isTee: boolean
+  isShorts: boolean
+  isSwim: boolean
+  isAccessory: boolean
+  isClothing: boolean
+  isSport: boolean
 }
 
-const LINE_IDS: Record<string, number[]> = {
-  // Daily = normal clothing only (no sport, no accessories)
-  daily: [
-    433345279, 433345190, 433345163, // Tee Women
-    433344927, 433344876, 433344735, 432343313, // Tee Men
-    433351920,                        // Bikini
-    433345077,                        // Swim Shorts
-  ],
-  // Sport = sport clothing only (no accessories)
-  sport: [
-    433345518, 433345476, 433345296, // Sport Tee Unisex
-    433351405, 433351139, 433350977, 433350867, // Sport Shorts Unisex
-  ],
+const ACCESSORY_KEYWORDS = [
+  'cap', 'beanie', 'hat', 'backpack', 'bag', 'tote', 'towel', 'phone', 'case',
+  'mug', 'mouse', 'desk mat', 'loafer', 'sock', 'sticker', 'poster', 'sandal',
+]
+
+function classify(name: string): Classification {
+  const n = name.toLowerCase()
+  const isWomen = n.includes('women')
+  const isMen = n.includes('men') && !isWomen // "women" contains "men"
+  const isUnisex = n.includes('unisex')
+  const isTee = n.includes('tee') || n.includes('shirt')
+  const isSwim = n.includes('swim') || n.includes('bikini')
+  const isShorts = n.includes('shorts') && !isSwim
+  const isAccessory = ACCESSORY_KEYWORDS.some((k) => n.includes(k))
+  const isClothing = isTee || isShorts || isSwim
+  const isSport = n.includes('sport')
+  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isAccessory, isClothing, isSport }
 }
 
-const CATEGORY_IDS: Record<string, number[]> = {
-  tees:        [433345279, 433345190, 433345163, 433344927, 433344876, 433344735, 432343313, 433345518, 433345476, 433345296],
-  shorts:      [433351405, 433351139, 433350977, 433350867],
-  swimwear:    [433351920, 433345077],
-  accessories: [...ACCESSORY_IDS],
+function inGender(gender: string, c: Classification): boolean {
+  // Unisex and genderless accessories show under both; women-only is excluded
+  // from men and vice versa.
+  if (gender === 'men') return c.isUnisex || !c.isWomen
+  if (gender === 'women') return c.isUnisex || !c.isMen
+  return true
+}
+
+function inLine(line: string, c: Classification): boolean {
+  if (line === 'sport') return c.isSport
+  if (line === 'daily') return c.isClothing && !c.isSport
+  return true
+}
+
+function inCategory(category: string, c: Classification): boolean {
+  switch (category) {
+    case 'tees': return c.isTee
+    case 'shorts': return c.isShorts
+    case 'swimwear': return c.isSwim
+    case 'accessories': return c.isAccessory
+    default: return true
+  }
 }
 
 // Default display order when no line filter is active
@@ -108,28 +115,17 @@ export default async function ShopPage({ searchParams }: Props) {
     console.error('[Printful] getProducts failed:', err)
   }
 
-  let products = [...allProducts]
-
-  // 1. Gender filter
-  if (gender && GENDER_IDS[gender]) {
-    const ids = new Set(GENDER_IDS[gender])
-    products = products.filter((p) => ids.has(p.id))
-  }
-
-  // 2. Line filter — skip for categories that have no daily/sport split
+  // Filter by keyword classification (gender → line → category).
   const effectiveLine = NO_LINE_CATEGORIES.has(category) ? '' : line
-  if (effectiveLine && LINE_IDS[effectiveLine]) {
-    const ids = new Set(LINE_IDS[effectiveLine])
-    products = products.filter((p) => ids.has(p.id))
-  }
+  const products = allProducts.filter((p) => {
+    const c = classify(p.name)
+    if (gender && !inGender(gender, c)) return false
+    if (effectiveLine && !inLine(effectiveLine, c)) return false
+    if (category && !inCategory(category, c)) return false
+    return true
+  })
 
-  // 3. Category filter
-  if (category && CATEGORY_IDS[category]) {
-    const ids = new Set(CATEGORY_IDS[category])
-    products = products.filter((p) => ids.has(p.id))
-  }
-
-  // 4. Sort: normal clothing → sportswear → swimwear → accessories
+  // Sort: normal clothing → sportswear → swimwear → accessories
   products.sort((a, b) =>
     (SORT_PRIORITY[a.id] ?? 99) - (SORT_PRIORITY[b.id] ?? 99)
   )
@@ -238,40 +234,13 @@ export default async function ShopPage({ searchParams }: Props) {
           </div>
         </div>
 
-<div className={styles.filterBar} role="navigation" aria-label="Filters">
-          <div className={styles.filterGroup}>
-            <span className={styles.filterGroupLabel}>Gender</span>
-            <div className={styles.filterLinks}>
-              {genderFilters.map((f) => (
-                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                  {f.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <span className={styles.filterGroupLabel}>Line</span>
-            <div className={styles.filterLinks}>
-              {lineFilters.map((f) => (
-                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                  {f.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <span className={styles.filterGroupLabel}>Category</span>
-            <div className={styles.filterLinks}>
-              {categoryFilters.map((f) => (
-                <Link key={f.label} href={f.href} className={f.active ? `${styles.filter} ${styles.filterActive}` : styles.filter}>
-                  {f.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+<ShopFilters
+          groups={[
+            { label: 'Gender', items: genderFilters },
+            { label: 'Line', items: lineFilters },
+            { label: 'Category', items: categoryFilters },
+          ]}
+        />
       </header>
 
       {products.length === 0 ? (

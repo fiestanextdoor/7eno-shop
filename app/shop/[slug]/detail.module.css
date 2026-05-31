@@ -360,8 +360,171 @@
   letter-spacing: 3px;
 }
 
+/* ── Image thumbnails (front / back) ── */
+.thumbs {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.thumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  background: var(--bone);
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.thumb:hover {
+  border-color: var(--ink);
+}
+
+.thumbActive {
+  border-color: var(--ink);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.thumbImg {
+  object-fit: contain;
+  padding: 6px;
+}
+
+/* ── Collapsible sections (size guide, care) ── */
+.disclosure {
+  border-top: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.disclosureSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.disclosureSummary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosureSummary:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.disclosureIcon {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--stone);
+  transition: transform 0.2s;
+}
+
+.disclosure[open] .disclosureIcon {
+  transform: rotate(45deg);
+}
+
+/* ── Care & material ── */
+.careList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 0 18px;
+}
+
+.careItem {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  color: var(--stone);
+}
+
+.careItem::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: rgba(17, 17, 17, 0.3);
+}
+
+.careSubLabel {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  margin: 2px 0 10px;
+}
+
+/* ── Size guide table ── */
+.sizeTableWrap {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.sizeTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+}
+
+.sizeTable th,
+.sizeTable td {
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  padding: 8px 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sizeTable thead th {
+  color: var(--oxblood);
+  text-transform: uppercase;
+}
+
+.sizeTable tbody th {
+  text-align: left;
+  color: var(--stone);
+  text-transform: uppercase;
+}
+
+.sizeTable td {
+  color: var(--ink);
+}
+
+.sizeTableNote {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--stone);
+  padding: 10px 0 18px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sizeBtn,
   .addBtn,
-  .backLink { transition: none; }
+  .backLink,
+  .thumb,
+  .disclosureIcon { transition: none; }
 }

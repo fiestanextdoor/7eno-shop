@@ -50,101 +50,28 @@
   margin-bottom: 12px;
 }
 
-/* ── Filter bar ── */
-.filterBar {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  width: fit-content;
-  max-width: 100%;
-  border: 1px solid rgba(17, 17, 17, 0.1);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.filterBar::-webkit-scrollbar {
-  display: none;
-}
-
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.filterGroup + .filterGroup {
-  border-left: 1px solid rgba(17, 17, 17, 0.1);
-}
-
-.filterGroupLabel {
-  font-family: var(--font-mono);
-  font-size: 0.42rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(17, 17, 17, 0.3);
-  padding: 10px 16px 6px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
-  white-space: nowrap;
-}
-
-.filterLinks {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 8px 8px;
-}
-
-.filter {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--stone);
-  padding: 7px 14px;
-  border: 1px solid transparent;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.2s, background 0.2s, border-color 0.2s;
-}
-
-.filter:hover {
-  color: var(--ink);
-  border-color: rgba(17, 17, 17, 0.15);
-}
-
-.filter:focus-visible {
-  outline: 2px solid var(--oxblood);
-  outline-offset: 2px;
-}
-
-.filterActive {
-  color: var(--bone);
-  background: var(--oxblood);
-  border-color: var(--oxblood);
-}
-
-.filterActive:hover {
-  color: var(--bone);
-  border-color: var(--oxblood);
-}
-
 /* ── Product grid ── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* minmax(0, 1fr) instead of 1fr: a bare 1fr track is minmax(auto, 1fr) and
+     grows to fit its widest content (e.g. a card with many colour swatches),
+     making one column wider than the other — which, via the image aspect-ratio,
+     made the photos in one column taller than the other. minmax(0, …) forces
+     strictly equal columns so all photos share the same height. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 3px;
   padding: 3px;
 }
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1200px) {
   .grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

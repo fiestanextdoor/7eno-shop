@@ -157,6 +157,93 @@ export async function getEuSizeMap(catalogProductId: number): Promise<Record<str
 }
 
 /**
+ * Material/spec bullets from a Printful catalog product's description (the lines
+ * that start with "•", e.g. "100% combed ring-spun cotton"). Printful exposes no
+ * dedicated care field, so these feed the "Material" part of the care block.
+ */
+export async function getProductMaterials(catalogProductId: number): Promise<string[]> {
+  const data = (await fetchCatalogJson(`/products/${catalogProductId}`)) as
+    | { result?: { product?: { description?: string } } }
+    | null
+  const desc = data?.result?.product?.description ?? ''
+  return desc
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith('•'))
+    .map((l) => l.replace(/^•\s*/, '').trim())
+    .filter(Boolean)
+}
+
+export interface SizeGuide {
+  unit: string
+  sizes: string[]
+  rows: { label: string; values: Record<string, string> }[]
+}
+
+/**
+ * A size guide for apparel, built from Printful's "measure yourself" body
+ * measurements. Printful reports inches; we convert to cm for the EU audience.
+ * Ranges (e.g. chest 34–37") become "86–94". Optionally filtered to the sizes a
+ * product actually offers so the guide matches the buyable options.
+ */
+export async function getSizeGuide(
+  catalogProductId: number,
+  allowedSizes?: string[]
+): Promise<SizeGuide | null> {
+  const data = (await fetchCatalogJson(`/products/${catalogProductId}/sizes`)) as
+    | {
+        result?: {
+          available_sizes?: string[]
+          size_tables?: Array<{
+            type?: string
+            measurements?: Array<{
+              type_label?: string
+              values?: Array<{
+                size: string | number
+                value?: string | number
+                min_value?: string | number
+                max_value?: string | number
+              }>
+            }>
+          }>
+        }
+      }
+    | null
+
+  const tables = data?.result?.size_tables ?? []
+  if (tables.length === 0) return null
+  // Prefer body measurements ("measure yourself") so customers can pick a size.
+  const table = tables.find((t) => t.type === 'measure_yourself') ?? tables[0]
+  const measurements = table?.measurements ?? []
+  if (measurements.length === 0) return null
+
+  const toCm = (inch: string | number) => Math.round(Number(inch) * 2.54)
+  const cell = (v: { value?: string | number; min_value?: string | number; max_value?: string | number }) => {
+    if (v.value !== undefined && v.value !== null && v.value !== '') return `${toCm(v.value)}`
+    if (v.min_value !== undefined && v.max_value !== undefined) return `${toCm(v.min_value)}–${toCm(v.max_value)}`
+    return ''
+  }
+
+  let sizes = data?.result?.available_sizes ?? []
+  if (sizes.length === 0) sizes = (measurements[0].values ?? []).map((v) => String(v.size))
+  if (allowedSizes && allowedSizes.length) {
+    const allow = new Set(allowedSizes)
+    sizes = sizes.filter((s) => allow.has(s))
+  }
+  if (sizes.length === 0) return null
+
+  const rows = measurements.map((m) => {
+    const byVal: Record<string, string> = {}
+    for (const v of m.values ?? []) byVal[String(v.size)] = cell(v)
+    const values: Record<string, string> = {}
+    for (const s of sizes) values[s] = byVal[s] ?? ''
+    return { label: m.type_label ?? '', values }
+  })
+
+  return { unit: 'cm', sizes, rows }
+}
+
+/**
  * Resolves a set of store product ids to a lookup keyed by sync variant id,
  * carrying the authoritative variant (price, catalog variant_id, currency) and
  * its product name. Shared by the checkout and shipping-rates routes so prices
