@@ -6,7 +6,7 @@ import styles from './coming-soon.module.css'
 
 export const metadata: Metadata = {
   title: '7ENO — Coming Soon',
-  description: 'Divine Authority. Launching 12 June 2026.',
+  description: 'Divine Authority. Launching 19 June 2026.',
   robots: { index: false, follow: false },
 }
 
