@@ -9,7 +9,7 @@
 export const RELEASE_AT_UTC = Date.UTC(2026, 5, 19, 17, 0, 0)
 
 /** Human-readable launch moment for the announcement page. */
-export const RELEASE_DATE_LABEL = '19 June 2026'
+export const RELEASE_DATE_LABEL = 'June 19th'
 export const RELEASE_TIME_LABEL = '19:00 CEST'
 
 /** True while the shop is still locked (before the launch moment). */

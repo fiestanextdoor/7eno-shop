@@ -25,7 +25,7 @@ export default function ComingSoonPage() {
 
       <section className={styles.content}>
         <div className={styles.logo}>
-          <LogoWordmark variant="butter" height={64} align="center" priority />
+          <LogoWordmark variant="butter" height={96} align="center" priority />
         </div>
 
         <p className={styles.quote}>Immortality is not a gift. It is a refusal.</p>
