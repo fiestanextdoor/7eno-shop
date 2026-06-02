@@ -93,3 +93,30 @@ describe('buildPrintifyOrderItems', () => {
     expect(items).toEqual([{ product_id: 'abc123', variant_id: 100, quantity: 2 }])
   })
 })
+
+describe('getProducts (paginated)', () => {
+  const originalFetch = global.fetch
+  afterEach(() => { global.fetch = originalFetch })
+
+  it('walks pages and maps every product', async () => {
+    process.env.PRINTIFY_API_KEY = 'k'
+    process.env.PRINTIFY_SHOP_ID = '42'
+    const page = (current: number, last: number, id: string) => ({
+      ok: true,
+      json: async () => ({
+        current_page: current, last_page: last, total: 2, per_page: 1,
+        data: [{ ...raw, id }],
+      }),
+    })
+    const calls: string[] = []
+    global.fetch = jest.fn(async (url: string) => {
+      calls.push(url)
+      return calls.length === 1 ? page(1, 2, 'p1') : page(2, 2, 'p2')
+    }) as unknown as typeof fetch
+
+    const { getProducts } = await import('./printify')
+    const products = await getProducts()
+    expect(products.map((p) => p.id)).toEqual(['p1', 'p2'])
+    expect(calls).toHaveLength(2)
+  })
+})
