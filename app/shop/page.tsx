@@ -35,11 +35,21 @@ const ACCESSORY_KEYWORDS = [
   'mug', 'mouse', 'desk mat', 'loafer', 'sock', 'sticker', 'poster', 'sandal',
 ]
 
+// Products whose name doesn't encode gender (e.g. Printify swimwear comes through
+// as "7ENO Bikini" / "7ENO Swim Shorts"). Force the gender so the Men/Women filter
+// behaves: a bikini is women-only, swim shorts are men-only. Matched on a lowercased
+// substring of the product name.
+const GENDER_OVERRIDES: Array<{ match: string; gender: 'men' | 'women' | 'unisex' }> = [
+  { match: 'bikini', gender: 'women' },
+  { match: 'swim shorts', gender: 'men' },
+]
+
 function classify(name: string): Classification {
   const n = name.toLowerCase()
-  const isWomen = n.includes('women')
-  const isMen = n.includes('men') && !isWomen // "women" contains "men"
-  const isUnisex = n.includes('unisex')
+  const genderOverride = GENDER_OVERRIDES.find((o) => n.includes(o.match))?.gender
+  const isWomen = genderOverride ? genderOverride === 'women' : n.includes('women')
+  const isMen = genderOverride ? genderOverride === 'men' : (n.includes('men') && !n.includes('women'))
+  const isUnisex = genderOverride ? genderOverride === 'unisex' : n.includes('unisex')
   const isTee = n.includes('tee') || n.includes('shirt')
   const isSwim = n.includes('swim') || n.includes('bikini')
   const isShorts = n.includes('shorts') && !isSwim
