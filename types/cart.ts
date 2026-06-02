@@ -1,6 +1,9 @@
+import type { Provider } from '@/types/catalog'
+
 export interface CartItem {
-  variantId: number
-  productId: number
+  provider: Provider
+  variantId: string
+  productId: string
   productName: string
   variantName: string
   price: string
