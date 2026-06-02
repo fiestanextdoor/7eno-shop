@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
-import { getProducts, getProduct } from '@/lib/printful'
+import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor } from '@/lib/color-utils'
-import type { SyncProduct } from '@/types/printful'
+import type { NormalizedProduct } from '@/types/catalog'
 import styles from './shop.module.css'
 
 export const metadata: Metadata = {
@@ -74,7 +74,7 @@ function inCategory(category: string, c: Classification): boolean {
 }
 
 // Default display order when no line filter is active
-const SORT_PRIORITY: Record<number, number> = {
+const SORT_PRIORITY: Record<string, number> = {
   // 1. Normal clothing — Women
   433345279: 0, 433345190: 1, 433345163: 2,
   // 1. Normal clothing — Men
@@ -108,11 +108,11 @@ interface Props {
 export default async function ShopPage({ searchParams }: Props) {
   const { gender = '', line = '', category = '' } = await searchParams
 
-  let allProducts: SyncProduct[] = []
+  let allProducts: NormalizedProduct[] = []
   try {
-    allProducts = await getProducts()
+    allProducts = await getCatalogProducts()
   } catch (err) {
-    console.error('[Printful] getProducts failed:', err)
+    console.error('[Catalog] getCatalogProducts failed:', err)
   }
 
   // Filter by keyword classification (gender → line → category).
@@ -134,44 +134,38 @@ export default async function ShopPage({ searchParams }: Props) {
   const [bgRemovedUrls, productInfoMap] = await Promise.all([
     Promise.all(
       products.map((p) =>
-        p.thumbnail_url ? removeBackground(p.thumbnail_url) : Promise.resolve(null)
+        p.thumbnailUrl ? removeBackground(p.thumbnailUrl) : Promise.resolve(null)
       )
     ),
     Promise.all(
       products.map((p) =>
-        getProduct(String(p.id))
-          .then(async ({ sync_variants }) => {
+        getCatalogProduct(p.provider, p.id)
+          .then(async (detail) => {
+            const variants = detail.variants
             // Collect definitively-colored hexes (non-near-white) — used to prevent
             // brand override from duplicating a color already shown by another swatch.
             const skipHexes = new Set<string>()
-            for (const v of sync_variants) {
+            for (const v of variants) {
               if (!v.color) continue
-              const h = resolveHex(v.color, v.color_code ?? '')
+              const h = resolveHex(v.color, v.colorCode ?? '')
               if (!isNearWhite(h)) skipHexes.add(h)
             }
 
             const seen = new Set<string>()
             const raw: { color: string; hex: string; hex2?: string; imageUrl?: string | null; displayName: string }[] = []
-            for (const v of sync_variants) {
+            for (const v of variants) {
               if (v.color && !seen.has(v.color)) {
                 seen.add(v.color)
-                const rawHex = resolveHex(v.color, v.color_code ?? '')
+                const rawHex = resolveHex(v.color, v.colorCode ?? '')
                 const hex = applyBrandOverride(p.name, rawHex, v.color, skipHexes)
                 const displayName = resolveDisplayName(v.color, rawHex, hex, p.name)
-                const naturalHex2 = v.color_code2 ? resolveHex('', v.color_code2) : null
                 const logoHex = resolveLogoColor(p.name, hex)
-                const hex2 = (naturalHex2 && naturalHex2 !== hex) ? naturalHex2 : (logoHex !== hex ? logoHex : undefined)
-                const previewFile =
-                  v.files?.find((f) => f.type === 'preview') ??
-                  v.files?.find((f) => f.type === 'default') ??
-                  v.files?.[0] ??
-                  null
-                const swatchImageUrl = previewFile?.preview_url ?? previewFile?.url ?? null
-                raw.push({ color: v.color, hex, hex2, imageUrl: swatchImageUrl, displayName })
+                const hex2 = logoHex !== hex ? logoHex : undefined
+                raw.push({ color: v.color, hex, hex2, imageUrl: v.imageUrl, displayName })
               }
             }
             // Deduplicate by resolved hex — prevents duplicate paper swatches when multiple
-            // Printful color names map to the same final color (e.g. "Blood" + "White" → paper)
+            // color names map to the same final color (e.g. "Blood" + "White" → paper)
             const seenHex = new Set<string>()
             const deduped = raw.filter((s) => {
               if (seenHex.has(s.hex)) return false
@@ -187,10 +181,9 @@ export default async function ShopPage({ searchParams }: Props) {
                 return { ...s, imageUrl: processed ?? s.imageUrl }
               })
             )
-            const firstVariant = sync_variants[0]
-            return { id: p.id, swatches, price: firstVariant?.retail_price, currency: firstVariant?.currency }
+            return { id: p.id, swatches, priceCents: detail.priceCents, currency: detail.currency }
           })
-          .catch(() => ({ id: p.id, swatches: [], price: undefined, currency: undefined }))
+          .catch(() => ({ id: p.id, swatches: [], priceCents: undefined, currency: undefined as string | undefined }))
       )
     ).then((entries) => Object.fromEntries(entries.map((e) => [e.id, e]))),
   ])
@@ -251,7 +244,7 @@ export default async function ShopPage({ searchParams }: Props) {
       ) : (
         <div className={styles.grid}>
           {products.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} imageUrl={bgRemovedUrls[i]} colorSwatches={productInfoMap[p.id]?.swatches} price={productInfoMap[p.id]?.price} currency={productInfoMap[p.id]?.currency} />
+            <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={bgRemovedUrls[i]} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} />
           ))}
         </div>
       )}
