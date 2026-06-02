@@ -146,6 +146,27 @@ const BRAND_PALETTE: Array<{ name: string; hex: string }> = [
   { name: 'Coin',   hex: '#C4A860' },
 ]
 
+// Explicit brand swatch colours for products whose provider data doesn't encode
+// the 7ENO colourway in the product name or variant colour (e.g. swimwear, which
+// comes through as plain "Black" / "White drawstring"). Keyed by a lowercased
+// substring of the product name. hex = top-left, hex2 = bottom-right.
+const BRAND_SWATCH_OVERRIDES: Array<{ match: string; hex: string; hex2: string }> = [
+  { match: 'bikini',      hex: '#5C1A1B', hex2: '#EDE8DC' }, // Blood → Butter
+  { match: 'swim shorts', hex: '#5C1A1B', hex2: '#EDE8DC' }, // Blood → Butter
+]
+
+/**
+ * Forced two-tone swatch colours for a product, or null when no override applies.
+ * Lets us present brand colourways the provider data can't express on its own.
+ */
+export function brandSwatchOverride(productName: string): { hex: string; hex2: string } | null {
+  const n = productName.toLowerCase()
+  for (const o of BRAND_SWATCH_OVERRIDES) {
+    if (n.includes(o.match)) return { hex: o.hex, hex2: o.hex2 }
+  }
+  return null
+}
+
 /** Nearest 7ENO brand colour name for a resolved hex (by RGB distance). */
 export function brandColorName(hex: string): string {
   const c = hex.startsWith('#') && hex.length >= 7 ? hex : '#888888'
@@ -277,6 +298,10 @@ export function resolveSwatchBackground(
   productName = '',
   skipHexes?: Set<string>
 ): string {
+  // Brand colourway override (e.g. swimwear) takes precedence over data-derived colours.
+  const override = productName ? brandSwatchOverride(productName) : null
+  if (override) return `linear-gradient(135deg, ${override.hex} 50%, ${override.hex2} 50%)`
+
   const rawHex = resolveHex(colorName, colorCode)
   const hex1 = applyBrandOverride(productName, rawHex, colorName, skipHexes)
 

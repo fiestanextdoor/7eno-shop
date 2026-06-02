@@ -3,7 +3,7 @@ import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
 import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
 import { removeBackground } from '@/lib/remove-bg'
-import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor } from '@/lib/color-utils'
+import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor, brandSwatchOverride } from '@/lib/color-utils'
 import type { NormalizedProduct } from '@/types/catalog'
 import styles from './shop.module.css'
 
@@ -157,10 +157,11 @@ export default async function ShopPage({ searchParams }: Props) {
               if (v.color && !seen.has(v.color)) {
                 seen.add(v.color)
                 const rawHex = resolveHex(v.color, v.colorCode ?? '')
-                const hex = applyBrandOverride(p.name, rawHex, v.color, skipHexes)
-                const displayName = resolveDisplayName(v.color, rawHex, hex, p.name)
-                const logoHex = resolveLogoColor(p.name, hex)
-                const hex2 = logoHex !== hex ? logoHex : undefined
+                const displayName = resolveDisplayName(v.color, rawHex, applyBrandOverride(p.name, rawHex, v.color, skipHexes), p.name)
+                // Brand colourway override (e.g. swimwear) wins over data-derived colours.
+                const override = brandSwatchOverride(p.name)
+                const hex = override ? override.hex : applyBrandOverride(p.name, rawHex, v.color, skipHexes)
+                const hex2 = override ? override.hex2 : (resolveLogoColor(p.name, hex) !== hex ? resolveLogoColor(p.name, hex) : undefined)
                 raw.push({ color: v.color, hex, hex2, imageUrl: v.imageUrl, displayName })
               }
             }
