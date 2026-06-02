@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createOrder, isAutoConfirmEnabled, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
+import { createOrder as createPrintfulOrder, isAutoConfirmEnabled as isPrintfulAutoConfirm, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
+import { createOrder as createPrintifyOrder, type PrintifyOrderRecipient, type PrintifyOrderLine } from '@/lib/printify'
 import { createServiceClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest) {
 
     const shipMethod = session.metadata?.ship_method || undefined
 
-    let cartItems: { variantId: number; quantity: number; productName?: string; variantName?: string }[]
+    // Compact cart metadata: r=provider, p=productId, v=variantId, q=quantity.
+    let cartItems: { r: 'printful' | 'printify'; p: string; v: string; q: number }[]
     try {
       cartItems = JSON.parse(session.metadata?.cart ?? '[]')
     } catch {
@@ -68,18 +70,20 @@ export async function POST(req: NextRequest) {
     const supabase = await createServiceClient()
     const userId = session.metadata?.user_id ?? null
 
-    // Idempotency: Stripe retries webhooks. If this session was already fulfilled,
-    // do not create a second Printful order.
+    // Idempotency: if we already recorded fulfillments for this session, stop.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existing } = await (supabase.from('orders') as any)
-      .select('printful_order_id')
+      .select('fulfillments')
       .eq('stripe_session_id', session.id)
       .maybeSingle()
-    if (existing?.printful_order_id) {
+    if (existing?.fulfillments && Array.isArray(existing.fulfillments) && existing.fulfillments.length > 0) {
       return NextResponse.json({ received: true, alreadyProcessed: true })
     }
 
-    const recipient: PrintfulOrderRecipient = {
+    const phone = customer.phone ?? ''
+
+    // Printful recipient (single name, no phone needed).
+    const printfulRecipient: PrintfulOrderRecipient = {
       name: shipAddr.name || customer.name || 'Customer',
       email: customer.email ?? '',
       address1: shipAddr.line2 ? `${shipAddr.line1}, ${shipAddr.line2}` : shipAddr.line1,
@@ -89,24 +93,52 @@ export async function POST(req: NextRequest) {
       zip: shipAddr.postalCode,
     }
 
-    const items: PrintfulOrderItem[] = cartItems.map((i) => ({
-      sync_variant_id: i.variantId,
-      quantity: i.quantity,
-    }))
-
-    let printfulOrderId: string | null = null
-    let fulfillmentError: unknown = null
-    try {
-      const printfulOrder = await createOrder(recipient, items, shipMethod) as unknown as { id?: number | string } | null
-      printfulOrderId = String(printfulOrder?.id ?? '')
-      console.log(
-        '[Webhook] Printful order created for session', session.id,
-        isAutoConfirmEnabled() ? '(auto-submitted for fulfillment)' : '(draft, awaiting manual confirmation)'
-      )
-    } catch (err) {
-      fulfillmentError = err
-      console.error('[Webhook] Printful order creation failed:', err)
+    // Printify recipient (split name + phone).
+    const printifyRecipient: PrintifyOrderRecipient = {
+      name: shipAddr.name || customer.name || 'Customer',
+      email: customer.email ?? '',
+      phone,
+      address1: shipAddr.line1,
+      address2: shipAddr.line2 ?? '',
+      city: shipAddr.city,
+      country_code: shipAddr.country,
+      zip: shipAddr.postalCode,
     }
+
+    const pfItems: PrintfulOrderItem[] = cartItems
+      .filter((i) => i.r === 'printful')
+      .map((i) => ({ sync_variant_id: Number(i.v), quantity: i.q }))
+    const piItems: PrintifyOrderLine[] = cartItems
+      .filter((i) => i.r === 'printify')
+      .map((i) => ({ productId: i.p, variantId: i.v, quantity: i.q }))
+
+    const fulfillments: { provider: string; order_id: string; status: string }[] = []
+    let fulfillmentError: unknown = null
+
+    if (pfItems.length) {
+      try {
+        const order = await createPrintfulOrder(printfulRecipient, pfItems, shipMethod) as unknown as { id?: number | string }
+        fulfillments.push({ provider: 'printful', order_id: String(order?.id ?? ''), status: 'processing' })
+        console.log('[Webhook] Printful order created for session', session.id,
+          isPrintfulAutoConfirm() ? '(auto-submitted)' : '(draft)')
+      } catch (err) {
+        fulfillmentError = err
+        console.error('[Webhook] Printful order creation failed:', err)
+      }
+    }
+
+    if (piItems.length) {
+      try {
+        const order = await createPrintifyOrder(printifyRecipient, piItems, session.id)
+        fulfillments.push({ provider: 'printify', order_id: order.id, status: 'pending' })
+        console.log('[Webhook] Printify order created for session', session.id)
+      } catch (err) {
+        fulfillmentError = err
+        console.error('[Webhook] Printify order creation failed:', err)
+      }
+    }
+
+    const printfulOrderId = fulfillments.find((f) => f.provider === 'printful')?.order_id ?? null
 
     // Persist the order regardless of fulfillment outcome so a paid order is
     // never lost. A failed fulfillment is recorded for manual follow-up/refund.
@@ -117,21 +149,22 @@ export async function POST(req: NextRequest) {
         user_id: userId,
         stripe_session_id: session.id,
         printful_order_id: printfulOrderId,
+        fulfillments,
         status: fulfillmentError ? 'fulfillment_failed' : 'processing',
         total_amount: session.amount_total ?? 0,
         currency: session.currency ?? 'eur',
         items: cartItems.map((i) => ({
-          variantId: i.variantId,
-          quantity: i.quantity,
-          productName: i.productName ?? '',
-          variantName: i.variantName ?? '',
+          provider: i.r,
+          productId: i.p,
+          variantId: i.v,
+          quantity: i.q,
         })),
         shipping_address: {
-          name: recipient.name,
-          line1: recipient.address1,
-          city: recipient.city,
-          postal_code: recipient.zip,
-          country: recipient.country_code,
+          name: printfulRecipient.name,
+          line1: shipAddr.line2 ? `${shipAddr.line1}, ${shipAddr.line2}` : shipAddr.line1,
+          city: shipAddr.city,
+          postal_code: shipAddr.postalCode,
+          country: shipAddr.country,
         },
       }, { onConflict: 'stripe_session_id' })
       persisted = true
