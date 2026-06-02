@@ -9,6 +9,9 @@ describe('verifyPrintifySignature', () => {
   it('accepts a correct HMAC-SHA256 signature', () => {
     expect(verifyPrintifySignature(body, sig, secret)).toBe(true)
   })
+  it('accepts a signature with the Printify "sha256=" prefix', () => {
+    expect(verifyPrintifySignature(body, `sha256=${sig}`, secret)).toBe(true)
+  })
   it('rejects a wrong signature', () => {
     expect(verifyPrintifySignature(body, 'deadbeef', secret)).toBe(false)
   })
