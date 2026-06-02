@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useCartStore } from '@/store/cart'
+import { cartItemKey } from '@/lib/cart-key'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping'
 import styles from './CartDrawer.module.css'
 
@@ -44,7 +45,7 @@ export default function CartDrawer() {
           <>
             <ul className={styles.items}>
               {items.map((item) => (
-                <li key={item.variantId} className={styles.item}>
+                <li key={cartItemKey(item.provider, item.variantId)} className={styles.item}>
                   {item.imageUrl ? (
                     <div className={styles.thumb}>
                       <Image src={item.imageUrl} alt={item.productName} fill style={{ objectFit: 'cover' }} />
@@ -59,12 +60,12 @@ export default function CartDrawer() {
                       {item.currency} {(parseFloat(item.price) * item.quantity).toFixed(2)}
                     </div>
                     <div className={styles.qtyRow}>
-                      <button className={styles.qtyBtn} onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>−</button>
+                      <button className={styles.qtyBtn} onClick={() => updateQuantity(cartItemKey(item.provider, item.variantId), item.quantity - 1)}>−</button>
                       <span className={styles.qty}>{item.quantity}</span>
-                      <button className={styles.qtyBtn} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>+</button>
+                      <button className={styles.qtyBtn} onClick={() => updateQuantity(cartItemKey(item.provider, item.variantId), item.quantity + 1)}>+</button>
                     </div>
                   </div>
-                  <button className={styles.removeBtn} onClick={() => removeItem(item.variantId)} aria-label="Remove item">
+                  <button className={styles.removeBtn} onClick={() => removeItem(cartItemKey(item.provider, item.variantId))} aria-label="Remove item">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M2 4h12M5 4V2.5A.5.5 0 015.5 2h5a.5.5 0 01.5.5V4M6 7v5M10 7v5M3 4l.8 9.2A.8.8 0 003.8 14h8.4a.8.8 0 00.8-.8L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>

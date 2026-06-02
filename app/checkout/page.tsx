@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
+import { cartItemKey } from '@/lib/cart-key'
 import {
   ALLOWED_COUNTRIES,
   COUNTRY_NAMES,
@@ -115,7 +116,7 @@ export default function CheckoutPage() {
 
         <div className={styles.items}>
           {items.map((item) => (
-            <div key={item.variantId} className={styles.item}>
+            <div key={cartItemKey(item.provider, item.variantId)} className={styles.item}>
               {item.imageUrl ? (
                 <Image
                   src={item.imageUrl}
