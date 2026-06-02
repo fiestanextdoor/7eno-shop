@@ -36,8 +36,9 @@ export default function LatestDrop({ productId, productName, imageUrl, variants,
   const handleAdd = () => {
     if (!selectedVariant) return
     addItem({
-      variantId: selectedVariant.id,
-      productId,
+      provider: 'printful',
+      variantId: String(selectedVariant.id),
+      productId: String(productId),
       productName,
       variantName: selectedVariant.name,
       price: selectedVariant.retail_price,
