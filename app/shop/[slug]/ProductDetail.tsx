@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { SyncVariant, PrintfulFile } from '@/types/printful'
+import type { NormalizedVariant, Provider } from '@/types/catalog'
 import type { SizeGuide } from '@/lib/printful'
 import { useCartStore } from '@/store/cart'
 import { resolveSwatchBackground, resolveHex, applyBrandOverride, brandColorName, isNearWhite } from '@/lib/color-utils'
@@ -24,12 +24,11 @@ const CARE_INSTRUCTIONS = [
 ]
 
 interface ProductDetailProps {
-  productId: number
+  provider: Provider
+  productId: string
   productName: string
-  variants: SyncVariant[]
-  previewFile: PrintfulFile | null
-  productThumbnail?: string | null
-  bgRemovedUrl?: string | null
+  variants: NormalizedVariant[]
+  baseImageUrl?: string | null
   colorImages?: Record<string, string>
   colorBackImages?: Record<string, string>
   euSizeMap?: Record<string, string>
@@ -38,12 +37,11 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({
+  provider,
   productId,
   productName,
   variants,
-  previewFile,
-  productThumbnail,
-  bgRemovedUrl,
+  baseImageUrl = null,
   colorImages = {},
   colorBackImages = {},
   euSizeMap = {},
@@ -51,6 +49,9 @@ export default function ProductDetail({
   sizeGuide = null,
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
+  const currency = variants[0]?.currency ?? 'EUR'
+  const currencySymbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency
+  const fmt = (cents: number) => `${currencySymbol}${(cents / 100).toFixed(2)}`
   const displaySize = (v: { size: string; name: string }) =>
     euSizeMap[v.size] ?? (v.size || v.name).replace(/\b\w/g, (c) => c.toUpperCase())
   const uniqueColors = Array.from(
@@ -60,32 +61,26 @@ export default function ProductDetail({
 
   // Non-near-white hexes: prevent brand override from duplicating an existing swatch color
   const skipHexes = new Set(
-    uniqueColors.map((v) => resolveHex(v.color, v.color_code ?? '')).filter((h) => !isNearWhite(h))
+    uniqueColors.map((v) => resolveHex(v.color, v.colorCode ?? '')).filter((h) => !isNearWhite(h))
   )
 
   // 7ENO brand colour name (Butter/Blood/Ink/Stone/…) for a variant colour,
-  // instead of Printful's fabric name like "Vintage White".
+  // instead of the provider's fabric name like "Vintage White".
   const brandNameFor = (color: string) => {
     const v = uniqueColors.find((c) => c.color === color)
     if (!v) return color
-    const finalHex = applyBrandOverride(productName, resolveHex(v.color, v.color_code ?? ''), v.color, skipHexes)
+    const finalHex = applyBrandOverride(productName, resolveHex(v.color, v.colorCode ?? ''), v.color, skipHexes)
     return brandColorName(finalHex)
   }
 
   const defaultColor = uniqueColors[0]?.color ?? ''
-  const baseImageUrl =
-    bgRemovedUrl ??
-    previewFile?.preview_url ??
-    previewFile?.url ??
-    productThumbnail ??
-    null
 
   const frontFor = (color: string) => colorImages[color] ?? baseImageUrl
   const backFor = (color: string) => colorBackImages[color] ?? null
 
   const [selectedColor, setSelectedColor] = useState<string>(defaultColor)
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(baseImageUrl)
-  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
 
@@ -97,8 +92,8 @@ export default function ProductDetail({
     ? variants.filter((v) => v.color === selectedColor)
     : variants
 
-  const allOutOfStock = colorVariants.every((v) => v.in_stock === false)
-  const isAvailable = (v: SyncVariant) => allOutOfStock ? true : v.in_stock !== false
+  const allOutOfStock = colorVariants.every((v) => v.inStock === false)
+  const isAvailable = (v: NormalizedVariant) => (allOutOfStock ? true : v.inStock !== false)
 
   const uniqueSizes = Array.from(
     new Map(colorVariants.map((v) => [v.size || v.name, v])).values()
@@ -115,11 +110,12 @@ export default function ProductDetail({
   const handleAddToCart = () => {
     if (!selectedVariant) return
     addItem({
+      provider,
       variantId: selectedVariant.id,
       productId,
       productName,
       variantName: selectedVariant.name,
-      price: selectedVariant.retail_price,
+      price: (selectedVariant.priceCents / 100).toFixed(2),
       currency: selectedVariant.currency,
       quantity: 1,
       imageUrl: frontImageUrl,
@@ -152,8 +148,6 @@ export default function ProductDetail({
     return () => clearTimeout(t)
   }, [added])
 
-  const currency = variants[0]?.currency ?? 'EUR'
-  const currencySymbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency
   const colorLabel = brandNameFor(selectedColor || variants[0]?.color || '')
 
   return (
@@ -214,8 +208,10 @@ export default function ProductDetail({
         <div className={styles.priceRow}>
           <span className={styles.price}>
             {selectedVariant
-              ? `${currencySymbol}${selectedVariant.retail_price}`
-              : `${currencySymbol}${variants[0]?.retail_price ?? '—'}`}
+              ? fmt(selectedVariant.priceCents)
+              : variants[0]
+              ? fmt(variants[0].priceCents)
+              : '—'}
           </span>
           <span className={styles.priceNote}>incl. tax</span>
         </div>
@@ -235,7 +231,7 @@ export default function ProductDetail({
                     styles.colorSwatch,
                     selectedColor === v.color ? styles.colorSwatchSelected : '',
                   ].join(' ')}
-                  style={{ background: resolveSwatchBackground(v.color, v.color_code, v.color_code2, productName, skipHexes) }}
+                  style={{ background: resolveSwatchBackground(v.color, v.colorCode, null, productName, skipHexes) }}
                   onClick={() => handleColorChange(v.color)}
                   title={brandNameFor(v.color)}
                   aria-pressed={selectedColor === v.color}
