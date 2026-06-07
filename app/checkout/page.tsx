@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
+import { cartItemKey } from '@/lib/cart-key'
 import {
   ALLOWED_COUNTRIES,
   COUNTRY_NAMES,
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, total } = useCartStore()
   const [form, setForm] = useState<AddressForm>(EMPTY_FORM)
+  const [agreed, setAgreed] = useState(false)
   const [payLoading, setPayLoading] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
 
@@ -44,6 +46,8 @@ export default function CheckoutPage() {
     form.line1.trim() !== '' &&
     form.city.trim() !== '' &&
     form.postalCode.trim() !== ''
+
+  const canPay = addressComplete && agreed
 
   // Shipping is a flat fee, free above the threshold. It depends only on the
   // subtotal, so it is known immediately, without an extra "calculate" step or
@@ -60,7 +64,7 @@ export default function CheckoutPage() {
   }
 
   const handleCheckout = async () => {
-    if (!addressComplete) return
+    if (!canPay) return
     setPayLoading(true)
     setPayError(null)
     try {
@@ -115,7 +119,7 @@ export default function CheckoutPage() {
 
         <div className={styles.items}>
           {items.map((item) => (
-            <div key={item.variantId} className={styles.item}>
+            <div key={cartItemKey(item.provider, item.variantId, item.bundleId, item.productId)} className={styles.item}>
               {item.imageUrl ? (
                 <Image
                   src={item.imageUrl}
@@ -236,15 +240,43 @@ export default function CheckoutPage() {
 
         {payError && <p className={styles.error} aria-live="polite">{payError}</p>}
 
+        <label className={styles.agree}>
+          <input
+            type="checkbox"
+            className={styles.agreeCheckbox}
+            checked={agreed}
+            onChange={(e) => {
+              setAgreed(e.target.checked)
+              setPayError(null)
+            }}
+          />
+          <span className={styles.agreeText}>
+            I agree to the{' '}
+            <Link href="/terms" target="_blank" rel="noopener noreferrer" className={styles.agreeLink}>
+              Terms &amp; Conditions
+            </Link>{' '}
+            and{' '}
+            <Link href="/returns" target="_blank" rel="noopener noreferrer" className={styles.agreeLink}>
+              Returns Policy
+            </Link>
+            .
+          </span>
+        </label>
+
         <button
           className={styles.payBtn}
           onClick={handleCheckout}
-          disabled={payLoading || !addressComplete}
+          disabled={payLoading || !canPay}
         >
           {payLoading ? 'Redirecting...' : 'Pay with Stripe'}
         </button>
         {!addressComplete && (
           <p className={styles.shippingNote}>Fill in your shipping address to continue.</p>
+        )}
+        {addressComplete && !agreed && (
+          <p className={styles.shippingNote}>
+            Please accept the Terms &amp; Conditions and Returns Policy to continue.
+          </p>
         )}
       </div>
     </main>

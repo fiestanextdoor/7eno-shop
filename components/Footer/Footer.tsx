@@ -91,8 +91,14 @@ export default function Footer() {
       <div className={styles.bottom}>
         <span className={styles.copy}>© 2026 7ENO. All rights reserved.</span>
         <div style={{ display: 'flex', gap: '24px' }}>
+          <Link href="/deals" className={styles.copy} style={{ textDecoration: 'none' }}>
+            Deals
+          </Link>
           <Link href="/terms" className={styles.copy} style={{ textDecoration: 'none' }}>
             Terms &amp; Conditions
+          </Link>
+          <Link href="/returns" className={styles.copy} style={{ textDecoration: 'none' }}>
+            Returns
           </Link>
           <Link href="/privacy" className={styles.copy} style={{ textDecoration: 'none' }}>
             Privacy Policy

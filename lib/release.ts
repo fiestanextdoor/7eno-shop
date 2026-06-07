@@ -1,10 +1,11 @@
 /**
- * Single source of truth for the shop launch.
+ * Single source of truth for the shop launch moment.
  *
- * Until this moment the entire storefront is sealed behind /coming-soon and no
- * orders can be placed (enforced in proxy.ts). After it, the site opens
- * automatically. Launch: 19 June 2026, 19:00 Europe/Amsterdam (CEST = UTC+2),
- * i.e. 17:00 UTC. Month is 0-based in Date.UTC, so 5 = June.
+ * Drives the /coming-soon teaser (date label + countdown). The site is now
+ * open: the storefront seal that previously redirected every page to
+ * /coming-soon has been removed from proxy.ts. Launch: 19 June 2026, 19:00
+ * Europe/Amsterdam (CEST = UTC+2), i.e. 17:00 UTC. Month is 0-based in
+ * Date.UTC, so 5 = June.
  */
 export const RELEASE_AT_UTC = Date.UTC(2026, 5, 19, 17, 0, 0)
 

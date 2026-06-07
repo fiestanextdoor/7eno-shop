@@ -1,0 +1,123 @@
+.page {
+  background: var(--ink);
+  min-height: 100vh;
+  padding: 120px var(--gutter) 80px;
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: var(--bone);
+  line-height: 1.1;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.3);
+  margin-top: -32px;
+}
+
+.intro {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: rgba(246, 243, 236, 0.8);
+  line-height: 1.8;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(246, 243, 236, 0.06);
+}
+
+.heading {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.4);
+}
+
+.section p {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: rgba(246, 243, 236, 0.7);
+  line-height: 1.8;
+}
+
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.stepNum {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--bone);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(246, 243, 236, 0.15);
+  border-radius: 50%;
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stepTitle {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.legal {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: rgba(246, 243, 236, 0.7);
+  line-height: 1.8;
+}
+
+.link {
+  color: var(--bone);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: rgba(246, 243, 236, 0.6);
+}

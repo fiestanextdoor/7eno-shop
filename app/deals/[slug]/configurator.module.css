@@ -1,0 +1,189 @@
+.page {
+  background: var(--ink);
+  min-height: 100vh;
+  padding: 120px var(--gutter) 80px;
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  color: var(--bone);
+  line-height: 1.1;
+}
+
+.description {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: rgba(246, 243, 236, 0.7);
+  line-height: 1.7;
+  margin-top: -16px;
+}
+
+.products {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.product {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(246, 243, 236, 0.08);
+}
+
+.thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.thumbImg {
+  object-fit: cover;
+}
+
+.thumbPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.productName {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--bone);
+}
+
+.swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(246, 243, 236, 0.2);
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatchActive {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+.sizes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sizeBtn {
+  min-width: 44px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid rgba(246, 243, 236, 0.25);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.sizeSelected {
+  background: var(--bone);
+  color: var(--ink);
+}
+
+.outOfStock {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(246, 243, 236, 0.08);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: rgba(246, 243, 236, 0.7);
+}
+
+.strike {
+  text-decoration: line-through;
+  color: rgba(246, 243, 236, 0.4);
+}
+
+.setPrice {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.saveRow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.addBtn {
+  background: var(--bone);
+  color: var(--ink);
+  border: none;
+  padding: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: var(--butter);
+}
+
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.added {
+  background: var(--butter);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .addBtn { transition: none; }
+}

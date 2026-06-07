@@ -4,33 +4,39 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import type { SyncProduct } from '@/types/printful'
+import type { NormalizedProduct, NormalizedColor } from '@/types/catalog'
 import { productSlug } from '@/lib/slug'
 import styles from './ProductCard.module.css'
 
-interface ColorSwatch {
-  color: string
-  hex: string
-  hex2?: string
-  imageUrl?: string | null
-  displayName?: string
-}
-
 interface ProductCardProps {
-  product: SyncProduct
+  product: NormalizedProduct
   index?: number
   imageUrl?: string | null
-  colorSwatches?: ColorSwatch[]
-  price?: string
+  hoverImageUrl?: string | null
+  colorSwatches?: NormalizedColor[]
+  priceCents?: number
   currency?: string
+  dealLabel?: string | null
 }
 
-export default function ProductCard({ product, index = 0, imageUrl, colorSwatches, price, currency }: ProductCardProps) {
+function formatPrice(cents: number | undefined, currency: string | undefined): string | null {
+  if (cents == null) return null
+  const symbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : (currency ?? '')
+  return `${symbol}${(cents / 100).toFixed(2)}`
+}
+
+export default function ProductCard({ product, index = 0, imageUrl, hoverImageUrl, colorSwatches, priceCents, currency, dealLabel }: ProductCardProps) {
   const router = useRouter()
   const [hoverSrc, setHoverSrc] = useState<string | null>(null)
+
+  // When the product has a dedicated hover photo, reveal it while the cursor is
+  // over the image (separate from the per-swatch hover handled below).
+  const showCardHover = () => hoverImageUrl && setHoverSrc(hoverImageUrl)
+  const clearCardHover = () => hoverImageUrl && setHoverSrc(null)
   const num = String(index + 1).padStart(2, '0')
-  const baseSrc = imageUrl ?? product.thumbnail_url
+  const baseSrc = imageUrl ?? product.thumbnailUrl
   const slug = productSlug(product.name)
+  const priceLabel = formatPrice(priceCents ?? product.priceCents, currency ?? product.currency)
 
   // Clicking a swatch opens the product with that colour preselected, instead
   // of just following the card link to the default colour.
@@ -44,7 +50,11 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
     <Link href={`/shop/${slug}`} className={styles.card}>
 
       {/* Image */}
-      <div className={styles.imageWrap}>
+      <div
+        className={styles.imageWrap}
+        onMouseEnter={showCardHover}
+        onMouseLeave={clearCardHover}
+      >
         {baseSrc ? (
           <Image
             src={baseSrc}
@@ -72,6 +82,9 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
         {/* Top-left index */}
         <span className={styles.index}>{num}</span>
 
+        {/* Top-right combi-deal badge */}
+        {dealLabel && <span className={styles.dealBadge}>{dealLabel}</span>}
+
         {/* Hover CTA */}
         <div className={styles.hoverBar}>
           <span className={styles.hoverLabel}>View Product</span>
@@ -83,11 +96,7 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
       <div className={styles.info}>
         <div className={styles.nameWrap}>
           <p className={styles.name}>{product.name}</p>
-          {price && (
-            <p className={styles.price}>
-              {currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency}{price}
-            </p>
-          )}
+          {priceLabel && <p className={styles.price}>{priceLabel}</p>}
         </div>
         {colorSwatches && colorSwatches.length > 0 && (
           <div className={styles.swatches}>
