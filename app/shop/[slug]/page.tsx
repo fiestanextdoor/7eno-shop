@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
 import { getCatalogProducts, getCatalogProduct, findBySlug } from '@/lib/catalog'
+import { getProductImageOverride } from '@/lib/product-images'
+import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
@@ -116,6 +118,16 @@ export default async function ProductPage({ params }: Props) {
     )
   }
 
+  // Local lifestyle photos appended to the gallery (used as-is, no remove.bg).
+  const extraImages = getProductImageOverride(slug)?.galleryImages ?? []
+
+  // Combi-deals this product is part of (matched by live id or slug).
+  const deals = getBundlesForProduct({ productId: match.id, slug }).map((b) => ({
+    id: b.id,
+    title: b.title,
+    discountCents: b.discountCents,
+  }))
+
   return (
     <main className={styles.page}>
       <ProductDetail
@@ -129,6 +141,8 @@ export default async function ProductPage({ params }: Props) {
         euSizeMap={euSizeMap}
         materials={materials}
         sizeGuide={sizeGuide}
+        extraImages={extraImages}
+        deals={deals}
       />
     </main>
   )

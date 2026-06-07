@@ -34,6 +34,8 @@ interface ProductDetailProps {
   euSizeMap?: Record<string, string>
   materials?: string[]
   sizeGuide?: SizeGuide | null
+  extraImages?: string[]
+  deals?: { id: string; title: string; discountCents: number }[]
 }
 
 export default function ProductDetail({
@@ -47,6 +49,8 @@ export default function ProductDetail({
   euSizeMap = {},
   materials = [],
   sizeGuide = null,
+  extraImages = [],
+  deals = [],
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
   const currency = variants[0]?.currency ?? 'EUR'
@@ -86,7 +90,8 @@ export default function ProductDetail({
 
   const frontImageUrl = frontFor(selectedColor)
   const backImageUrl = backFor(selectedColor)
-  const gallery = [frontImageUrl, backImageUrl].filter((u): u is string => Boolean(u))
+  // Provider front/back mockups first, then any local lifestyle photos.
+  const gallery = [frontImageUrl, backImageUrl, ...extraImages].filter((u): u is string => Boolean(u))
 
   const colorVariants = hasColors && selectedColor
     ? variants.filter((v) => v.color === selectedColor)
@@ -171,18 +176,24 @@ export default function ProductDetail({
 
         {gallery.length > 1 && (
           <div className={styles.thumbs}>
-            {gallery.map((url, i) => (
+            {gallery.map((url, i) => {
+              const label =
+                url === frontImageUrl ? 'Front view'
+                : url === backImageUrl ? 'Back view'
+                : `View ${i + 1}`
+              return (
               <button
                 key={url}
                 type="button"
                 className={[styles.thumb, activeImageUrl === url ? styles.thumbActive : ''].join(' ')}
                 onClick={() => setActiveImageUrl(url)}
-                aria-label={i === 0 ? 'Front view' : 'Back view'}
+                aria-label={label}
                 aria-pressed={activeImageUrl === url}
               >
                 <Image src={url} alt="" fill className={styles.thumbImg} sizes="80px" unoptimized />
               </button>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -215,6 +226,18 @@ export default function ProductDetail({
           </span>
           <span className={styles.priceNote}>incl. tax</span>
         </div>
+
+        {/* Combi-deal: this product is part of one or more sets */}
+        {deals.length > 0 && (
+          <div className={styles.dealBanner}>
+            {deals.map((d) => (
+              <Link key={d.id} href={`/deals/${d.id}`} className={styles.dealLink}>
+                Combine &amp; save {currencySymbol}{(d.discountCents / 100).toFixed(2)} with the {d.title}
+                <span aria-hidden="true"> →</span>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* Colors */}
         {hasColors && (

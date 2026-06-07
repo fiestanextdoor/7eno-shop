@@ -64,6 +64,22 @@
   z-index: 2;
 }
 
+/* Combi-deal badge top-right */
+.dealBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  padding: 4px 8px;
+  background: var(--oxblood);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+
 /* Swatch hover image overlay */
 .hoverOverlay {
   position: absolute;

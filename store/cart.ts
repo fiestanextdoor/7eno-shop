@@ -18,7 +18,7 @@ interface CartState {
   itemCount: () => number
 }
 
-const keyOf = (i: CartItem) => cartItemKey(i.provider, i.variantId)
+const keyOf = (i: CartItem) => cartItemKey(i.provider, i.variantId, i.bundleId, i.productId)
 
 export const useCartStore = create<CartState>()(
   persist(

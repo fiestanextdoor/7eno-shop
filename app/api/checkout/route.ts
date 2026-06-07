@@ -4,6 +4,8 @@ import { getProduct as getPrintfulProduct } from '@/lib/printful'
 import { normalizePrintfulDetail } from '@/lib/printful-normalize'
 import { buildVariantLookup as buildPrintifyLookup } from '@/lib/printify'
 import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
+import { getBundle } from '@/lib/bundles'
+import { resolveBundleDiscountCents, type BundleMemberItem } from '@/lib/bundle-discount'
 import { createClient } from '@/lib/supabase/server'
 import type { NormalizedVariant } from '@/types/catalog'
 import type { CartItem } from '@/types/cart'
@@ -75,7 +77,8 @@ export async function POST(req: NextRequest) {
   // Build line items and the cart metadata from server-trusted data only.
   type CheckoutParams = NonNullable<Parameters<typeof stripe.checkout.sessions.create>[0]>
   const lineItems: NonNullable<CheckoutParams['line_items']> = []
-  const cartMeta: { r: string; p: string; v: string; q: number }[] = []
+  const cartMeta: { r: string; p: string; v: string; q: number; b?: string }[] = []
+  const bundleMembers: BundleMemberItem[] = []
   let subtotalCents = 0
   let currency = 'eur'
 
@@ -96,7 +99,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product price unavailable' }, { status: 502 })
     }
 
-    currency = found.variant.currency.toLowerCase()
+    // Assert a single currency across the whole cart, so the bundle coupon's
+    // currency (set below) is provably the session currency. `currency` is only
+    // bound from server-resolved variant data, never from the client.
+    const itemCurrency = found.variant.currency.toLowerCase()
+    if (cartMeta.length === 0) {
+      currency = itemCurrency
+    } else if (itemCurrency !== currency) {
+      return NextResponse.json({ error: 'Mixed-currency cart is not supported' }, { status: 502 })
+    }
     subtotalCents += unitAmount * item.quantity
 
     lineItems.push({
@@ -119,8 +130,18 @@ export async function POST(req: NextRequest) {
       p: item.productId,
       v: item.variantId,
       q: item.quantity,
+      ...(item.bundleId ? { b: item.bundleId } : {}),
     })
+
+    // Every item past the `found` guard above has resolved to a real variant.
+    if (item.bundleId) {
+      bundleMembers.push({ bundleId: item.bundleId, productId: item.productId, resolved: true })
+    }
   }
+
+  // Re-derive the bundle discount server-side from server-trusted data. Only
+  // complete, valid sets earn a discount; the total is clamped to the subtotal.
+  const bundleDiscountCents = resolveBundleDiscountCents(bundleMembers, subtotalCents, getBundle)
 
   // Flat-rate shipping computed from the server-trusted subtotal: free above the
   // threshold, otherwise the fixed fee. Never read from the client.
@@ -189,6 +210,17 @@ export async function POST(req: NextRequest) {
       sessionParams.customer = stripeCustomerId
     } else if (customerEmail) {
       sessionParams.customer_email = customerEmail
+    }
+
+    if (bundleDiscountCents > 0) {
+      const coupon = await stripe.coupons.create({
+        amount_off: bundleDiscountCents,
+        currency,
+        duration: 'once',
+        max_redemptions: 1,
+        name: 'Combi-deal',
+      })
+      sessionParams.discounts = [{ coupon: coupon.id }]
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)

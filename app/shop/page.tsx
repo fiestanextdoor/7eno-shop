@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
 import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
+import { getProductImageOverride } from '@/lib/product-images'
+import { getBundlesForProduct } from '@/lib/bundles'
+import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor, brandSwatchOverride } from '@/lib/color-utils'
 import type { NormalizedProduct } from '@/types/catalog'
@@ -102,6 +105,16 @@ const SORT_PRIORITY: Record<string, number> = {
 }
 
 const NO_LINE_CATEGORIES = new Set(['swimwear', 'accessories'])
+
+// "Save €X" label for a product that belongs to one or more combi-deals (uses
+// the largest discount among matching sets). Null when the product is in none.
+function dealLabelFor(productId: string, slug: string, currency: string | undefined): string | null {
+  const matched = getBundlesForProduct({ productId, slug })
+  if (matched.length === 0) return null
+  const best = Math.max(...matched.map((b) => b.discountCents))
+  const symbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : (currency ?? '')
+  return `Save ${symbol}${(best / 100).toFixed(2)}`
+}
 
 function buildHref(params: { gender?: string; line?: string; category?: string }) {
   const parts: string[] = []
@@ -255,7 +268,7 @@ export default async function ShopPage({ searchParams }: Props) {
       ) : (
         <div className={styles.grid}>
           {products.map((p, i) => (
-            <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={bgRemovedUrls[i]} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} />
+            <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={bgRemovedUrls[i]} hoverImageUrl={getProductImageOverride(productSlug(p.name))?.hoverImage ?? null} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} dealLabel={dealLabelFor(p.id, productSlug(p.name), productInfoMap[p.id]?.currency ?? p.currency)} />
           ))}
         </div>
       )}

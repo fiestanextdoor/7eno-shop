@@ -10,4 +10,8 @@ export interface CartItem {
   currency: string
   quantity: number
   imageUrl: string | null
+  /** Set this item belongs to. Undefined for a standalone purchase. */
+  bundleId?: string
+  /** Display label for the set, shown grouped in the cart. */
+  bundleTitle?: string
 }

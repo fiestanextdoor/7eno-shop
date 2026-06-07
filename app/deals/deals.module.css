@@ -1,0 +1,132 @@
+.page {
+  background: var(--ink);
+  min-height: 100vh;
+  padding: 120px var(--gutter) 80px;
+}
+
+.header {
+  max-width: 1200px;
+  margin: 0 auto 48px;
+}
+
+.headerLabel {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.4);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: var(--bone);
+  line-height: 1.1;
+}
+
+.grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 2px;
+}
+
+.cardTitle {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--bone);
+}
+
+.cardProducts {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  color: rgba(246, 243, 236, 0.5);
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.from {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: rgba(246, 243, 236, 0.4);
+  text-decoration: line-through;
+}
+
+.setPrice {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.save {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.empty {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 80px 0;
+}
+
+.emptyTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--bone);
+}
+
+.emptySub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.4);
+  margin-top: 8px;
+}

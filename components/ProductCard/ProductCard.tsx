@@ -12,9 +12,11 @@ interface ProductCardProps {
   product: NormalizedProduct
   index?: number
   imageUrl?: string | null
+  hoverImageUrl?: string | null
   colorSwatches?: NormalizedColor[]
   priceCents?: number
   currency?: string
+  dealLabel?: string | null
 }
 
 function formatPrice(cents: number | undefined, currency: string | undefined): string | null {
@@ -23,9 +25,14 @@ function formatPrice(cents: number | undefined, currency: string | undefined): s
   return `${symbol}${(cents / 100).toFixed(2)}`
 }
 
-export default function ProductCard({ product, index = 0, imageUrl, colorSwatches, priceCents, currency }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, imageUrl, hoverImageUrl, colorSwatches, priceCents, currency, dealLabel }: ProductCardProps) {
   const router = useRouter()
   const [hoverSrc, setHoverSrc] = useState<string | null>(null)
+
+  // When the product has a dedicated hover photo, reveal it while the cursor is
+  // over the image (separate from the per-swatch hover handled below).
+  const showCardHover = () => hoverImageUrl && setHoverSrc(hoverImageUrl)
+  const clearCardHover = () => hoverImageUrl && setHoverSrc(null)
   const num = String(index + 1).padStart(2, '0')
   const baseSrc = imageUrl ?? product.thumbnailUrl
   const slug = productSlug(product.name)
@@ -43,7 +50,11 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
     <Link href={`/shop/${slug}`} className={styles.card}>
 
       {/* Image */}
-      <div className={styles.imageWrap}>
+      <div
+        className={styles.imageWrap}
+        onMouseEnter={showCardHover}
+        onMouseLeave={clearCardHover}
+      >
         {baseSrc ? (
           <Image
             src={baseSrc}
@@ -70,6 +81,9 @@ export default function ProductCard({ product, index = 0, imageUrl, colorSwatche
 
         {/* Top-left index */}
         <span className={styles.index}>{num}</span>
+
+        {/* Top-right combi-deal badge */}
+        {dealLabel && <span className={styles.dealBadge}>{dealLabel}</span>}
 
         {/* Hover CTA */}
         <div className={styles.hoverBar}>

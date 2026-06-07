@@ -212,6 +212,71 @@
   font-weight: 600;
 }
 
+.agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.agreeCheckbox {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.agreeCheckbox::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  transform: scale(0);
+  transition: transform 0.15s;
+  box-shadow: inset 1em 1em var(--bone);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.agreeCheckbox:checked {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.agreeCheckbox:checked::before {
+  transform: scale(1);
+}
+
+.agreeCheckbox:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.agreeText {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.agreeLink {
+  color: var(--oxblood);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.agreeLink:hover {
+  color: var(--ink);
+}
+
 .payBtn {
   background: var(--ink);
   color: var(--bone);
@@ -270,4 +335,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .payBtn { transition: none; }
+  .agreeCheckbox,
+  .agreeCheckbox::before { transition: none; }
 }
