@@ -87,6 +87,45 @@
   outline-offset: 4px;
 }
 
+/* ── Intro (states the app name + purpose, also for Google OAuth verification) ── */
+.intro {
+  background: var(--paper);
+  padding: 72px var(--gutter);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.introInner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.introKicker {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.introTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.introText {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(17, 17, 17, 0.7);
+}
+
 /* ── Category strip (oxblood) ── */
 .categoryStrip {
   background: var(--bone);
