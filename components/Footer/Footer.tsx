@@ -27,9 +27,9 @@ export default function Footer() {
         </Link>
         <p className={styles.tagline}>Divine Authority · MMXXVI</p>
         <p className={styles.about}>
-          7ENO Shop is the official online store for 7ENO streetwear. Create an
-          account or sign in with Google to place orders, track your shipments
-          and manage your details.
+          7ENO is the official online streetwear store. Create an account or
+          sign in with Google to place orders, track your shipments and manage
+          your details.
         </p>
       </div>
 

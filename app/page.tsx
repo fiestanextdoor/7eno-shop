@@ -8,9 +8,9 @@ import Link from 'next/link'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
-  title: '7ENO Shop — Premium Streetwear',
+  title: '7ENO · Premium Streetwear',
   description:
-    '7ENO Shop is the official online store for 7ENO streetwear. Sign in with Google to place orders, track your shipments and manage your account.',
+    '7ENO is the official online streetwear store. Sign in with Google to place orders, track your shipments and manage your account.',
 }
 
 const CATEGORIES = [
@@ -44,12 +44,12 @@ export default async function HomePage() {
 
       <section className={styles.intro}>
         <div className={styles.introInner}>
-          <p className={styles.introKicker}>7ENO Shop</p>
+          <p className={styles.introKicker}>7ENO</p>
           <h2 className={styles.introTitle}>The official 7ENO streetwear store</h2>
           <p className={styles.introText}>
-            7ENO Shop is the official online store for 7ENO streetwear. Browse the
-            collection, create an account or sign in with Google, and place orders,
-            track your shipments and manage your details.
+            7ENO is the official online streetwear store. Browse the collection,
+            create an account or sign in with Google, and place orders, track
+            your shipments and manage your details.
           </p>
         </div>
       </section>

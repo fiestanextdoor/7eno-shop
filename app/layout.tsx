@@ -22,8 +22,18 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
-  title: '7ENO — Divine Authority',
-  description: 'Premium streetwear inspired by divine authority.',
+  title: '7ENO · Divine Authority',
+  description: '7ENO is the official online streetwear store.',
+  // Machine-readable site/app name. Keep this identical to the OAuth consent
+  // screen app name ("7ENO") so Google's app verification sees a matching name.
+  applicationName: '7ENO',
+  openGraph: {
+    siteName: '7ENO',
+    title: '7ENO',
+    description: '7ENO is the official online streetwear store.',
+    url: 'https://www.7eno.shop',
+    type: 'website',
+  },
   // Google Search Console ownership verification (needed for Google OAuth app
   // verification). Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the token from
   // the Search Console "HTML tag" method; omitted when unset.
@@ -46,6 +56,20 @@ export default function RootLayout({
     <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
+        {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: '7ENO',
+              alternateName: '7ENO streetwear store',
+              url: 'https://www.7eno.shop',
+              description: '7ENO is the official online streetwear store.',
+            }),
+          }}
+        />
       </head>
       <body>
         <CartProvider>
