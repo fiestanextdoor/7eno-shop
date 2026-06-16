@@ -8,8 +8,9 @@ import Link from 'next/link'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
-  title: '7ENO — Divine Authority',
-  description: 'Premium streetwear. Divine Authority.',
+  title: '7ENO Shop — Premium Streetwear',
+  description:
+    '7ENO Shop is the official online store for 7ENO streetwear. Sign in with Google to place orders, track your shipments and manage your account.',
 }
 
 const CATEGORIES = [
