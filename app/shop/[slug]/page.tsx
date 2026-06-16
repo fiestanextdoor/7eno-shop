@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
 import { getCatalogProducts, getCatalogProduct, findBySlug } from '@/lib/catalog'
+import { variantFrontImage, variantBackImage } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
@@ -103,12 +104,14 @@ export default async function ProductPage({ params }: Props) {
     materials = mats
     sizeGuide = guide
 
-    // Back-view mockups (Printful "back" files).
+    // Back-view mockups: only genuine back-angle product mockups, and only when
+    // they differ from the front mockup (some products ship a back mockup as
+    // their sole image, which is then already used as the front).
     const rawBack: Record<string, string> = {}
     for (const variant of syncVariants) {
       if (!variant.color || rawBack[variant.color]) continue
-      const backFile = (variant.files ?? []).find((f) => /back/i.test(f.type) && f.preview_url)
-      if (backFile?.preview_url) rawBack[variant.color] = backFile.preview_url
+      const back = variantBackImage(variant)
+      if (back && back !== variantFrontImage(variant)) rawBack[variant.color] = back
     }
     await Promise.all(
       Object.entries(rawBack).map(async ([color, url]) => {
@@ -118,8 +121,15 @@ export default async function ProductPage({ params }: Props) {
     )
   }
 
-  // Local lifestyle photos appended to the gallery (used as-is, no remove.bg).
-  const extraImages = getProductImageOverride(slug)?.galleryImages ?? []
+  // Local image overrides (used as-is, no remove.bg): front/back replacements
+  // for products whose provider mockups are incomplete, plus lifestyle photos.
+  const imageOverride = getProductImageOverride(slug)
+  const extraImages = imageOverride?.galleryImages ?? []
+
+  // Per-colour local photos win over the provider mockups (used as-is, no
+  // remove.bg). Used for multi-colour tees where Printful lacks a back mockup.
+  if (imageOverride?.colorFrontImages) Object.assign(colorImages, imageOverride.colorFrontImages)
+  if (imageOverride?.colorBackImages) Object.assign(colorBackImages, imageOverride.colorBackImages)
 
   // Combi-deals this product is part of (matched by live id or slug).
   const deals = getBundlesForProduct({ productId: match.id, slug }).map((b) => ({
@@ -138,6 +148,8 @@ export default async function ProductPage({ params }: Props) {
         baseImageUrl={bgRemovedBase}
         colorImages={colorImages}
         colorBackImages={colorBackImages}
+        frontOverride={imageOverride?.frontImage ?? null}
+        backOverride={imageOverride?.backImage ?? null}
         euSizeMap={euSizeMap}
         materials={materials}
         sizeGuide={sizeGuide}

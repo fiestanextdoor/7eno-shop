@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
+import styles from './PageTransition.module.css'
 
 const STAY   = 600
 const OUT_MS = 400
@@ -10,21 +11,26 @@ export default function PageTransition() {
   const pathname   = usePathname()
   const prevPath   = useRef(pathname)
   const overlayRef = useRef<HTMLDivElement>(null)
-  const logoRef    = useRef<HTMLImageElement>(null)
+  const markRef    = useRef<HTMLDivElement>(null)
   const navigating = useRef(false)
   const hideTimer  = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const show = useCallback(() => {
     const el   = overlayRef.current
-    const logo = logoRef.current
-    if (!el || !logo) return
+    const mark = markRef.current
+    if (!el || !mark) return
 
     if (hideTimer.current) clearTimeout(hideTimer.current)
 
     el.style.transition    = 'none'
     el.style.opacity       = '1'
     el.style.pointerEvents = 'all'
-    logo.style.opacity     = '1'
+
+    // Restart the assembly animation on every navigation: drop the class,
+    // force a reflow so the browser resets the keyframes, then re-add it.
+    mark.classList.remove(styles.play)
+    void mark.offsetWidth
+    mark.classList.add(styles.play)
   }, [])
 
   const hide = useCallback(() => {
@@ -61,30 +67,17 @@ export default function PageTransition() {
     return () => { if (hideTimer.current) clearTimeout(hideTimer.current) }
   }, [pathname, hide])
 
+  /* eslint-disable @next/next/no-img-element */
   return (
-    <div
-      ref={overlayRef}
-      aria-hidden="true"
-      style={{
-        position:       'fixed',
-        inset:          0,
-        zIndex:         9999,
-        background:     'var(--oxblood)',
-        display:        'flex',
-        alignItems:     'center',
-        justifyContent: 'center',
-        opacity:        0,
-        pointerEvents:  'none',
-        willChange:     'opacity',
-      }}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={logoRef}
-        src="/logos/beeldmerk-wit.png"
-        alt=""
-        style={{ width: 130, objectFit: 'contain', opacity: 1 }}
-      />
+    <div ref={overlayRef} aria-hidden="true" className={styles.overlay}>
+      <div ref={markRef} className={styles.mark}>
+        <img src="/logos/parts/7-bottom.png" alt="" className={`${styles.part} ${styles.partBottom}`} />
+        <img src="/logos/parts/7-top.png"    alt="" className={`${styles.part} ${styles.partTop}`} />
+        <img src="/logos/parts/bolt-fill.png" alt="" className={`${styles.part} ${styles.partBolt}`} />
+        <img src="/logos/beeldmerk-wit.png"  alt="" className={styles.final} />
+        <div className={styles.flash} />
+      </div>
     </div>
   )
+  /* eslint-enable @next/next/no-img-element */
 }

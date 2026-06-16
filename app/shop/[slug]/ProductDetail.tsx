@@ -31,6 +31,10 @@ interface ProductDetailProps {
   baseImageUrl?: string | null
   colorImages?: Record<string, string>
   colorBackImages?: Record<string, string>
+  /** Local front image that replaces the provider mockup for every colour. */
+  frontOverride?: string | null
+  /** Local back image used when the provider has no genuine back mockup. */
+  backOverride?: string | null
   euSizeMap?: Record<string, string>
   materials?: string[]
   sizeGuide?: SizeGuide | null
@@ -46,6 +50,8 @@ export default function ProductDetail({
   baseImageUrl = null,
   colorImages = {},
   colorBackImages = {},
+  frontOverride = null,
+  backOverride = null,
   euSizeMap = {},
   materials = [],
   sizeGuide = null,
@@ -79,11 +85,11 @@ export default function ProductDetail({
 
   const defaultColor = uniqueColors[0]?.color ?? ''
 
-  const frontFor = (color: string) => colorImages[color] ?? baseImageUrl
-  const backFor = (color: string) => colorBackImages[color] ?? null
+  const frontFor = (color: string) => frontOverride ?? colorImages[color] ?? baseImageUrl
+  const backFor = (color: string) => backOverride ?? colorBackImages[color] ?? null
 
   const [selectedColor, setSelectedColor] = useState<string>(defaultColor)
-  const [activeImageUrl, setActiveImageUrl] = useState<string | null>(baseImageUrl)
+  const [activeImageUrl, setActiveImageUrl] = useState<string | null>(frontFor(defaultColor))
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
@@ -134,7 +140,7 @@ export default function ProductDetail({
     if (!colorParam || !uniqueColors.some((v) => v.color === colorParam)) return
     /* eslint-disable react-hooks/set-state-in-effect */
     setSelectedColor(colorParam)
-    setActiveImageUrl(colorImages[colorParam] ?? baseImageUrl)
+    setActiveImageUrl(frontFor(colorParam))
     /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -168,7 +174,6 @@ export default function ProductDetail({
             className={styles.mainImg}
             priority
             sizes="(max-width: 900px) 100vw, 55vw"
-            unoptimized
           />
         ) : (
           <div className={styles.imgPlaceholder} />
@@ -190,7 +195,7 @@ export default function ProductDetail({
                 aria-label={label}
                 aria-pressed={activeImageUrl === url}
               >
-                <Image src={url} alt="" fill className={styles.thumbImg} sizes="80px" unoptimized />
+                <Image src={url} alt="" fill className={styles.thumbImg} sizes="80px" />
               </button>
               )
             })}

@@ -1,1 +1,174 @@
-/* Styles handled via inline styles in PageTransition.tsx */
+/* Page-transition overlay: the 7ENO beeldmerk assembles itself from its three
+ * parts (top of the 7, leg of the 7, lightning bolt). The bolt strikes in
+ * last, with a flash and a tiny impact shake, after which the parts crossfade
+ * into the real one-piece beeldmerk so the final frame is always the exact
+ * brand mark. The whole sequence fits inside the existing 600 ms overlay
+ * stay, so loading never takes longer. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--oxblood);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Container with the composite beeldmerk's aspect ratio; the part geometry
+ * below is expressed as percentages of this box. */
+.mark {
+  position: relative;
+  width: clamp(140px, 22vw, 200px);
+  aspect-ratio: 1160 / 1198;
+}
+
+.part,
+.final {
+  position: absolute;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Geometry: each part placed on its region of the composite mark, fitted
+ * against the official beeldmerk asset (uniform scale, alpha-overlap fit). */
+.partTop {
+  left: 7.76%;
+  top: 8.35%;
+  width: 61.9%;
+  height: 65.03%;
+}
+
+.partBottom {
+  left: 15.34%;
+  top: 0.17%;
+  width: 61.9%;
+  height: 92.49%;
+}
+
+.partBolt {
+  left: 12.93%;
+  top: 25.04%;
+  width: 65.52%;
+  height: 64.02%;
+  z-index: 2;
+}
+
+.final {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Impact flash, masked to the mark's box */
+.flash {
+  position: absolute;
+  inset: -20%;
+  z-index: 3;
+  background: radial-gradient(closest-side, rgba(255, 252, 240, 0.95), rgba(255, 252, 240, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Sequence (all 560 ms, percentages share one clock) ──
+ * 0-380 ms   top + leg fly in from opposite corners
+ * 215-345 ms bolt strikes in from the upper right
+ * 340-460 ms flash + impact shake
+ * 390-490 ms parts crossfade into the one-piece beeldmerk */
+
+.play.mark {
+  animation: shake 560ms linear both;
+}
+
+.play .partTop {
+  animation: flyTop 560ms both;
+}
+
+.play .partBottom {
+  animation: flyBottom 560ms both;
+}
+
+.play .partBolt {
+  animation: strike 560ms both;
+}
+
+.play .flash {
+  animation: flash 560ms linear both;
+}
+
+.play .final {
+  animation: reveal 560ms linear both;
+}
+
+@keyframes flyTop {
+  0% {
+    opacity: 0;
+    transform: translate(-55%, -45%) rotate(-10deg);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  58% { opacity: 1; transform: translate(1.5%, 1%) rotate(0.4deg); }
+  68% { transform: none; }
+  70% { opacity: 1; }
+  88%, 100% { opacity: 0; transform: none; }
+}
+
+@keyframes flyBottom {
+  0% {
+    opacity: 0;
+    transform: translate(45%, 50%) rotate(8deg);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  58% { opacity: 1; transform: translate(-1.5%, -1%) rotate(-0.4deg); }
+  68% { transform: none; }
+  70% { opacity: 1; }
+  88%, 100% { opacity: 0; transform: none; }
+}
+
+@keyframes strike {
+  0%, 38% {
+    opacity: 0;
+    transform: translate(48%, -58%) scale(1.18);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
+  }
+  56% { opacity: 1; transform: translate(-1%, 1%) scale(0.985); }
+  62% { transform: none; }
+  72% { opacity: 1; }
+  88%, 100% { opacity: 0; transform: none; }
+}
+
+@keyframes flash {
+  0%, 59% { opacity: 0; }
+  66% { opacity: 0.9; }
+  82%, 100% { opacity: 0; }
+}
+
+@keyframes shake {
+  0%, 61% { transform: none; }
+  65% { transform: translate(-3px, 2px); }
+  70% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -1px); }
+  80%, 100% { transform: none; }
+}
+
+@keyframes reveal {
+  0%, 70% { opacity: 0; }
+  88%, 100% { opacity: 1; }
+}
+
+/* Reduced motion: no assembly, just the finished mark */
+@media (prefers-reduced-motion: reduce) {
+  .play.mark,
+  .play .partTop,
+  .play .partBottom,
+  .play .partBolt,
+  .play .flash {
+    animation: none;
+  }
+  .play .final {
+    animation: none;
+    opacity: 1;
+  }
+}

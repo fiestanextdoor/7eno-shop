@@ -191,7 +191,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const sessionParams: CheckoutParams = {
-      payment_method_types: ['card'],
+      // 'card' levert in Stripe Checkout automatisch ook de wallets (Apple Pay,
+      // Google Pay, Link) op ondersteunde apparaten. 'ideal' voegt iDEAL toe;
+      // dit vereist EUR en mode: 'payment' (beide hierboven gegarandeerd).
+      payment_method_types: ['card', 'ideal'],
       mode: 'payment',
       line_items: lineItems,
       shipping_options: [shippingOption],

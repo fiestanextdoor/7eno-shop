@@ -24,6 +24,15 @@
   color: var(--butter);
 }
 
+.about {
+  max-width: 48ch;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: rgba(246, 243, 236, 0.6);
+}
+
 /* ── Links grid ── */
 .grid {
   max-width: var(--max-width);

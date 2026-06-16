@@ -267,9 +267,18 @@ export default async function ShopPage({ searchParams }: Props) {
         </div>
       ) : (
         <div className={styles.grid}>
-          {products.map((p, i) => (
-            <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={bgRemovedUrls[i]} hoverImageUrl={getProductImageOverride(productSlug(p.name))?.hoverImage ?? null} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} dealLabel={dealLabelFor(p.id, productSlug(p.name), productInfoMap[p.id]?.currency ?? p.currency)} />
-          ))}
+          {products.map((p, i) => {
+            const slug = productSlug(p.name)
+            const ov = getProductImageOverride(slug)
+            // A local front photo replaces the provider thumbnail as the card
+            // image (the men's tees whose only Printful mockup is the back);
+            // the back then becomes the hover image.
+            const cardImage = ov?.frontImage ?? bgRemovedUrls[i]
+            const cardHover = ov?.hoverImage ?? ov?.backImage ?? null
+            return (
+              <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={cardImage} hoverImageUrl={cardHover} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} dealLabel={dealLabelFor(p.id, slug, productInfoMap[p.id]?.currency ?? p.currency)} />
+            )
+          })}
         </div>
       )}
     </main>

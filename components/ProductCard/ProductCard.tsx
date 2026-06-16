@@ -62,7 +62,6 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
             fill
             className={styles.image}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            unoptimized={!!imageUrl}
           />
         ) : (
           <div className={styles.placeholder} />
@@ -70,12 +69,13 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
 
         {/* Swatch hover overlay */}
         {hoverSrc && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={hoverSrc}
             alt=""
             aria-hidden="true"
+            fill
             className={styles.hoverOverlay}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         )}
 

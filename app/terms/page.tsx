@@ -75,7 +75,7 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2 className={styles.heading}>12. Contact</h2>
-            <p>7ENO<br />Daalakkersweg 2, 5641 JA Eindhoven<br /><a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a></p>
+            <p>7ENO<br />Daalakkersweg 2, 5641 JA Eindhoven<br />KvK: 42081073<br /><a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a></p>
           </section>
         </div>
       </main>

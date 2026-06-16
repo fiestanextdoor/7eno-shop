@@ -26,6 +26,11 @@ export default function Footer() {
           <LogoWordmark variant="butter" height={36} align="center" />
         </Link>
         <p className={styles.tagline}>Divine Authority · MMXXVI</p>
+        <p className={styles.about}>
+          7ENO Shop is the official online store for 7ENO streetwear. Create an
+          account or sign in with Google to place orders, track your shipments
+          and manage your details.
+        </p>
       </div>
 
       {/* Links grid */}
@@ -89,7 +94,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className={styles.bottom}>
-        <span className={styles.copy}>© 2026 7ENO. All rights reserved.</span>
+        <span className={styles.copy}>© 2026 7ENO · KvK 42081073 · All rights reserved.</span>
         <div style={{ display: 'flex', gap: '24px' }}>
           <Link href="/deals" className={styles.copy} style={{ textDecoration: 'none' }}>
             Deals
