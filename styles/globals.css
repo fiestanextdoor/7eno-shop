@@ -14,13 +14,15 @@
   --mid:     #8F8A80;
   --rule:    #C8C1B2;
 
-  --font-display: 'Oswald', 'Arial Narrow', system-ui, sans-serif;
-  --font-sans:    'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* SF Pro via Apple's system-font stack: real SF Pro on macOS/iOS/iPadOS,
+     graceful fallback to the platform system sans (Segoe UI, Roboto) elsewhere.
+     The browser auto-picks the SF Pro Text/Display optical size by font size. */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+               system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Headings and the legacy `--font-serif` alias now use the same SF Pro stack. */
+  --font-display: var(--font-sans);
+  --font-serif:   var(--font-sans);
   --font-mono:    'Space Mono', ui-monospace, monospace;
-  /* Existing components reference --font-serif for their display headings; map
-     it to the logo-matching condensed display face. Long-form body copy, inputs
-     and descriptions use --font-sans instead. */
-  --font-serif:   var(--font-display);
 
   --nav-height: 110px;
   --max-width: 1280px;
@@ -44,13 +46,12 @@ body {
   background: var(--butter);
   color: var(--ink);
   font-family: var(--font-sans);
+  /* SF Pro Medium as the default text weight (headings set their own heavier
+     weight). */
+  font-weight: 500;
   font-size: 1rem;
   line-height: 1.6;
   font-variant-numeric: lining-nums;
-  /* The display face (Oswald) ships no italic; suppressing synthesis renders the
-     existing `font-style: italic` headings upright (on-brand for the wordmark)
-     instead of a faux-slanted oblique. Real weights come from the variable fonts. */
-  font-synthesis: none;
 }
 
 a {

@@ -1,28 +1,14 @@
 import type { Metadata, Viewport } from 'next'
-import { Oswald, Archivo, Space_Mono } from 'next/font/google'
+import { Space_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CartProvider from '@/components/CartProvider/CartProvider'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
 import PageTransition from '@/components/PageTransition/PageTransition'
 import '@/styles/globals.css'
 
-// Display face for headings/product names: a bold condensed grotesque that
-// echoes the angular, condensed 7ENO wordmark. Variable font, so weight is
-// omitted to load the full range.
-const oswald = Oswald({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-})
-
-// Body face: a clean, highly readable grotesque that pairs with Oswald for
-// long-form copy, form fields and product descriptions.
-const archivo = Archivo({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-})
-
+// Headings and body both use SF Pro (Apple's system font) via the system-font
+// stack in globals.css — no web-font download. Space Mono stays for the small
+// uppercase label accents.
 const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -62,7 +48,7 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={`${oswald.variable} ${archivo.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={spaceMono.variable}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
         {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}
