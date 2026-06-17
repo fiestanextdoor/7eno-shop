@@ -1,0 +1,108 @@
+.viewport {
+  overflow: hidden;
+  /* Fade the belt into the section background at both edges. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+
+.track {
+  display: flex;
+  gap: 3px;
+  width: max-content;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  animation: carouselScroll linear infinite;
+}
+
+/* Pause so a card can be read and clicked. */
+.track:hover,
+.track:focus-within {
+  animation-play-state: paused;
+}
+
+.slide {
+  flex-shrink: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  max-width: 70vw;
+  background: var(--bone);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--oxblood);
+}
+
+.image {
+  object-fit: contain;
+  object-position: center;
+  padding: 22px;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background: var(--oxblood);
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--ink);
+  padding: 14px 16px 18px;
+  border-top: 1px solid rgba(17, 17, 17, 0.07);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
+}
+
+@keyframes carouselScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* No auto-scroll: let people scroll the row themselves. */
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    overflow-x: auto;
+  }
+
+  .track {
+    animation: none;
+  }
+
+  .image {
+    transition: none;
+  }
+}
+
+/* Touch devices: never zoom on tap (no real hover). */
+@media (hover: none) {
+  .card:hover .image {
+    transform: none;
+  }
+}

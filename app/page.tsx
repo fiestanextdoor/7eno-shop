@@ -1,8 +1,11 @@
 import Hero from '@/components/Hero/Hero'
 import Marquee from '@/components/Marquee/Marquee'
-import LatestDrop from '@/components/LatestDrop/LatestDrop'
-import { getProducts, getProduct, getEuSizeMapForProduct } from '@/lib/printful'
+import ProductCarousel, { type CarouselItem } from '@/components/ProductCarousel/ProductCarousel'
+import { getCatalogProducts } from '@/lib/catalog'
+import { getProductCardImages } from '@/lib/product-images'
+import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
+import type { NormalizedProduct } from '@/types/catalog'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -18,26 +21,42 @@ const CATEGORIES = [
   { num: '02', name: '7ENO Sport', href: '/shop?line=sport', logo: '/logos/7eno-sport.png' },
 ]
 
+/** Fisher-Yates shuffle so the carousel shows the full catalog in random order. */
+function shuffle<T>(input: T[]): T[] {
+  const arr = [...input]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
 export default async function HomePage() {
-  let hero = null
+  let products: NormalizedProduct[] = []
   try {
-    const all = await getProducts()
-    hero = all[0] ?? null
+    products = await getCatalogProducts()
   } catch (err) {
-    console.error('[Printful] getProducts failed:', err)
+    console.error('[Catalog] getCatalogProducts failed:', err)
   }
 
-  const [heroBgRemoved, heroDetail] = await Promise.all([
-    hero?.thumbnail_url ? removeBackground(hero.thumbnail_url) : Promise.resolve(null),
-    hero ? getProduct(String(hero.id)).catch(() => null) : Promise.resolve(null),
-  ])
-
-  const heroEuSizeMap = heroDetail
-    ? await getEuSizeMapForProduct(heroDetail.sync_variants)
-    : {}
+  // Build the carousel cards: prefer a local front photo (no background removal
+  // needed), otherwise the background-removed provider thumbnail. Both reuse the
+  // same Supabase cache as /shop, so this adds no remove.bg calls for products
+  // already shown there.
+  const carouselItems: CarouselItem[] = await Promise.all(
+    shuffle(products).map(async (p) => {
+      const slug = productSlug(p.name)
+      const local = getProductCardImages(slug).front
+      const image =
+        local ??
+        (p.thumbnailUrl ? await removeBackground(p.thumbnailUrl).catch(() => null) : null) ??
+        p.thumbnailUrl
+      return { slug, name: p.name, image }
+    })
+  )
 
   return (
-    <main>
+    <main className={styles.homeMain}>
       <Hero />
 
       <Marquee />
@@ -67,16 +86,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {hero && heroDetail && (
-        <section className={styles.latestDrop}>
-          <div className={styles.latestDropInner}>
-            <LatestDrop
-              productId={hero.id}
-              productName={hero.name}
-              imageUrl={heroBgRemoved ?? hero.thumbnail_url}
-              variants={heroDetail.sync_variants}
-              euSizeMap={heroEuSizeMap}
-            />
+      {carouselItems.length > 0 && (
+        <section className={styles.carouselSection}>
+          <div className={styles.carouselHeader}>
+            <p className={styles.carouselLabel}>The Collection</p>
+            <h2 className={styles.carouselTitle}>In rotation</h2>
+          </div>
+          <ProductCarousel items={carouselItems} />
+          <div className={styles.carouselFooter}>
+            <Link href="/shop" className={styles.viewAll}>View all products →</Link>
           </div>
         </section>
       )}

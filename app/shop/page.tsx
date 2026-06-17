@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
+import DonationBanner from '@/components/DonationBanner/DonationBanner'
 import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
-import { getProductImageOverride } from '@/lib/product-images'
+import { getProductCardImages } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
@@ -260,6 +261,8 @@ export default async function ShopPage({ searchParams }: Props) {
         />
       </header>
 
+      <DonationBanner variant="bar" />
+
       {products.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyTitle}>No products yet.</p>
@@ -269,12 +272,12 @@ export default async function ShopPage({ searchParams }: Props) {
         <div className={styles.grid}>
           {products.map((p, i) => {
             const slug = productSlug(p.name)
-            const ov = getProductImageOverride(slug)
             // A local front photo replaces the provider thumbnail as the card
-            // image (the men's tees whose only Printful mockup is the back);
-            // the back then becomes the hover image.
-            const cardImage = ov?.frontImage ?? bgRemovedUrls[i]
-            const cardHover = ov?.hoverImage ?? ov?.backImage ?? null
+            // image (the men's tees whose only Printful mockup is the back, and
+            // the multi-colour women's tee); the back becomes the hover image.
+            const cardImages = getProductCardImages(slug)
+            const cardImage = cardImages.front ?? bgRemovedUrls[i]
+            const cardHover = cardImages.hover ?? null
             return (
               <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={cardImage} hoverImageUrl={cardHover} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} dealLabel={dealLabelFor(p.id, slug, productInfoMap[p.id]?.currency ?? p.currency)} />
             )

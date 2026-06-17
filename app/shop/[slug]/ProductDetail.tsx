@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { NormalizedVariant, Provider } from '@/types/catalog'
 import type { SizeGuide } from '@/lib/printful'
 import { useCartStore } from '@/store/cart'
+import DonationBanner from '@/components/DonationBanner/DonationBanner'
 import { resolveSwatchBackground, resolveHex, applyBrandOverride, brandColorName, isNearWhite } from '@/lib/color-utils'
 import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_RATE } from '@/lib/shipping'
 import styles from './detail.module.css'
@@ -231,6 +232,9 @@ export default function ProductDetail({
           </span>
           <span className={styles.priceNote}>incl. tax</span>
         </div>
+
+        {/* Charity: all profit goes to Life4HSP */}
+        <DonationBanner variant="inline" />
 
         {/* Combi-deal: this product is part of one or more sets */}
         {deals.length > 0 && (

@@ -1,3 +1,16 @@
+/* Homepage-only display typeface: same editorial vibe, less default than the
+   site-wide serif. Overriding --font-serif here cascades to every serif element
+   inside the homepage <main> (hero, marquee, headings) without touching the nav,
+   footer or other pages. */
+.homeMain {
+  /* Redefine the var so elements that read `var(--font-serif)` (hero heading,
+     section titles) switch, and set font-family directly so inherited body text
+     (e.g. the intro paragraph) switches too. */
+  --font-serif: var(--font-display);
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
 /* ── Featured section ── */
 .featured {
   background: var(--paper);
@@ -218,14 +231,44 @@
   padding-top: 16px;
 }
 
-/* ── Latest Drop ── */
-.latestDrop {
-  background: var(--oxblood);
+/* ── Product carousel ── */
+.carouselSection {
+  background: var(--paper);
+  padding: 80px 0 96px;
+  overflow: hidden;
 }
 
-.latestDropInner {
+.carouselHeader {
   max-width: var(--max-width);
-  margin: 0 auto;
+  margin: 0 auto 44px;
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.carouselLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.carouselTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.carouselFooter {
+  margin-top: 48px;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--gutter);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
+import { Cormorant_Garamond, Space_Mono, Fraunces } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CartProvider from '@/components/CartProvider/CartProvider'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
@@ -18,6 +18,17 @@ const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-mono',
+  display: 'swap',
+})
+
+// Homepage display serif: same editorial elegance as the site-wide Cormorant,
+// but more distinctive. Variable font (weight omitted) with the optical-size
+// axis so the big headings get Fraunces' high-contrast display cut.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  axes: ['opsz'],
+  variable: '--font-display',
   display: 'swap',
 })
 
@@ -53,7 +64,7 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable} ${fraunces.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
         {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}

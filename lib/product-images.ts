@@ -90,3 +90,21 @@ const OVERRIDES: Record<string, ProductImageOverride> = {
 export function getProductImageOverride(slug: string): ProductImageOverride | null {
   return OVERRIDES[slug] ?? null
 }
+
+/**
+ * The front photo and hover (back) photo for a /shop product card, resolved from
+ * the local override. Falls back to the first per-colour pair when a product only
+ * has `colorFrontImages` / `colorBackImages` (e.g. the Ink/Butter Tee Women),
+ * so its card still flips to the back on hover. Returns `{}` when there is no
+ * override (the caller then uses the provider mockup).
+ */
+export function getProductCardImages(slug: string): { front?: string; hover?: string } {
+  const ov = OVERRIDES[slug]
+  if (!ov) return {}
+  const firstColorFront = ov.colorFrontImages ? Object.values(ov.colorFrontImages)[0] : undefined
+  const firstColorBack = ov.colorBackImages ? Object.values(ov.colorBackImages)[0] : undefined
+  return {
+    front: ov.frontImage ?? firstColorFront,
+    hover: ov.hoverImage ?? ov.backImage ?? firstColorBack,
+  }
+}
