@@ -2,9 +2,8 @@ import Hero from '@/components/Hero/Hero'
 import Marquee from '@/components/Marquee/Marquee'
 import ProductCarousel, { type CarouselItem } from '@/components/ProductCarousel/ProductCarousel'
 import { getCatalogProducts } from '@/lib/catalog'
-import { getProductCardImages } from '@/lib/product-images'
+import { resolveCardImage } from '@/lib/card-image'
 import { productSlug } from '@/lib/slug'
-import { removeBackground } from '@/lib/remove-bg'
 import type { NormalizedProduct } from '@/types/catalog'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -39,18 +38,13 @@ export default async function HomePage() {
     console.error('[Catalog] getCatalogProducts failed:', err)
   }
 
-  // Build the carousel cards: prefer a local front photo (no background removal
-  // needed), otherwise the background-removed provider thumbnail. Both reuse the
-  // same Supabase cache as /shop, so this adds no remove.bg calls for products
-  // already shown there.
+  // Build the carousel cards: a local front photo or the background-removed
+  // provider thumbnail (same resolution + Supabase cache as /shop, so no extra
+  // remove.bg calls for products already shown there).
   const carouselItems: CarouselItem[] = await Promise.all(
     shuffle(products).map(async (p) => {
       const slug = productSlug(p.name)
-      const local = getProductCardImages(slug).front
-      const image =
-        local ??
-        (p.thumbnailUrl ? await removeBackground(p.thumbnailUrl).catch(() => null) : null) ??
-        p.thumbnailUrl
+      const image = await resolveCardImage({ slug, thumbnailUrl: p.thumbnailUrl })
       return { slug, name: p.name, image }
     })
   )

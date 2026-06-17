@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav/Nav'
+import BundleCover from '@/components/BundleCover/BundleCover'
 import { getBundles, computeBundlePricing, lowestVariantPriceCents } from '@/lib/bundles'
 import { getCatalogProduct } from '@/lib/catalog'
+import { resolveCardImage } from '@/lib/card-image'
 import styles from './deals.module.css'
 
 export const metadata: Metadata = {
@@ -24,7 +26,14 @@ export default async function DealsPage() {
         if (!Number.isFinite(sumCents)) return null
         const pricing = computeBundlePricing(sumCents, bundle.discountCents)
         const currency = products[0]?.currency ?? 'EUR'
-        return { bundle, pricing, currency, productNames: products.map((p) => p.name) }
+        const productNames = products.map((p) => p.name)
+        // Composite cover: one background-removed photo per product in the set.
+        const coverImages = await Promise.all(
+          bundle.products.map((ref, i) =>
+            resolveCardImage({ slug: ref.slug, thumbnailUrl: products[i].thumbnailUrl }),
+          ),
+        )
+        return { bundle, pricing, currency, productNames, coverImages }
       } catch {
         return null
       }
@@ -50,13 +59,13 @@ export default async function DealsPage() {
           </div>
         ) : (
           <div className={styles.grid}>
-            {visible.map(({ bundle, pricing, currency, productNames }) => (
+            {visible.map(({ bundle, pricing, currency, productNames, coverImages }) => (
               <Link key={bundle.id} href={`/deals/${bundle.id}`} className={styles.card}>
                 <div className={styles.imageWrap}>
                   {bundle.image ? (
                     <Image src={bundle.image} alt={bundle.title} fill className={styles.image} sizes="(max-width: 640px) 100vw, 50vw" unoptimized />
                   ) : (
-                    <div className={styles.placeholder} />
+                    <BundleCover images={coverImages} names={productNames} />
                   )}
                 </div>
                 <div className={styles.info}>
