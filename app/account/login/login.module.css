@@ -103,7 +103,7 @@
   background: transparent;
   border: 1px solid rgba(17, 17, 17, 0.2);
   color: var(--ink);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;

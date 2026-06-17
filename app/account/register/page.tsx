@@ -57,7 +57,7 @@ export default function RegisterPage() {
         <div className={styles.card}>
           <p className={styles.brand}>7ENO</p>
           <h1 className={styles.title}>Confirm your email</h1>
-          <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--stone)', lineHeight: 1.6 }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--stone)', lineHeight: 1.6 }}>
             We sent a confirmation link to <strong>{email}</strong>. Click the link to activate your account.
           </p>
         </div>

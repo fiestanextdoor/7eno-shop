@@ -137,7 +137,7 @@
 }
 
 .addressLine {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: var(--butter);
   line-height: 1.4;

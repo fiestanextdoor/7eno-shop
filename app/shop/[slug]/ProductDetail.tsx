@@ -41,6 +41,8 @@ interface ProductDetailProps {
   sizeGuide?: SizeGuide | null
   extraImages?: string[]
   deals?: { id: string; title: string; discountCents: number }[]
+  /** When true (the Life4HSP collaboration product), show the donation banner. */
+  charityPartner?: boolean
 }
 
 export default function ProductDetail({
@@ -58,6 +60,7 @@ export default function ProductDetail({
   sizeGuide = null,
   extraImages = [],
   deals = [],
+  charityPartner = false,
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
   const currency = variants[0]?.currency ?? 'EUR'
@@ -233,8 +236,8 @@ export default function ProductDetail({
           <span className={styles.priceNote}>incl. tax</span>
         </div>
 
-        {/* Charity: all profit goes to Life4HSP */}
-        <DonationBanner variant="inline" />
+        {/* Charity: only the Life4HSP collaboration product donates its profit */}
+        {charityPartner && <DonationBanner variant="inline" />}
 
         {/* Combi-deal: this product is part of one or more sets */}
         {deals.length > 0 && (

@@ -131,6 +131,10 @@ export default async function ProductPage({ params }: Props) {
   if (imageOverride?.colorFrontImages) Object.assign(colorImages, imageOverride.colorFrontImages)
   if (imageOverride?.colorBackImages) Object.assign(colorBackImages, imageOverride.colorBackImages)
 
+  // Charity collaboration: only the Life4HSP product carries the donation banner
+  // (its name contains "Life4HSP", e.g. "7ENO X Life4HSP Sport Tee").
+  const isLife4Hsp = /life4hsp/i.test(detail!.name)
+
   // Combi-deals this product is part of (matched by live id or slug).
   const deals = getBundlesForProduct({ productId: match.id, slug }).map((b) => ({
     id: b.id,
@@ -155,6 +159,7 @@ export default async function ProductPage({ params }: Props) {
         sizeGuide={sizeGuide}
         extraImages={extraImages}
         deals={deals}
+        charityPartner={isLife4Hsp}
       />
     </main>
   )

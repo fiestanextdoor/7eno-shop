@@ -1,16 +1,25 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Space_Mono, Fraunces } from 'next/font/google'
+import { Oswald, Archivo, Space_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CartProvider from '@/components/CartProvider/CartProvider'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
 import PageTransition from '@/components/PageTransition/PageTransition'
 import '@/styles/globals.css'
 
-const cormorant = Cormorant_Garamond({
+// Display face for headings/product names: a bold condensed grotesque that
+// echoes the angular, condensed 7ENO wordmark. Variable font, so weight is
+// omitted to load the full range.
+const oswald = Oswald({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-serif',
+  variable: '--font-display',
+  display: 'swap',
+})
+
+// Body face: a clean, highly readable grotesque that pairs with Oswald for
+// long-form copy, form fields and product descriptions.
+const archivo = Archivo({
+  subsets: ['latin'],
+  variable: '--font-sans',
   display: 'swap',
 })
 
@@ -18,17 +27,6 @@ const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-mono',
-  display: 'swap',
-})
-
-// Homepage display serif: same editorial elegance as the site-wide Cormorant,
-// but more distinctive. Variable font (weight omitted) with the optical-size
-// axis so the big headings get Fraunces' high-contrast display cut.
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-  axes: ['opsz'],
-  variable: '--font-display',
   display: 'swap',
 })
 
@@ -64,7 +62,7 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${oswald.variable} ${archivo.variable} ${spaceMono.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
         {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}

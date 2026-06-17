@@ -31,7 +31,7 @@
 }
 
 .intro {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   color: rgba(246, 243, 236, 0.8);
   line-height: 1.8;
@@ -54,7 +54,7 @@
 }
 
 .section p {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   color: rgba(246, 243, 236, 0.7);
   line-height: 1.8;
@@ -106,7 +106,7 @@
 }
 
 .legal {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   color: rgba(246, 243, 236, 0.7);
   line-height: 1.8;

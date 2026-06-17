@@ -1,16 +1,3 @@
-/* Homepage-only display typeface: same editorial vibe, less default than the
-   site-wide serif. Overriding --font-serif here cascades to every serif element
-   inside the homepage <main> (hero, marquee, headings) without touching the nav,
-   footer or other pages. */
-.homeMain {
-  /* Redefine the var so elements that read `var(--font-serif)` (hero heading,
-     section titles) switch, and set font-family directly so inherited body text
-     (e.g. the intro paragraph) switches too. */
-  --font-serif: var(--font-display);
-  font-family: var(--font-display);
-  font-optical-sizing: auto;
-}
-
 /* ── Featured section ── */
 .featured {
   background: var(--paper);

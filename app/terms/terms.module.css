@@ -47,7 +47,7 @@
 }
 
 .section p {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   color: rgba(246, 243, 236, 0.7);
   line-height: 1.8;

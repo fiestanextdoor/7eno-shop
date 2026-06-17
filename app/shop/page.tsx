@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
-import DonationBanner from '@/components/DonationBanner/DonationBanner'
 import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
 import { getProductCardImages } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
@@ -260,8 +259,6 @@ export default async function ShopPage({ searchParams }: Props) {
           ]}
         />
       </header>
-
-      <DonationBanner variant="bar" />
 
       {products.length === 0 ? (
         <div className={styles.emptyState}>
