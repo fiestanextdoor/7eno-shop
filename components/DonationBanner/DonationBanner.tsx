@@ -6,20 +6,28 @@ interface DonationBannerProps {
    * compact card used inside the single-product info panel.
    */
   variant?: 'bar' | 'inline'
+  /**
+   * `profit` (default): 100% of 7ENO's profit is donated — used as the general
+   * statement. `product`: 100% of *this product's* proceeds are donated — used
+   * on the Life4HSP collaboration product, which gives away the whole sale.
+   */
+  scope?: 'profit' | 'product'
 }
 
 /**
- * States that 100% of 7ENO's profit is donated to Life4HSP. Shown on the shop
- * overview and on every single-product page.
+ * States how much 7ENO donates to Life4HSP. Shown on the shop overview and on
+ * every single-product page; the Life4HSP collaboration product uses
+ * scope="product" to signal that 100% of that product is donated.
  */
-export default function DonationBanner({ variant = 'bar' }: DonationBannerProps) {
+export default function DonationBanner({ variant = 'bar', scope = 'profit' }: DonationBannerProps) {
   return (
     <aside className={variant === 'inline' ? styles.inline : styles.bar} aria-label="Charity">
       <span className={styles.mark} aria-hidden="true">♡</span>
       <p className={styles.text}>
         <span className={styles.kicker}>Wear it for good</span>
         <span className={styles.statement}>
-          100% of our profit is donated to <strong className={styles.cause}>Life4HSP</strong>.
+          {scope === 'product' ? '100% of this product' : '100% of our profit'} is donated to{' '}
+          <strong className={styles.cause}>Life4HSP</strong>.
         </span>
       </p>
     </aside>

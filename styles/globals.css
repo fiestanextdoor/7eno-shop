@@ -14,12 +14,13 @@
   --mid:     #8F8A80;
   --rule:    #C8C1B2;
 
-  /* SF Pro via Apple's system-font stack: real SF Pro on macOS/iOS/iPadOS,
-     graceful fallback to the platform system sans (Segoe UI, Roboto) elsewhere.
-     The browser auto-picks the SF Pro Text/Display optical size by font size. */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
-               system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  /* Headings and the legacy `--font-serif` alias now use the same SF Pro stack. */
+  /* Cormorant Garamond is the site-wide typeface: a high-contrast renaissance
+     serif loaded + self-hosted by next/font (exposed as --font-cormorant in
+     layout.tsx). Falls back to classic system serifs before the web font swaps
+     in. The --font-sans name is kept for backwards compatibility across the
+     existing modules; headings and the --font-serif alias resolve to the same
+     family. */
+  --font-sans: var(--font-cormorant), Georgia, 'Times New Roman', 'Iowan Old Style', serif;
   --font-display: var(--font-sans);
   --font-serif:   var(--font-sans);
   --font-mono:    'Space Mono', ui-monospace, monospace;
@@ -46,8 +47,8 @@ body {
   background: var(--butter);
   color: var(--ink);
   font-family: var(--font-sans);
-  /* SF Pro Medium as the default text weight (headings set their own heavier
-     weight). */
+  /* Medium (500) Cormorant gives the body a touch more presence than the airy
+     regular weight, while headings set their own heavier weight. */
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.6;

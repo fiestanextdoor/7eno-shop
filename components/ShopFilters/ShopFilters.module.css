@@ -74,6 +74,34 @@
   border-color: var(--oxblood);
 }
 
+/* Featured destination (e.g. Deals) — a CTA, not a filter, so it reads in the
+   brand accent and fills on hover. */
+.featuredCell {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(17, 17, 17, 0.1);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  padding: 0 18px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+}
+
+.featuredCell:hover {
+  background: var(--oxblood);
+  color: var(--bone);
+}
+
+.featuredCell:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
 /* ── Mobile-only elements: hidden on desktop ── */
 .toggle,
 .overlayVisible,
@@ -90,17 +118,19 @@
   }
 
   .toggle {
-    display: inline-flex;
+    display: flex;
+    width: 100%;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     font-family: var(--font-mono);
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--ink);
     background: transparent;
     border: 1px solid var(--ink);
-    padding: 12px 18px;
+    padding: 15px 18px;
     cursor: pointer;
   }
 
@@ -195,10 +225,31 @@
   }
 
   .drawerBody {
+    flex: 1;
     padding: 20px 24px 40px;
     display: flex;
     flex-direction: column;
     gap: 28px;
+  }
+
+  /* Prominent destination link at the top of the drawer (e.g. Deals). */
+  .drawerFeatured {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--bone);
+    background: var(--oxblood);
+    padding: 16px 18px;
+    text-decoration: none;
+  }
+
+  .drawerFeatured:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 
   .drawerGroup {
@@ -246,6 +297,58 @@
     color: var(--bone);
     background: var(--oxblood);
     border-color: var(--oxblood);
+  }
+
+  /* Sticky action footer: reset + an explicit "apply" CTA so the result of
+     filtering is always one tap away at the bottom of the drawer. */
+  .drawerFooter {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    padding: 16px 24px;
+    background: var(--bone);
+    border-top: 1px solid rgba(17, 17, 17, 0.12);
+  }
+
+  .clearAll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 14px 18px;
+    text-decoration: none;
+  }
+
+  .clearAll:focus-visible,
+  .showResults:focus-visible {
+    outline: 2px solid var(--oxblood);
+    outline-offset: 2px;
+  }
+
+  .showResults {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--bone);
+    background: var(--ink);
+    border: none;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .showResults:hover {
+    background: var(--oxblood);
   }
 }
 

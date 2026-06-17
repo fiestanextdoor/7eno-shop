@@ -56,6 +56,40 @@
   display: block;
 }
 
+.presaleNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--oxblood);
+  padding: 14px 16px;
+  margin-bottom: 32px;
+}
+
+.presaleIcon {
+  flex-shrink: 0;
+  color: var(--oxblood);
+  margin-top: 2px;
+}
+
+.presaleText {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.presaleTitle {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  margin-bottom: 4px;
+}
+
 .items {
   display: flex;
   flex-direction: column;

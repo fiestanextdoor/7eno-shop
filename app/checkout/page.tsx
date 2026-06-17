@@ -117,6 +117,26 @@ export default function CheckoutPage() {
           {items.length} item{items.length > 1 ? 's' : ''}
         </span>
 
+        <div className={styles.presaleNotice} role="status">
+          <svg
+            className={styles.presaleIcon}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+            <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <p className={styles.presaleText}>
+            <strong className={styles.presaleTitle}>Pre-sale order</strong>
+            Because these pieces are pre-sale, shipping can run up to{' '}
+            <strong>5 working days</strong> longer than the usual estimate. Your
+            order is reserved and ships the moment stock lands.
+          </p>
+        </div>
+
         <div className={styles.items}>
           {items.map((item) => (
             <div key={cartItemKey(item.provider, item.variantId, item.bundleId, item.productId)} className={styles.item}>

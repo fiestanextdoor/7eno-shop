@@ -1,14 +1,25 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Mono } from 'next/font/google'
+import { Space_Mono, Cormorant_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CartProvider from '@/components/CartProvider/CartProvider'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
 import PageTransition from '@/components/PageTransition/PageTransition'
 import '@/styles/globals.css'
 
-// Headings and body both use SF Pro (Apple's system font) via the system-font
-// stack in globals.css — no web-font download. Space Mono stays for the small
-// uppercase label accents.
+// Cormorant Garamond is the site-wide typeface for headings and body: a soft,
+// high-contrast renaissance serif that gives the "Divine Authority" brand an
+// ethereal, scriptural feel. Wired to --font-sans in globals.css. Space Mono
+// stays for the small uppercase label accents (a distinct, functional element).
+// Both are self-hosted by next/font at build time, so no external font CDN is
+// hit (keeps the `font-src 'self'` CSP intact).
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
+
 const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -48,7 +59,7 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={spaceMono.variable}>
+    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
         {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}

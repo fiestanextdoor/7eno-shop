@@ -28,6 +28,7 @@ interface Classification {
   isTee: boolean
   isShorts: boolean
   isSwim: boolean
+  isTowel: boolean
   isAccessory: boolean
   isClothing: boolean
   isSport: boolean
@@ -56,10 +57,13 @@ function classify(name: string): Classification {
   const isTee = n.includes('tee') || n.includes('shirt')
   const isSwim = n.includes('swim') || n.includes('bikini')
   const isShorts = n.includes('shorts') && !isSwim
+  // A beach towel belongs in swimwear too, but is not "clothing" — keep it out
+  // of isClothing so it doesn't leak into the Daily/Sport line filters.
+  const isTowel = n.includes('towel')
   const isAccessory = ACCESSORY_KEYWORDS.some((k) => n.includes(k))
   const isClothing = isTee || isShorts || isSwim
   const isSport = n.includes('sport')
-  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isAccessory, isClothing, isSport }
+  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport }
 }
 
 function inGender(gender: string, c: Classification): boolean {
@@ -80,7 +84,7 @@ function inCategory(category: string, c: Classification): boolean {
   switch (category) {
     case 'tees': return c.isTee
     case 'shorts': return c.isShorts
-    case 'swimwear': return c.isSwim
+    case 'swimwear': return c.isSwim || c.isTowel
     case 'accessories': return c.isAccessory
     default: return true
   }
@@ -257,6 +261,8 @@ export default async function ShopPage({ searchParams }: Props) {
             { label: 'Line', items: lineFilters },
             { label: 'Category', items: categoryFilters },
           ]}
+          featured={{ label: 'Deals', href: '/deals' }}
+          resultCount={products.length}
         />
       </header>
 

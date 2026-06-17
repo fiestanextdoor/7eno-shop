@@ -236,8 +236,8 @@ export default function ProductDetail({
           <span className={styles.priceNote}>incl. tax</span>
         </div>
 
-        {/* Charity: only the Life4HSP collaboration product donates its profit */}
-        {charityPartner && <DonationBanner variant="inline" />}
+        {/* Charity: the Life4HSP collaboration product donates 100% of the product */}
+        {charityPartner && <DonationBanner variant="inline" scope="product" />}
 
         {/* Combi-deal: this product is part of one or more sets */}
         {deals.length > 0 && (

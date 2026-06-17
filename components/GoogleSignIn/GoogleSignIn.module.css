@@ -1,0 +1,10 @@
+/* Centres Google's rendered button and reserves height to avoid layout shift
+   while the GIS script loads. The button itself is rendered by Google inside
+   this container, so its visual style is fixed by Google's API options. */
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 8px;
+}

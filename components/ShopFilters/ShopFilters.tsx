@@ -15,7 +15,17 @@ export interface FilterGroup {
   items: FilterItem[]
 }
 
-export default function ShopFilters({ groups }: { groups: FilterGroup[] }) {
+export default function ShopFilters({
+  groups,
+  featured,
+  resultCount,
+}: {
+  groups: FilterGroup[]
+  /** Prominent standalone link rendered apart from the filters (e.g. Deals). */
+  featured?: { label: string; href: string }
+  /** Number of products currently shown — surfaced in the mobile drawer CTA. */
+  resultCount?: number
+}) {
   const [open, setOpen] = useState(false)
 
   // Close on Escape and lock body scroll while the drawer is open.
@@ -55,6 +65,12 @@ export default function ShopFilters({ groups }: { groups: FilterGroup[] }) {
             </div>
           </div>
         ))}
+        {featured && (
+          <Link href={featured.href} className={styles.featuredCell}>
+            {featured.label}
+            <span aria-hidden="true"> →</span>
+          </Link>
+        )}
       </div>
 
       {/* Mobile: toggle button */}
@@ -100,6 +116,12 @@ export default function ShopFilters({ groups }: { groups: FilterGroup[] }) {
         </div>
 
         <div className={styles.drawerBody}>
+          {featured && (
+            <Link href={featured.href} onClick={() => setOpen(false)} className={styles.drawerFeatured}>
+              {featured.label}
+              <span aria-hidden="true"> →</span>
+            </Link>
+          )}
           {groups.map((g) => (
             <div key={g.label} className={styles.drawerGroup}>
               <span className={styles.drawerGroupLabel}>{g.label}</span>
@@ -117,6 +139,20 @@ export default function ShopFilters({ groups }: { groups: FilterGroup[] }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Sticky footer: reset (only when filtering) + a clear "apply" CTA. */}
+        <div className={styles.drawerFooter}>
+          {activeFilters > 0 && (
+            <Link href="/shop" onClick={() => setOpen(false)} className={styles.clearAll}>
+              Clear all
+            </Link>
+          )}
+          <button type="button" className={styles.showResults} onClick={() => setOpen(false)}>
+            {typeof resultCount === 'number'
+              ? `Show ${resultCount} ${resultCount === 1 ? 'result' : 'results'}`
+              : 'Done'}
+          </button>
         </div>
       </aside>
     </>
