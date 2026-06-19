@@ -27,7 +27,15 @@ export default function DonationBanner({ variant = 'bar', scope = 'profit' }: Do
         <span className={styles.kicker}>Wear it for good</span>
         <span className={styles.statement}>
           {scope === 'product' ? '100% of this product' : '100% of our profit'} is donated to{' '}
-          <strong className={styles.cause}>Life4HSP</strong>.
+          <a
+            href="https://life4hsp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.cause}
+          >
+            Life4HSP
+          </a>
+          .
         </span>
       </p>
     </aside>

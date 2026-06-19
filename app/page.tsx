@@ -55,18 +55,6 @@ export default async function HomePage() {
 
       <Marquee />
 
-      <section className={styles.intro}>
-        <div className={styles.introInner}>
-          <p className={styles.introKicker}>7ENO</p>
-          <h2 className={styles.introTitle}>The official 7ENO streetwear store</h2>
-          <p className={styles.introText}>
-            7ENO is the official online streetwear store. Browse the collection,
-            create an account or sign in with Google, and place orders, track
-            your shipments and manage your details.
-          </p>
-        </div>
-      </section>
-
       <section className={styles.categoryStrip}>
         <div className={styles.categoryStripInner}>
           {CATEGORIES.map((cat) => (

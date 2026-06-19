@@ -95,8 +95,10 @@ export async function proxy(request: NextRequest) {
 
   // ── Storefront seal ─────────────────────────────────────────────────────
   // Until the launch moment (lib/release.ts), every page redirects to the
-  // /coming-soon teaser. Auto-lifts at 19 June 2026, 19:00 CEST.
-  if (isShopLocked() && !hasBypass && !isSealExempt(pathname)) {
+  // /coming-soon teaser. Auto-lifts at 19 June 2026, 19:00 CEST. Disabled in
+  // development so the shop is browsable locally without the preview bypass.
+  const sealActive = process.env.NODE_ENV === 'production'
+  if (sealActive && isShopLocked() && !hasBypass && !isSealExempt(pathname)) {
     const comingSoon = request.nextUrl.clone()
     comingSoon.pathname = '/coming-soon'
     comingSoon.search = ''

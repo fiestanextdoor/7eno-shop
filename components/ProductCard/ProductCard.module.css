@@ -80,6 +80,70 @@
   border-radius: 3px;
 }
 
+/* Life4HSP charity badge: a logo "bolletje" top-right that expands into a pill
+   ("100% profit donated") and spins the logo a full turn on hover/focus. */
+.charityBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 1px;
+  border-radius: 999px;
+  background: var(--bone);
+  box-shadow: 0 2px 10px rgba(17, 17, 17, 0.18);
+  overflow: hidden;
+  transition: padding-left 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.charityBadge:hover,
+.card:focus-visible .charityBadge {
+  padding-left: 14px;
+}
+
+/* When the product also carries a combi-deal badge, drop below it. */
+.charityBadgeWithDeal {
+  top: 54px;
+}
+
+.charityLabel {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  transition:
+    max-width 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.3s ease,
+    margin-right 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.charityBadge:hover .charityLabel,
+.card:focus-visible .charityLabel {
+  max-width: 240px;
+  opacity: 1;
+  margin-right: 10px;
+}
+
+.charityLogo {
+  width: 45px;
+  height: auto;
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.charityBadge:hover .charityLogo,
+.card:focus-visible .charityLogo {
+  transform: rotate(360deg);
+}
+
 /* Swatch hover image overlay */
 .hoverOverlay {
   position: absolute;
@@ -205,4 +269,9 @@
 @media (prefers-reduced-motion: reduce) {
   .image   { transition: none; }
   .hoverBar { transition: none; }
+  .charityBadge,
+  .charityLogo,
+  .charityLabel { transition: none; }
+  .charityBadge:hover .charityLogo,
+  .card:focus-visible .charityLogo { transform: none; }
 }

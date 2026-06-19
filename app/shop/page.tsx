@@ -54,7 +54,10 @@ function classify(name: string): Classification {
   const isWomen = genderOverride ? genderOverride === 'women' : n.includes('women')
   const isMen = genderOverride ? genderOverride === 'men' : (n.includes('men') && !n.includes('women'))
   const isUnisex = genderOverride ? genderOverride === 'unisex' : n.includes('unisex')
-  const isTee = n.includes('tee') || n.includes('shirt')
+  // The Life4HSP charity collab is a sport tee: pin it to the tees category and
+  // the sport line (and the sportswear sort block below) regardless of how the
+  // provider names it, so it always sits next to the other sport shirts.
+  const isTee = n.includes('tee') || n.includes('shirt') || n.includes('life4hsp')
   const isSwim = n.includes('swim') || n.includes('bikini')
   const isShorts = n.includes('shorts') && !isSwim
   // A beach towel belongs in swimwear too, but is not "clothing" — keep it out
@@ -62,7 +65,7 @@ function classify(name: string): Classification {
   const isTowel = n.includes('towel')
   const isAccessory = ACCESSORY_KEYWORDS.some((k) => n.includes(k))
   const isClothing = isTee || isShorts || isSwim
-  const isSport = n.includes('sport')
+  const isSport = n.includes('sport') || n.includes('life4hsp')
   return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport }
 }
 
@@ -152,10 +155,14 @@ export default async function ShopPage({ searchParams }: Props) {
     return true
   })
 
-  // Sort: normal clothing → sportswear → swimwear → accessories
-  products.sort((a, b) =>
-    (SORT_PRIORITY[a.id] ?? 99) - (SORT_PRIORITY[b.id] ?? 99)
-  )
+  // Sort: normal clothing → sportswear → swimwear → accessories. The Life4HSP
+  // collab has no fixed id in SORT_PRIORITY, so pin it to the head of the
+  // sportswear block (just before priority 10) so it always sits next to the
+  // other sport shirts, under every filter and with none.
+  const LIFE4HSP_SORT = 9.5
+  const sortPriority = (p: NormalizedProduct) =>
+    /life4hsp/i.test(p.name) ? LIFE4HSP_SORT : (SORT_PRIORITY[p.id] ?? 99)
+  products.sort((a, b) => sortPriority(a) - sortPriority(b))
 
   // Remove.bg + color swatches in parallel for all filtered products
   const [bgRemovedUrls, productInfoMap] = await Promise.all([

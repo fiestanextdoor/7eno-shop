@@ -131,7 +131,7 @@ export default function CheckoutPage() {
           </svg>
           <p className={styles.presaleText}>
             <strong className={styles.presaleTitle}>Pre-sale order</strong>
-            Because these pieces are pre-sale, shipping can run up to{' '}
+            Because pre-sale is active, shipping can run up to{' '}
             <strong>5 working days</strong> longer than the usual estimate. Your
             order is reserved and ships the moment stock lands.
           </p>

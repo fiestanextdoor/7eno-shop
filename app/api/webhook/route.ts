@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createOrder as createPrintfulOrder, isAutoConfirmEnabled as isPrintfulAutoConfirm, type PrintfulOrderRecipient, type PrintfulOrderItem } from '@/lib/printful'
 import { createOrder as createPrintifyOrder, type PrintifyOrderRecipient, type PrintifyOrderLine } from '@/lib/printify'
 import { createServiceClient } from '@/lib/supabase/server'
+import { sendOrderConfirmationEmail, type OrderEmailItem } from '@/lib/email/order-confirmation'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -192,6 +193,49 @@ export async function POST(req: NextRequest) {
       // (that would retry fulfillment and duplicate the Printful order); log for
       // manual reconciliation instead.
       console.error('[Webhook] CRITICAL: Printful order', printfulOrderId, 'created but not recorded for session', session.id)
+    }
+
+    // Order confirmation email. Best-effort: a paid + fulfilled order must still
+    // return 200, so any failure here is logged, never thrown. The idempotency
+    // guard above ensures Stripe retries won't reach this twice.
+    if (customer.email) {
+      try {
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+          expand: ['data.price.product'],
+          limit: 100,
+        })
+        const items: OrderEmailItem[] = lineItems.data.map((li) => {
+          const product = li.price?.product
+          const variant =
+            product && typeof product === 'object' && !('deleted' in product) ? product.description : null
+          return {
+            name: li.description ?? 'Item',
+            variant: variant ?? null,
+            quantity: li.quantity ?? 1,
+            amountCents: li.amount_total ?? 0,
+          }
+        })
+
+        await sendOrderConfirmationEmail(customer.email, {
+          orderRef: printfulOrderId ?? fulfillments[0]?.order_id ?? session.id.slice(-12),
+          customerName: printfulRecipient.name,
+          items,
+          subtotalCents: session.amount_subtotal ?? 0,
+          shippingCents: session.total_details?.amount_shipping ?? 0,
+          discountCents: session.total_details?.amount_discount ?? 0,
+          totalCents: session.amount_total ?? 0,
+          currency: session.currency ?? 'eur',
+          shippingAddress: {
+            name: printfulRecipient.name,
+            line1: shipAddr.line2 ? `${shipAddr.line1}, ${shipAddr.line2}` : shipAddr.line1,
+            city: shipAddr.city,
+            postalCode: shipAddr.postalCode,
+            country: shipAddr.country,
+          },
+        })
+      } catch (err) {
+        console.error('[Webhook] Failed to send confirmation email for session', session.id, err)
+      }
     }
   }
 

@@ -36,6 +36,9 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
   const num = String(index + 1).padStart(2, '0')
   const baseSrc = imageUrl ?? product.thumbnailUrl
   const slug = productSlug(product.name)
+  // Charity collaboration: only the Life4HSP product (its name contains
+  // "Life4HSP") carries the donation badge — same convention as the product page.
+  const isLife4Hsp = /life4hsp/i.test(product.name)
   const priceLabel = formatPrice(priceCents ?? product.priceCents, currency ?? product.currency)
 
   // Clicking a swatch opens the product with that colour preselected, instead
@@ -84,6 +87,17 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
 
         {/* Top-right combi-deal badge */}
         {dealLabel && <span className={styles.dealBadge}>{dealLabel}</span>}
+
+        {/* Top-right charity badge: a logo "bolletje" that expands into a pill
+            ("100% profit donated") and spins the logo on hover. Only on the
+            Life4HSP collaboration product; drops below the deal badge if present. */}
+        {isLife4Hsp && (
+          <div className={`${styles.charityBadge} ${dealLabel ? styles.charityBadgeWithDeal : ''}`}>
+            <span className={styles.charityLabel}>100% profit donated to Life4HSP</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logos/life4hsp.png" alt="Life4HSP" className={styles.charityLogo} />
+          </div>
+        )}
 
         {/* Hover CTA */}
         <div className={styles.hoverBar}>
