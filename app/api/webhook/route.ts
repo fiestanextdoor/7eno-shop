@@ -181,6 +181,23 @@ export async function POST(req: NextRequest) {
       console.error('[Webhook] Failed to save order to Supabase for session', session.id, err)
     }
 
+    // Record the discount-code redemption (single-use per account). Best-effort
+    // and idempotent: the unique (user_id, code) constraint absorbs Stripe
+    // retries. Only signed-in orders carry a promo_code (the code requires an
+    // account), so userId is present whenever this runs.
+    const promoCode = session.metadata?.promo_code
+    if (promoCode && userId) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from('coupon_redemptions') as any).upsert(
+          { user_id: userId, code: promoCode, stripe_session_id: session.id },
+          { onConflict: 'user_id,code', ignoreDuplicates: true }
+        )
+      } catch (err) {
+        console.error('[Webhook] Failed to record promo redemption for session', session.id, err)
+      }
+    }
+
     if (fulfillmentError) {
       // Could not fulfill. The order record exists with status 'fulfillment_failed'.
       // Return 500 so Stripe retries: a transient Printful error may succeed on a

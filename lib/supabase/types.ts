@@ -88,6 +88,26 @@ export interface Database {
           status?: string
         }
       }
+      coupon_redemptions: {
+        Row: {
+          id: string
+          user_id: string
+          code: string
+          stripe_session_id: string | null
+          redeemed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          code: string
+          stripe_session_id?: string | null
+          redeemed_at?: string
+        }
+        Update: {
+          code?: string
+          stripe_session_id?: string | null
+        }
+      }
     }
   }
 }
@@ -95,3 +115,4 @@ export interface Database {
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Address = Database['public']['Tables']['addresses']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
+export type CouponRedemption = Database['public']['Tables']['coupon_redemptions']['Row']

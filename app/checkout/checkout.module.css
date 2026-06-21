@@ -188,6 +188,101 @@
   outline-offset: 1px;
 }
 
+.promo {
+  margin-bottom: 24px;
+}
+
+.promoRow {
+  display: flex;
+  gap: 10px;
+}
+
+.promoRow .input {
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.promoBtn {
+  flex-shrink: 0;
+  background: var(--ink);
+  color: var(--bone);
+  border: none;
+  padding: 0 22px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.promoBtn:hover:not(:disabled) {
+  background: var(--oxblood);
+}
+
+.promoBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.promoBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.promoApplied {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--oxblood);
+  padding: 12px 14px;
+}
+
+.promoAppliedText {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+
+.promoRemove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--stone);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.promoRemove:hover {
+  color: var(--oxblood);
+}
+
+.promoError,
+.promoSuccess {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.promoError {
+  color: var(--oxblood);
+}
+
+.promoSuccess {
+  color: var(--ink);
+}
+
 .summary {
   display: flex;
   flex-direction: column;
@@ -369,6 +464,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .payBtn { transition: none; }
+  .promoBtn { transition: none; }
   .agreeCheckbox,
   .agreeCheckbox::before { transition: none; }
 }

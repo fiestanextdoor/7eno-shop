@@ -39,6 +39,17 @@ create table if not exists public.orders (
   created_at timestamptz default now() not null
 );
 
+-- Inwisselingen van kortingscodes (één keer per account; gevuld door de
+-- Stripe webhook). De unique-constraint dwingt "één keer per account" af.
+create table if not exists public.coupon_redemptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  code text not null,
+  stripe_session_id text,
+  redeemed_at timestamptz default now() not null,
+  unique (user_id, code)
+);
+
 -- =====================================================
 -- Row Level Security
 -- =====================================================
@@ -46,6 +57,7 @@ create table if not exists public.orders (
 alter table public.profiles enable row level security;
 alter table public.addresses enable row level security;
 alter table public.orders enable row level security;
+alter table public.coupon_redemptions enable row level security;
 
 -- Profiles: eigen rij lezen en updaten
 create policy "Eigen profiel lezen" on public.profiles
@@ -61,6 +73,14 @@ create policy "Eigen adressen beheren" on public.addresses
 -- Orders: eigen bestellingen lezen
 create policy "Eigen bestellingen lezen" on public.orders
   for select using (auth.uid() = user_id);
+
+-- Coupon redemptions: eigen inwisselingen lezen; alleen de service role
+-- (Stripe webhook) mag ze aanmaken.
+create policy "Eigen coupon redemptions lezen" on public.coupon_redemptions
+  for select using (auth.uid() = user_id);
+
+create policy "Service role coupon redemptions schrijven" on public.coupon_redemptions
+  for insert to service_role with check (true);
 
 -- Verwijder oude policies die voor ALLE rollen golden (anon/authenticated konden
 -- hierdoor willekeurige orders aanmaken of wijzigen).

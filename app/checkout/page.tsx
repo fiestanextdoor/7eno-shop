@@ -41,6 +41,16 @@ export default function CheckoutPage() {
   const [payLoading, setPayLoading] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
 
+  // Discount code state. The code is single-use per account and not combinable
+  // with bundle deals, so it is hidden when the cart contains a bundle; the
+  // server re-validates everything before applying it (app/api/checkout).
+  const [promoInput, setPromoInput] = useState('')
+  const [appliedCode, setAppliedCode] = useState<string | null>(null)
+  const [promoPercent, setPromoPercent] = useState(0)
+  const [promoMsg, setPromoMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
+  const [promoNeedsLogin, setPromoNeedsLogin] = useState(false)
+  const [promoLoading, setPromoLoading] = useState(false)
+
   const addressComplete =
     form.name.trim() !== '' &&
     form.line1.trim() !== '' &&
@@ -49,6 +59,8 @@ export default function CheckoutPage() {
 
   const canPay = addressComplete && agreed
 
+  const hasBundle = items.some((item) => Boolean(item.bundleId))
+
   // Shipping is a flat fee, free above the threshold. It depends only on the
   // subtotal, so it is known immediately, without an extra "calculate" step or
   // a round-trip for the destination.
@@ -56,11 +68,52 @@ export default function CheckoutPage() {
   const shippingCost = computeShippingCents(Math.round(subtotal * 100)) / 100
   const freeShipping = shippingCost === 0
   const remainingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
-  const grandTotal = subtotal + shippingCost
+  // Display only: the discount applies to the product subtotal (not shipping).
+  // The authoritative amount is recomputed server-side from trusted prices.
+  const discount = appliedCode ? (subtotal * promoPercent) / 100 : 0
+  const grandTotal = Math.max(0, subtotal + shippingCost - discount)
 
   const updateField = (key: keyof AddressForm, value: string) => {
     setForm((f) => ({ ...f, [key]: value }))
     setPayError(null)
+  }
+
+  const applyPromo = async () => {
+    const code = promoInput.trim()
+    if (code === '') return
+    setPromoLoading(true)
+    setPromoMsg(null)
+    setPromoNeedsLogin(false)
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
+      const data = await res.json()
+      if (res.ok && data.valid) {
+        setAppliedCode(data.code)
+        setPromoPercent(data.percentOff)
+        setPromoMsg({ type: 'success', text: `Code ${data.code} applied — ${data.percentOff}% off.` })
+      } else {
+        setAppliedCode(null)
+        setPromoPercent(0)
+        setPromoNeedsLogin(res.status === 401)
+        setPromoMsg({ type: 'error', text: data.error ?? 'Could not apply this code.' })
+      }
+    } catch {
+      setPromoMsg({ type: 'error', text: 'Network error. Please try again.' })
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
+  const removePromo = () => {
+    setAppliedCode(null)
+    setPromoPercent(0)
+    setPromoInput('')
+    setPromoMsg(null)
+    setPromoNeedsLogin(false)
   }
 
   const handleCheckout = async () => {
@@ -71,7 +124,7 @@ export default function CheckoutPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, address: form }),
+        body: JSON.stringify({ items, address: form, ...(appliedCode ? { promoCode: appliedCode } : {}) }),
       })
       const data = await res.json()
       if (data.url) {
@@ -235,11 +288,79 @@ export default function CheckoutPage() {
           </label>
         </div>
 
+        <h2 className={styles.sectionTitle}>Discount code</h2>
+        <div className={styles.promo}>
+          {hasBundle ? (
+            <p className={styles.shippingNote}>
+              Discount codes can&apos;t be combined with bundle deals.
+            </p>
+          ) : appliedCode ? (
+            <div className={styles.promoApplied}>
+              <span className={styles.promoAppliedText}>
+                Code <strong>{appliedCode}</strong> · {promoPercent}% off
+              </span>
+              <button type="button" className={styles.promoRemove} onClick={removePromo}>
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className={styles.promoRow}>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Discount code"
+                value={promoInput}
+                onChange={(e) => {
+                  setPromoInput(e.target.value)
+                  setPromoMsg(null)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    applyPromo()
+                  }
+                }}
+                aria-label="Discount code"
+              />
+              <button
+                type="button"
+                className={styles.promoBtn}
+                onClick={applyPromo}
+                disabled={promoLoading || promoInput.trim() === ''}
+              >
+                {promoLoading ? '…' : 'Apply'}
+              </button>
+            </div>
+          )}
+          {promoMsg && (
+            <p
+              className={promoMsg.type === 'error' ? styles.promoError : styles.promoSuccess}
+              aria-live="polite"
+            >
+              {promoMsg.text}
+              {promoNeedsLogin && (
+                <>
+                  {' '}
+                  <Link href="/account/login?redirect=/checkout" className={styles.agreeLink}>
+                    Log in
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+
         <div className={styles.summary}>
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Subtotal</span>
             <span className={styles.summaryValue}>&euro;{subtotal.toFixed(2)}</span>
           </div>
+          {discount > 0 && (
+            <div className={styles.summaryRow}>
+              <span className={styles.summaryLabel}>Discount ({appliedCode})</span>
+              <span className={styles.summaryValue}>-&euro;{discount.toFixed(2)}</span>
+            </div>
+          )}
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Shipping</span>
             <span className={styles.summaryValue}>

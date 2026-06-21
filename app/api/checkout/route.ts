@@ -6,6 +6,7 @@ import { buildVariantLookup as buildPrintifyLookup } from '@/lib/printify'
 import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
 import { getBundle } from '@/lib/bundles'
 import { resolveBundleDiscountCents, type BundleMemberItem } from '@/lib/bundle-discount'
+import { PROMO_CODE, PROMO_PERCENT_OFF, isValidPromoCode } from '@/lib/promo'
 import { createClient } from '@/lib/supabase/server'
 import type { NormalizedVariant } from '@/types/catalog'
 import type { CartItem } from '@/types/cart'
@@ -13,10 +14,12 @@ import type { CartItem } from '@/types/cart'
 export async function POST(req: NextRequest) {
   let items: CartItem[]
   let address: unknown
+  let promoCode: unknown
   try {
     const body = await req.json()
     items = body.items
     address = body.address
+    promoCode = body.promoCode
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
@@ -187,6 +190,42 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Discount code. Single-use per account and not combinable with bundle deals,
+  // so it requires a signed-in account (that is how "one use per account" is
+  // enforced — see coupon_redemptions). Every check is repeated here, never
+  // trusting the client or the /api/promo/validate pre-check.
+  let appliedPromoCode: string | null = null
+  if (typeof promoCode === 'string' && promoCode.trim() !== '') {
+    if (!isValidPromoCode(promoCode)) {
+      return NextResponse.json({ error: 'This discount code is not valid.' }, { status: 400 })
+    }
+    if (bundleMembers.length > 0) {
+      return NextResponse.json(
+        { error: "Discount codes can't be combined with bundle deals." },
+        { status: 400 }
+      )
+    }
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Create an account or log in to use this discount code.' },
+        { status: 401 }
+      )
+    }
+    const { data: redeemed } = await supabase
+      .from('coupon_redemptions')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('code', PROMO_CODE)
+      .maybeSingle()
+    if (redeemed) {
+      return NextResponse.json(
+        { error: 'You have already used this discount code.' },
+        { status: 409 }
+      )
+    }
+    appliedPromoCode = PROMO_CODE
+  }
+
   const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
 
   try {
@@ -203,6 +242,7 @@ export async function POST(req: NextRequest) {
         cart: cartJson,
         ship_addr: JSON.stringify(addr),
         ...(user ? { user_id: user.id } : {}),
+        ...(appliedPromoCode ? { promo_code: appliedPromoCode } : {}),
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/checkout`,
@@ -224,13 +264,17 @@ export async function POST(req: NextRequest) {
         name: 'Combi-deal',
       })
       sessionParams.discounts = [{ coupon: coupon.id }]
-    } else {
-      // No combi-deal applied: let the customer enter a promotion code (e.g.
-      // MAARDANWEL, 7% off) on the Stripe Checkout page. Stripe forbids
-      // combining `discounts` with `allow_promotion_codes`, so this only runs
-      // when no bundle discount is set above. Create the code once per Stripe
-      // environment with `node --env-file=.env.local scripts/create-discount-code.mjs`.
-      sessionParams.allow_promotion_codes = true
+    } else if (appliedPromoCode) {
+      // Validated discount code (not combinable with bundles, hence else-if).
+      // A fresh single-use coupon is created per session; the account-level
+      // single-use is enforced separately via coupon_redemptions.
+      const coupon = await stripe.coupons.create({
+        percent_off: PROMO_PERCENT_OFF,
+        duration: 'once',
+        max_redemptions: 1,
+        name: appliedPromoCode,
+      })
+      sessionParams.discounts = [{ coupon: coupon.id }]
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)
