@@ -97,6 +97,17 @@ export function renderOrderConfirmation(data: OrderEmailData): RenderedEmail {
   const { currency } = data
   const subject = 'Your 7ENO order is confirmed'
 
+  // Email clients can't resolve relative URLs, so logos need an absolute
+  // origin. Mirrors the checkout route's NEXT_PUBLIC_BASE_URL handling, with
+  // the production domain as the fallback (not localhost) so live mail still
+  // renders if the env var is ever missing.
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.7eno.shop').replace(/\/+$/, '')
+
+  // The "100% donated" promise only holds for the Life4HSP collaboration
+  // product, not for the whole shop. Detect it by name (same convention as the
+  // storefront, app/shop/[slug]/page.tsx) and only then show the donation note.
+  const isCharityOrder = data.items.some((i) => /life4hsp/i.test(i.name))
+
   const itemsHtml = data.items.map((i) => itemRowHtml(i, currency)).join('')
 
   const totalsHtml = [
@@ -128,8 +139,8 @@ export function renderOrderConfirmation(data: OrderEmailData): RenderedEmail {
           <!-- Header -->
           <tr>
             <td align="center" style="padding:40px 40px 8px;">
-              <div style="font-family:${SERIF};font-size:34px;letter-spacing:8px;color:${INK};font-weight:700;">7ENO</div>
-              <div style="font-family:${MONO};font-size:10px;letter-spacing:4px;text-transform:uppercase;color:${OXBLOOD};margin-top:8px;">Order Confirmation</div>
+              <img src="${baseUrl}/logos/woordmerk-ink.png" width="180" height="138" alt="7ENO" style="display:block;border:0;margin:0 auto;max-width:100%;" />
+              <div style="font-family:${MONO};font-size:10px;letter-spacing:4px;text-transform:uppercase;color:${OXBLOOD};margin-top:12px;">Order Confirmation</div>
             </td>
           </tr>
           <!-- Greeting -->
@@ -178,16 +189,18 @@ export function renderOrderConfirmation(data: OrderEmailData): RenderedEmail {
               <p style="margin:0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK};">${addressHtml}</p>
             </td>
           </tr>
-          <!-- Donation -->
-          <tr>
-            <td style="padding:28px 40px 0;">
-              <p style="margin:0;font-family:${SERIF};font-style:italic;font-size:15px;line-height:1.6;color:${OXBLOOD};text-align:center;">Wear it for good. 100% of our profit is donated to <a href="https://life4hsp.com/" target="_blank" rel="noopener noreferrer" style="color:${OXBLOOD};text-decoration:underline;">Life4HSP</a>.</p>
+          <!-- Donation (charity collaboration product only) -->
+          ${isCharityOrder ? `<tr>
+            <td align="center" style="padding:28px 40px 0;">
+              <img src="${baseUrl}/logos/life4hsp.png" width="96" height="68" alt="Life4HSP" style="display:block;border:0;margin:0 auto 12px;max-width:100%;" />
+              <p style="margin:0;font-family:${SERIF};font-style:italic;font-size:15px;line-height:1.6;color:${OXBLOOD};text-align:center;">Wear it for good. 100% of this product is donated to <a href="https://life4hsp.com/" target="_blank" rel="noopener noreferrer" style="color:${OXBLOOD};text-decoration:underline;">Life4HSP</a>.</p>
             </td>
-          </tr>
+          </tr>` : ''}
           <!-- Footer -->
           <tr>
-            <td style="padding:28px 40px 40px;">
-              <hr style="border:none;border-top:1px solid ${RULE};margin:0 0 16px;" />
+            <td align="center" style="padding:28px 40px 40px;">
+              <hr style="border:none;border-top:1px solid ${RULE};margin:0 0 20px;" />
+              <img src="${baseUrl}/logos/beeldmerk-zwart.png" width="34" height="35" alt="" style="display:block;border:0;margin:0 auto 12px;" />
               <p style="margin:0;font-family:${MONO};font-size:11px;line-height:1.7;color:${STONE};text-align:center;">
                 7ENO · Divine Authority<br />
                 Questions about your order? Just reply to this email.
@@ -226,8 +239,9 @@ export function renderOrderConfirmation(data: OrderEmailData): RenderedEmail {
     `${addr.postalCode} ${addr.city}`,
     `${addr.country}`,
     '',
-    'Wear it for good. 100% of our profit is donated to Life4HSP (https://life4hsp.com).',
-    '',
+    ...(isCharityOrder
+      ? ['Wear it for good. 100% of this product is donated to Life4HSP (https://life4hsp.com).', '']
+      : []),
     'Questions about your order? Just reply to this email.',
     '7ENO · Divine Authority',
   ].join('\n')

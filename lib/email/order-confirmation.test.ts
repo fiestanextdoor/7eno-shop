@@ -69,11 +69,27 @@ describe('renderOrderConfirmation', () => {
     expect(withDiscount.html).toContain('-€10.00')
   })
 
-  it('renders the pre-sale shipping note and the donation line', () => {
+  it('renders the pre-sale shipping note', () => {
     const out = renderOrderConfirmation(baseOrder)
     expect(out.html).toContain('Pre-sale order')
     expect(out.html).toContain('up to 5 working days')
+  })
+
+  it('omits the donation note when no Life4HSP product is ordered', () => {
+    const out = renderOrderConfirmation(baseOrder)
+    expect(out.html).not.toContain('Life4HSP')
+    expect(out.html).not.toContain('donated to')
+    expect(out.text).not.toContain('donated to')
+  })
+
+  it('shows the donation note only for the Life4HSP collaboration product', () => {
+    const out = renderOrderConfirmation({
+      ...baseOrder,
+      items: [{ name: '7ENO X Life4HSP Sport Tee', variant: 'Black / M', quantity: 1, amountCents: 4000 }],
+    })
+    expect(out.html).toContain('100% of this product is donated to')
     expect(out.html).toContain('Life4HSP')
+    expect(out.text).toContain('100% of this product is donated to Life4HSP')
   })
 
   it('includes the shipping address', () => {

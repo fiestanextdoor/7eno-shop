@@ -224,6 +224,13 @@ export async function POST(req: NextRequest) {
         name: 'Combi-deal',
       })
       sessionParams.discounts = [{ coupon: coupon.id }]
+    } else {
+      // No combi-deal applied: let the customer enter a promotion code (e.g.
+      // MAARDANWEL, 7% off) on the Stripe Checkout page. Stripe forbids
+      // combining `discounts` with `allow_promotion_codes`, so this only runs
+      // when no bundle discount is set above. Create the code once per Stripe
+      // environment with `node --env-file=.env.local scripts/create-discount-code.mjs`.
+      sessionParams.allow_promotion_codes = true
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)
