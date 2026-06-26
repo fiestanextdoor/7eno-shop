@@ -98,6 +98,8 @@
   min-width: 70px;
   max-height: 196px;
   overflow-y: auto;
+  /* Keep scrolling inside the menu; never chain to the page behind it. */
+  overscroll-behavior: contain;
   padding: 6px;
   background: var(--bone);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.24);

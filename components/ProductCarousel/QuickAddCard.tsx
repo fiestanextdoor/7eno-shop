@@ -125,7 +125,9 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
             className={`${styles.addArea} ${open ? styles.addAreaOpen : ''}`}
             onMouseLeave={() => setOpen(false)}
           >
-            <div className={styles.sizePopover} role="menu" aria-label={`Choose a size for ${item.name}`}>
+            {/* data-lenis-prevent: let the size menu scroll natively instead of the
+                global Lenis smooth-scroll hijacking the wheel to the page. */}
+            <div className={styles.sizePopover} role="menu" aria-label={`Choose a size for ${item.name}`} data-lenis-prevent>
               {sizes.map((v) => (
                 <button
                   key={v.id}
