@@ -16,17 +16,32 @@
 .categoryStripInner {
   max-width: var(--max-width);
   margin: 0 auto;
-  display: grid;
-  /* 50 / 25 / 25: wide "Nieuwe Drop" tile, then Daily and Sport. */
-  grid-template-columns: 2fr 1fr 1fr;
+  display: flex;
   gap: 2px;
 }
 
-/* Stack the line blocks on phones so they never get cramped on narrower devices
-   (the layout must look the same across all phone widths). */
+/* Hover-expand: the hovered tile grows to 50% (flex-grow 2) and the other two
+   shrink to 25% each (flex-grow 1). Hovering away restores the default, where
+   only the first tile (Nieuwe Drop) is wide. Pure flex-grow ratios → 2:1:1. */
+.categoryStripInner:hover .categoryCard {
+  flex-grow: 1;
+}
+
+.categoryStripInner .categoryCard:hover {
+  flex-grow: 2;
+}
+
+/* Stack the line blocks on phones; the hover-expand is a pointer-only effect. */
 @media (max-width: 700px) {
   .categoryStripInner {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  .categoryCard,
+  .categoryCard:first-child,
+  .categoryStripInner:hover .categoryCard,
+  .categoryStripInner .categoryCard:hover {
+    flex-grow: 0;
+    flex-basis: auto;
   }
 }
 
@@ -43,6 +58,15 @@
   color: var(--bone);
   /* Fallback colour shown when the background photo is absent. */
   background: var(--oxblood);
+  /* Flex item: width is driven by flex-grow ratios (see .categoryStripInner). */
+  flex: 1 1 0;
+  min-width: 0;
+  transition: flex-grow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Default 50 / 25 / 25: the first tile (Nieuwe Drop) is twice as wide. */
+.categoryCard:first-child {
+  flex-grow: 2;
 }
 
 .categoryCard:nth-child(2) {
@@ -231,6 +255,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .categoryCard,
   .categoryMedia,
   .dealsCta { transition: none; }
 }
