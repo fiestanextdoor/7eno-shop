@@ -10,15 +10,17 @@
 .imageWrap {
   position: relative;
   aspect-ratio: 4 / 5;
-  overflow: hidden;
   background: var(--oxblood);
 }
 
+/* The image clips here (for the hover zoom) instead of on .imageWrap, so the
+   size menu can overflow the image bounds without being cut off. */
 .imageLink {
   position: absolute;
   inset: 0;
   z-index: 1;
   display: block;
+  overflow: hidden;
 }
 
 .image {
@@ -107,7 +109,9 @@
   scrollbar-color: var(--oxblood) transparent;
 }
 
-.card:hover .sizePopover,
+/* Opens only when the + icon is hovered/tapped (state-driven), never on a
+   plain card hover. The menu stays open while the pointer is anywhere in the
+   add area (button + menu), so it can be scrolled. */
 .addAreaOpen .sizePopover {
   opacity: 1;
   transform: translateY(0);
