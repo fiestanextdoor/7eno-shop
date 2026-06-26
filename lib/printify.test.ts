@@ -13,7 +13,7 @@ const raw: PrintifyProduct = {
   tags: [],
   visible: true,
   is_locked: false,
-  external: { id: '', handle: '' },
+  external: { id: 'ext-1', handle: 'olympus-tee' },
   blueprint_id: 5,
   print_provider_id: 9,
   options: [
@@ -86,6 +86,9 @@ describe('isPublished', () => {
   it('rejects a locked product (publish still pending)', () => {
     expect(isPublished({ ...raw, is_locked: true })).toBe(false)
   })
+  it('rejects a concept/draft (external present but id is empty)', () => {
+    expect(isPublished({ ...raw, external: { id: '', handle: '' } })).toBe(false)
+  })
   it('rejects a product that has never been published (no external marker)', () => {
     expect(isPublished({ ...raw, external: undefined })).toBe(false)
     expect(isPublished({ ...raw, external: null })).toBe(false)
@@ -139,15 +142,16 @@ describe('getProducts (paginated)', () => {
     expect(calls).toHaveLength(2)
   })
 
-  it('skips products that are not published (locked or no external marker)', async () => {
+  it('skips products that are not published (concept, locked or no external marker)', async () => {
     process.env.PRINTIFY_API_KEY = 'k'
     process.env.PRINTIFY_SHOP_ID = '42'
     global.fetch = jest.fn(async () => ({
       ok: true,
       json: async () => ({
-        current_page: 1, last_page: 1, total: 3, per_page: 50,
+        current_page: 1, last_page: 1, total: 4, per_page: 50,
         data: [
           { ...raw, id: 'published' },
+          { ...raw, id: 'concept', external: { id: '', handle: '' } },
           { ...raw, id: 'locked', is_locked: true },
           { ...raw, id: 'unpublished', external: undefined },
         ],

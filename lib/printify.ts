@@ -39,8 +39,9 @@ export interface PrintifyProduct {
   visible: boolean
   // True while a publish is still pending/in progress; such products are not yet live.
   is_locked?: boolean
-  // Printify populates this once publishing to the store has succeeded. Absent on
-  // products that have never been published (even when `visible` is true).
+  // Printify sets a real `id` here once publishing to the store has succeeded. A
+  // concept/draft keeps `external.id === ''` (or `external` is absent entirely),
+  // even when `visible` is true.
   external?: { id: string; handle: string } | null
   blueprint_id: number
   print_provider_id: number
@@ -193,15 +194,15 @@ function headers(): Record<string, string> {
 
 /**
  * Whether a product is published and live in the shop. It must be visible, not
- * locked (a locked product has a publish still pending), and carry the `external`
- * marker Printify sets once publishing has succeeded. A product can be `visible`
- * yet still unpublished, so visibility alone is not enough.
+ * locked (a locked product has a publish still pending), and carry a non-empty
+ * `external.id`, which Printify only sets once publishing to the store has
+ * succeeded. A concept/draft is still `visible` but keeps `external.id === ''`,
+ * so visibility alone is not enough to tell published from concept.
  */
 export function isPublished(raw: PrintifyProduct): boolean {
   if (raw.visible === false) return false
   if (raw.is_locked === true) return false
-  if (raw.external == null) return false
-  return true
+  return typeof raw.external?.id === 'string' && raw.external.id.length > 0
 }
 
 /** All published products in the shop, mapped to the normalized model. */
