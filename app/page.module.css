@@ -58,10 +58,12 @@
   color: var(--bone);
   /* Fallback colour shown when the background photo is absent. */
   background: var(--oxblood);
-  /* Flex item: width is driven by flex-grow ratios (see .categoryStripInner). */
+  /* Flex item: width is driven by flex-grow ratios (see .categoryStripInner).
+     Ease-in-out (not ease-out) so the expand ramps up and down gently instead
+     of snapping forward at the start. */
   flex: 1 1 0;
   min-width: 0;
-  transition: flex-grow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: flex-grow 0.65s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* Default 50 / 25 / 25: the first tile (Nieuwe Drop) is twice as wide. */
