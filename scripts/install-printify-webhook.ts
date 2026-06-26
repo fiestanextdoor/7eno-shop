@@ -1,6 +1,6 @@
 /**
- * One-time installer: registers the Printify order webhooks at our deployed URL,
- * signed with PRINTIFY_WEBHOOK_SECRET. Idempotent: it first deletes any existing
+ * One-time installer: registers the Printify order and product-publish webhooks at
+ * our deployed URL, signed with PRINTIFY_WEBHOOK_SECRET. Idempotent: it first deletes any existing
  * webhooks pointing at our endpoint, then recreates them with the secret, so
  * re-running never leaves duplicates.
  *
@@ -64,6 +64,9 @@ async function main() {
     'order:shipment:created',
     'order:shipment:delivered',
     'order:updated',
+    // Completes the publish flow: lets us call publishing_succeeded so products
+    // published in Printify unlock and appear on the shop.
+    'product:publish:started',
   ]
 
   // 1) Delete any existing webhooks that point at our endpoint (avoids duplicates

@@ -1,6 +1,8 @@
 import {
   mapPrintifyProduct,
   isPublished,
+  publishingSucceeded,
+  publishingFailed,
   splitName,
   buildPrintifyOrderItems,
   type PrintifyProduct,
@@ -113,6 +115,55 @@ describe('buildPrintifyOrderItems', () => {
       { productId: 'abc123', variantId: '100', quantity: 2 },
     ])
     expect(items).toEqual([{ product_id: 'abc123', variant_id: 100, quantity: 2 }])
+  })
+})
+
+describe('publishing callbacks', () => {
+  const originalFetch = global.fetch
+  afterEach(() => { global.fetch = originalFetch })
+
+  it('posts the external marker to publishing_succeeded', async () => {
+    process.env.PRINTIFY_API_KEY = 'k'
+    process.env.PRINTIFY_SHOP_ID = '42'
+    let captured: { url: string; init: RequestInit } | null = null
+    global.fetch = jest.fn(async (url: string, init: RequestInit) => {
+      captured = { url, init }
+      return { ok: true, text: async () => '' }
+    }) as unknown as typeof fetch
+
+    await publishingSucceeded('prod1', { id: 'prod1', handle: 'https://www.7eno.shop/shop/tee' })
+
+    expect(captured!.url).toBe(
+      'https://api.printify.com/v1/shops/42/products/prod1/publishing_succeeded.json'
+    )
+    expect(captured!.init.method).toBe('POST')
+    expect(JSON.parse(captured!.init.body as string)).toEqual({
+      external: { id: 'prod1', handle: 'https://www.7eno.shop/shop/tee' },
+    })
+  })
+
+  it('posts a reason to publishing_failed', async () => {
+    process.env.PRINTIFY_API_KEY = 'k'
+    process.env.PRINTIFY_SHOP_ID = '42'
+    let captured: { url: string; init: RequestInit } | null = null
+    global.fetch = jest.fn(async (url: string, init: RequestInit) => {
+      captured = { url, init }
+      return { ok: true, text: async () => '' }
+    }) as unknown as typeof fetch
+
+    await publishingFailed('prod1', 'boom')
+
+    expect(captured!.url).toBe(
+      'https://api.printify.com/v1/shops/42/products/prod1/publishing_failed.json'
+    )
+    expect(JSON.parse(captured!.init.body as string)).toEqual({ reason: 'boom' })
+  })
+
+  it('throws on a non-ok publishing_succeeded response', async () => {
+    process.env.PRINTIFY_API_KEY = 'k'
+    process.env.PRINTIFY_SHOP_ID = '42'
+    global.fetch = jest.fn(async () => ({ ok: false, status: 400, text: async () => 'bad' })) as unknown as typeof fetch
+    await expect(publishingSucceeded('prod1', { id: 'prod1', handle: '' })).rejects.toThrow(/400/)
   })
 })
 

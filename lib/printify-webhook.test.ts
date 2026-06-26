@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { verifyPrintifySignature, mapPrintifyStatus } from './printify-webhook'
+import { verifyPrintifySignature, mapPrintifyStatus, buildPublishHandle } from './printify-webhook'
 
 describe('verifyPrintifySignature', () => {
   const secret = 's3cr3t'
@@ -17,6 +17,23 @@ describe('verifyPrintifySignature', () => {
   })
   it('accepts (degraded) when no secret is configured', () => {
     expect(verifyPrintifySignature(body, sig, '')).toBe(true)
+  })
+})
+
+describe('buildPublishHandle', () => {
+  it('builds the public product URL from base url and slug', () => {
+    expect(buildPublishHandle('stroke-tee', 'https://www.7eno.shop')).toBe(
+      'https://www.7eno.shop/shop/stroke-tee'
+    )
+  })
+  it('strips a trailing slash from the base url', () => {
+    expect(buildPublishHandle('stroke-tee', 'https://www.7eno.shop/')).toBe(
+      'https://www.7eno.shop/shop/stroke-tee'
+    )
+  })
+  it('returns empty string when base url or slug is missing', () => {
+    expect(buildPublishHandle('stroke-tee', undefined)).toBe('')
+    expect(buildPublishHandle('', 'https://www.7eno.shop')).toBe('')
   })
 })
 

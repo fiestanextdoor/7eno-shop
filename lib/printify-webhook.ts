@@ -17,6 +17,16 @@ export function verifyPrintifySignature(body: string, signature: string | null, 
   return a.length === b.length && crypto.timingSafeEqual(a, b)
 }
 
+/**
+ * Build the public store URL for a published product, sent to Printify as the
+ * external `handle` (the "view in store" link in their dashboard). Returns '' when
+ * no base URL is configured, since the handle is informational only.
+ */
+export function buildPublishHandle(slug: string, baseUrl: string | undefined): string {
+  const base = (baseUrl ?? '').replace(/\/+$/, '')
+  return base && slug ? `${base}/shop/${slug}` : ''
+}
+
 /** Map a Printify webhook topic to our internal fulfillment status string. */
 export function mapPrintifyStatus(topic: string): string {
   switch (topic) {

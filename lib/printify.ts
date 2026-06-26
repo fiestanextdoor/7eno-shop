@@ -257,6 +257,47 @@ export async function buildVariantLookup(
   return lookup
 }
 
+// ── Publishing ──────────────────────────────────────────────────────────────
+// This store is a custom/API integration, so clicking "Publish" in Printify only
+// locks the product and fires a `product:publish:started` webhook; the product
+// stays locked (and invisible to `isPublished`) until we acknowledge it here.
+
+/**
+ * Acknowledge a successful publish. Printify then unlocks the product and stores
+ * the external `id`/`handle`, which is what flips `isPublished` to true. `id` must
+ * be non-empty; `handle` is the public product URL shown in the Printify dashboard.
+ */
+export async function publishingSucceeded(
+  productId: string,
+  external: { id: string; handle: string }
+): Promise<void> {
+  const shopId = getShopId()
+  const res = await fetch(
+    `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}/publishing_succeeded.json`,
+    { method: 'POST', headers: headers(), body: JSON.stringify({ external }) }
+  )
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Printify publishing_succeeded failed: ${res.status} ${err}`)
+  }
+}
+
+/**
+ * Acknowledge a failed publish so Printify unlocks the product instead of leaving
+ * it stuck in a locked, half-published state.
+ */
+export async function publishingFailed(productId: string, reason: string): Promise<void> {
+  const shopId = getShopId()
+  const res = await fetch(
+    `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}/publishing_failed.json`,
+    { method: 'POST', headers: headers(), body: JSON.stringify({ reason }) }
+  )
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Printify publishing_failed failed: ${res.status} ${err}`)
+  }
+}
+
 export interface PrintifyOrderRecipient {
   name: string
   email: string
