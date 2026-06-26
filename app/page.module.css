@@ -126,6 +126,15 @@
   color: rgba(246, 243, 236, 0.7);
 }
 
+/* Logo/title (+ optional caption) as one block, vertically centred in the tile. */
+.categoryBody {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
 .categoryLogo {
   width: 200px;
   max-width: 82%;
@@ -133,7 +142,6 @@
   object-fit: contain;
   /* Black source logo → white over the photo. */
   filter: invert(1);
-  margin: auto 0;
 }
 
 /* The wide hero tile (Olympian) carries a long wordmark, so give it more room. */
@@ -150,8 +158,16 @@
   font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: 0.95;
   color: var(--bone);
-  margin: auto 0;
   max-width: 92%;
+}
+
+/* Small caption under the logo (e.g. "Coming soon" on the Olympian tile). */
+.categoryCaption {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.85);
 }
 
 .categoryArrow {

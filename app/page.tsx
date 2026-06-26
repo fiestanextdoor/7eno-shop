@@ -21,8 +21,8 @@ export const metadata: Metadata = {
 // Line blocks laid out 50 / 25 / 25: a wide "Nieuwe Drop" tile, then 7ENO Daily
 // and 7ENO Sport. Drop background photos at these paths to fill the tiles; until
 // then each falls back to its logo/title on a solid brand colour (page.module.css).
-const CATEGORIES: { num: string; name: string; href: string; image: string; logo?: string }[] = [
-  { num: '01', name: 'Olympian', href: '/shop', image: '/categories/drop.jpg', logo: '/logos/olympian.png' },
+const CATEGORIES: { num: string; name: string; href: string; image: string; logo?: string; caption?: string }[] = [
+  { num: '01', name: 'Olympian', href: '/shop', image: '/categories/drop.jpg', logo: '/logos/olympian.png', caption: 'Coming soon' },
   { num: '02', name: '7ENO Daily', href: '/shop?line=daily', image: '/categories/daily.jpg', logo: '/logos/7eno-daily.png' },
   { num: '03', name: '7ENO Sport', href: '/shop?line=sport', image: '/categories/sport.jpg', logo: '/logos/7eno-sport.png' },
 ]
@@ -141,12 +141,15 @@ export default async function HomePage() {
                 aria-hidden
               />
               <span className={styles.categoryNum}>{cat.num}</span>
-              {cat.logo ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={cat.logo} alt={cat.name} className={styles.categoryLogo} />
-              ) : (
-                <span className={styles.categoryTitle}>{cat.name}</span>
-              )}
+              <span className={styles.categoryBody}>
+                {cat.logo ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={cat.logo} alt={cat.name} className={styles.categoryLogo} />
+                ) : (
+                  <span className={styles.categoryTitle}>{cat.name}</span>
+                )}
+                {cat.caption && <span className={styles.categoryCaption}>{cat.caption}</span>}
+              </span>
               <span className={styles.categoryArrow}>Shop →</span>
             </Link>
           ))}
