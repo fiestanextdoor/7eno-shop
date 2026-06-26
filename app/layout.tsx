@@ -62,9 +62,13 @@ export default function RootLayout({
     <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
-        {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO"). */}
+        {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO").
+            suppressHydrationWarning: some browser extensions inject a `src`/rewrite this
+            <script> before React hydrates, which otherwise throws a hydration-mismatch
+            warning. The server-rendered JSON-LD (what crawlers read) is unaffected. */}
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
