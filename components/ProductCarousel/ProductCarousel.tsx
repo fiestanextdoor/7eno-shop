@@ -13,54 +13,41 @@ interface ProductCarouselProps {
 }
 
 /**
- * An auto-scrolling belt of every product, in the (already shuffled) order it is
- * passed. The track is duplicated once so the loop is seamless; it pauses on
- * hover/focus so a card can be clicked, and reduced-motion users get a static,
- * horizontally scrollable row instead of the animation.
+ * A horizontally scrollable belt of product cards. There is no auto-scroll: the
+ * row is dragged/scrolled by hand and always shows a visible horizontal scrollbar
+ * so the affordance is obvious. Cards snap as you scroll for a tidy resting state.
  */
 export default function ProductCarousel({ items }: ProductCarouselProps) {
   if (items.length === 0) return null
 
-  // Duplicate the list so translateX(-50%) lands exactly on the start of the
-  // second copy → no visible jump when the animation repeats.
-  const loop = [...items, ...items]
-  // Constant scroll speed regardless of how many products there are.
-  const duration = `${Math.max(items.length * 5, 24)}s`
-
   return (
-    <div className={styles.viewport}>
-      <ul className={styles.track} style={{ animationDuration: duration }}>
-        {loop.map((item, i) => {
-          const isClone = i >= items.length
-          return (
-            <li
-              key={`${item.slug}-${i}`}
-              className={styles.slide}
-              aria-hidden={isClone ? true : undefined}
-            >
-              <Link
-                href={`/shop/${item.slug}`}
-                className={styles.card}
-                tabIndex={isClone ? -1 : undefined}
-              >
-                <div className={styles.imageWrap}>
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className={styles.image}
-                      sizes="(max-width: 640px) 60vw, 280px"
-                    />
-                  ) : (
-                    <div className={styles.placeholder} />
-                  )}
-                </div>
-                <span className={styles.name}>{item.name}</span>
-              </Link>
-            </li>
-          )
-        })}
+    <div
+      className={styles.viewport}
+      role="region"
+      aria-label="Latest products, scroll horizontally"
+      tabIndex={0}
+    >
+      <ul className={styles.track}>
+        {items.map((item, i) => (
+          <li key={`${item.slug}-${i}`} className={styles.slide}>
+            <Link href={`/shop/${item.slug}`} className={styles.card}>
+              <div className={styles.imageWrap}>
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className={styles.image}
+                    sizes="(max-width: 640px) 60vw, 280px"
+                  />
+                ) : (
+                  <div className={styles.placeholder} />
+                )}
+              </div>
+              <span className={styles.name}>{item.name}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   )

@@ -36,6 +36,7 @@ export interface PrintifyProduct {
   title: string
   description: string | null
   tags: string[]
+  created_at?: string
   visible: boolean
   // True while a publish is still pending/in progress; such products are not yet live.
   is_locked?: boolean
@@ -143,6 +144,7 @@ export function mapPrintifyProduct(raw: PrintifyProduct): NormalizedProduct {
     colors,
     priceCents: defaultVariant?.price ?? variants[0]?.priceCents,
     currency,
+    createdAt: raw.created_at,
   }
 }
 

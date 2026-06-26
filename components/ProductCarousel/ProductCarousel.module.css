@@ -1,8 +1,39 @@
 .viewport {
-  overflow: hidden;
-  /* Fade the belt into the section background at both edges. */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Snap each card to the start as you scroll. */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px var(--gutter) 22px;
+  /* Always-visible horizontal scrollbar (Firefox). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--oxblood) rgba(17, 17, 17, 0.12);
+}
+
+.viewport:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: -2px;
+}
+
+/* Always-visible, styled horizontal scrollbar (WebKit/Blink) so it is obvious
+   the row can be scrolled by hand. */
+.viewport::-webkit-scrollbar {
+  height: 8px;
+  -webkit-appearance: none;
+}
+
+.viewport::-webkit-scrollbar-track {
+  background: rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+}
+
+.viewport::-webkit-scrollbar-thumb {
+  background: var(--oxblood);
+  border-radius: 999px;
+}
+
+.viewport::-webkit-scrollbar-thumb:hover {
+  background: #7a2223;
 }
 
 .track {
@@ -12,17 +43,11 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  animation: carouselScroll linear infinite;
-}
-
-/* Pause so a card can be read and clicked. */
-.track:hover,
-.track:focus-within {
-  animation-play-state: paused;
 }
 
 .slide {
   flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .card {
@@ -80,29 +105,15 @@
   outline-offset: 3px;
 }
 
-@keyframes carouselScroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* No auto-scroll: let people scroll the row themselves. */
-@media (prefers-reduced-motion: reduce) {
-  .viewport {
-    overflow-x: auto;
-  }
-
-  .track {
-    animation: none;
-  }
-
-  .image {
-    transition: none;
-  }
-}
-
 /* Touch devices: never zoom on tap (no real hover). */
 @media (hover: none) {
   .card:hover .image {
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
   }
 }

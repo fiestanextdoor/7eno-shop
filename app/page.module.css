@@ -1,93 +1,10 @@
-/* ── Featured section ── */
-.featured {
+/* ── Product carousel (latest products, manual horizontal scroll) ── */
+.carouselSection {
   background: var(--paper);
-  padding: 80px var(--gutter) 100px;
+  padding: 56px 0 40px;
 }
 
-.featuredInner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
-
-.featuredHeader {
-  margin-bottom: 52px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.featuredHeadings {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.featuredLabel {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--oxblood);
-}
-
-.featuredTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 600;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  color: var(--ink);
-  line-height: 1;
-}
-
-.featuredGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-}
-
-@media (min-width: 640px) {
-  .featuredGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .featuredGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.featuredFooter {
-  margin-top: 52px;
-  display: flex;
-  justify-content: center;
-}
-
-.viewAll {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--bone);
-  background: var(--oxblood);
-  text-decoration: none;
-  padding: 14px 40px;
-  border: 1px solid var(--oxblood);
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.viewAll:hover {
-  background: #7a2223;
-  border-color: #7a2223;
-}
-
-.viewAll:focus-visible {
-  outline: 2px solid var(--oxblood);
-  outline-offset: 4px;
-}
-
-/* ── Category strip (oxblood) ── */
+/* ── Line blocks: 7ENO Daily / 7ENO Sport ── */
 .categoryStrip {
   background: var(--bone);
   padding: 64px var(--gutter);
@@ -103,8 +20,8 @@
   gap: 2px;
 }
 
-/* Stack the category cards on phones so they never get cramped on narrower
-   devices (the layout must look the same across all phone widths). */
+/* Stack the line blocks on phones so they never get cramped on narrower devices
+   (the layout must look the same across all phone widths). */
 @media (max-width: 600px) {
   .categoryStripInner {
     grid-template-columns: 1fr;
@@ -112,114 +29,190 @@
 }
 
 .categoryCard {
-  background: var(--bone);
-  padding: 40px 36px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  /* Taller blocks than before; scale with viewport. */
+  min-height: clamp(360px, 40vw, 480px);
+  padding: 34px 34px 30px;
   text-decoration: none;
-  color: var(--ink);
-  border: 1px solid var(--ink);
-  transition: background 0.25s, border-color 0.25s, color 0.25s;
-}
-
-.categoryCard:hover {
-  background: var(--ink);
   color: var(--bone);
-  border-color: var(--ink);
+  /* Fallback colour shown when the background photo is absent. */
+  background: var(--oxblood);
 }
 
-.categoryCard:hover .categoryNum,
-.categoryCard:hover .categoryArrow {
-  color: rgba(246, 243, 236, 0.5);
+.categoryCard:nth-child(2) {
+  background: var(--ink);
 }
 
-.categoryCard:hover .categoryLogo {
-  filter: invert(1);
+/* Background photo layer (set inline per card). 404s fall back to the card
+   colour, so a missing photo never breaks the layout. */
+.categoryMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Dark scrim so the (black, inverted-to-white) logo and labels stay legible on
+   any photo. */
+.categoryCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.22) 45%,
+    rgba(0, 0, 0, 0.66) 100%
+  );
+}
+
+.categoryCard > * {
+  position: relative;
+  z-index: 2;
+}
+
+.categoryCard:hover .categoryMedia {
+  transform: scale(1.05);
 }
 
 .categoryCard:focus-visible {
   outline: 2px solid var(--bone);
-  outline-offset: 2px;
-}
-
-.categoryLogo {
-  width: 160px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  transition: filter 0.25s;
-}
-
-@media (max-width: 480px) {
-  .categoryLogo {
-    width: 100px;
-  }
-
-  .categoryCard {
-    padding: 28px 20px;
-  }
+  outline-offset: -4px;
 }
 
 .categoryNum {
   font-family: var(--font-mono);
   font-size: 0.55rem;
   letter-spacing: 3px;
-  color: rgba(17, 17, 17, 0.4);
+  color: rgba(246, 243, 236, 0.7);
 }
 
+.categoryLogo {
+  width: 220px;
+  max-width: 70%;
+  height: auto;
+  object-fit: contain;
+  /* Black source logo → white over the photo. */
+  filter: invert(1);
+  margin: auto 0;
+}
 
 .categoryArrow {
   font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 2px;
-  color: rgba(17, 17, 17, 0.5);
+  color: var(--bone);
   margin-top: auto;
-  padding-top: 16px;
 }
 
-/* ── Product carousel ── */
-.carouselSection {
-  background: var(--paper);
-  padding: 80px 0 96px;
+@media (max-width: 480px) {
+  .categoryCard {
+    min-height: 300px;
+    padding: 26px 22px 22px;
+  }
+
+  .categoryLogo {
+    width: 160px;
+  }
+}
+
+/* ── Deals highlight band ── */
+.dealsBand {
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
+  background: var(--oxblood);
+  color: var(--bone);
+  padding: clamp(72px, 12vw, 132px) var(--gutter);
+  text-align: center;
 }
 
-.carouselHeader {
-  max-width: var(--max-width);
-  margin: 0 auto 44px;
-  padding: 0 var(--gutter);
+/* Optional background photo: drop one at /categories/deals.jpg. Missing → the
+   oxblood band + scrim still reads as an intentional design. */
+.dealsMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url(/categories/deals.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+.dealsBand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(40, 9, 10, 0.72), rgba(20, 5, 5, 0.82));
+}
+
+.dealsContent {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 18px;
 }
 
-.carouselLabel {
+.dealsLabel {
   font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--oxblood);
+  color: rgba(246, 243, 236, 0.75);
 }
 
-.carouselTitle {
+.dealsTitle {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 600;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  color: var(--ink);
-  line-height: 1;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 0.95;
+  color: var(--bone);
 }
 
-.carouselFooter {
-  margin-top: 48px;
-  display: flex;
-  justify-content: center;
-  padding: 0 var(--gutter);
+.dealsSub {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.5;
+  color: rgba(246, 243, 236, 0.86);
+  max-width: 30ch;
+}
+
+.dealsCta {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--bone);
+  text-decoration: none;
+  padding: 16px 44px;
+  border: 1px solid var(--bone);
+  transition: background 0.2s, color 0.2s;
+}
+
+.dealsCta:hover {
+  background: transparent;
+  color: var(--bone);
+}
+
+.dealsCta:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .viewAll,
-  .categoryCard { transition: none; }
+  .categoryMedia,
+  .dealsCta { transition: none; }
 }

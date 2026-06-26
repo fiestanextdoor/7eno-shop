@@ -31,4 +31,7 @@ export interface NormalizedProduct {
   colors: NormalizedColor[]
   priceCents?: number
   currency: string
+  // ISO-ish creation timestamp, used to sort "newest first". Only Printify
+  // exposes this at list level; Printful list products leave it undefined.
+  createdAt?: string
 }
