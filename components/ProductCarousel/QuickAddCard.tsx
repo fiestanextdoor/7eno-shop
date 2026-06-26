@@ -61,6 +61,10 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
   const canQuickAdd = sizes.length > 0
   const label = (v: CarouselVariant) => (v.size || v.name || 'One size')
 
+  // The shown photo follows the selected colour (falls back to the card image).
+  const activeColorObj = colors.find((c) => c.color === activeColor)
+  const displayImage = activeColorObj?.image ?? item.image
+
   function handleAdd(variant: CarouselVariant) {
     addItem({
       provider: item.provider,
@@ -71,7 +75,7 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
       price: (variant.priceCents / 100).toFixed(2),
       currency: item.currency,
       quantity: 1,
-      imageUrl: item.image,
+      imageUrl: displayImage,
     })
     setOpen(false)
     setJustAdded(true)
@@ -82,10 +86,11 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
     <div className={styles.card}>
       <div className={styles.imageWrap}>
         <Link href={`/shop/${item.slug}`} className={styles.imageLink} aria-label={item.name}>
-          {item.image ? (
+          {displayImage ? (
             <Image
-              src={item.image}
-              alt={item.name}
+              key={displayImage}
+              src={displayImage}
+              alt={activeColorObj ? `${item.name} — ${activeColorObj.displayName || activeColorObj.color}` : item.name}
               fill
               className={styles.image}
               sizes="(max-width: 640px) 55vw, 240px"
@@ -94,6 +99,26 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
             <span className={styles.placeholder} />
           )}
         </Link>
+
+        {hasColors && (
+          <div className={styles.swatches} aria-label="Available colours">
+            {colors.map((c) => (
+              <button
+                key={c.color}
+                type="button"
+                className={`${styles.swatch} ${activeColor === c.color ? styles.swatchActive : ''}`}
+                style={{ backgroundColor: c.hex || '#ccc' }}
+                aria-label={c.displayName || c.color}
+                aria-pressed={activeColor === c.color}
+                title={c.displayName || c.color}
+                onClick={() => {
+                  setActiveColor(c.color)
+                  setJustAdded(false)
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {canQuickAdd && (
           <div
@@ -131,26 +156,6 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
         <Link href={`/shop/${item.slug}`} className={styles.name}>
           {item.name}
         </Link>
-
-        {hasColors && (
-          <div className={styles.swatches} aria-label="Available colours">
-            {colors.map((c) => (
-              <button
-                key={c.color}
-                type="button"
-                className={`${styles.swatch} ${activeColor === c.color ? styles.swatchActive : ''}`}
-                style={{ backgroundColor: c.hex || '#ccc' }}
-                aria-label={c.displayName || c.color}
-                aria-pressed={activeColor === c.color}
-                title={c.displayName || c.color}
-                onClick={() => {
-                  setActiveColor(c.color)
-                  setJustAdded(false)
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )

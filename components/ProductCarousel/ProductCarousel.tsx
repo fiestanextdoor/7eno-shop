@@ -6,6 +6,8 @@ export interface CarouselColor {
   color: string
   hex: string
   displayName: string
+  /** Background-removed photo for this colour; the card swaps to it when selected. */
+  image: string | null
 }
 
 export interface CarouselVariant {

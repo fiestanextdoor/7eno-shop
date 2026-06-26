@@ -170,27 +170,35 @@
   text-decoration: underline;
 }
 
+/* Colour swatches overlay the bottom-left of the photo (opposite the + button),
+   so the actual colours are visible and clicking one swaps the photo. */
 .swatches {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
+  max-width: 55%;
 }
 
 .swatch {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   padding: 0;
-  border: 1px solid rgba(17, 17, 17, 0.25);
-  transition: box-shadow 0.15s, transform 0.15s;
+  border: 2px solid var(--bone);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .swatch:hover {
-  transform: scale(1.12);
+  transform: scale(1.14);
 }
 
 .swatchActive {
-  box-shadow: 0 0 0 2px var(--bone), 0 0 0 3px var(--ink);
+  box-shadow: 0 0 0 2px var(--oxblood), 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
 .swatch:focus-visible {

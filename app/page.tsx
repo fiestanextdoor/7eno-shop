@@ -3,6 +3,9 @@ import Marquee from '@/components/Marquee/Marquee'
 import ProductCarousel, { type CarouselItem } from '@/components/ProductCarousel/ProductCarousel'
 import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
 import { resolveCardImage } from '@/lib/card-image'
+import { getProductImageOverride } from '@/lib/product-images'
+import { removeBackground } from '@/lib/remove-bg'
+import { resolveHex } from '@/lib/color-utils'
 import { productSlug } from '@/lib/slug'
 import type { NormalizedProduct } from '@/types/catalog'
 import type { Metadata } from 'next'
@@ -46,6 +49,33 @@ async function withVariants(p: NormalizedProduct): Promise<NormalizedProduct> {
   }
 }
 
+/**
+ * Per-colour swatch + image data for a carousel card. Only multi-colour products
+ * get their own background-removed colour photo (so clicking a swatch swaps the
+ * image); single-colour products reuse the card image. Local per-colour overrides
+ * win over provider mockups, matching the product detail page.
+ */
+async function buildCarouselColors(slug: string, product: NormalizedProduct, fallbackImage: string | null) {
+  const multiColour = product.colors.length > 1
+  const override = getProductImageOverride(slug)
+  return Promise.all(
+    product.colors.map(async (c) => {
+      let image = fallbackImage
+      if (multiColour) {
+        const local = override?.colorFrontImages?.[c.color]
+        if (local) image = local
+        else if (c.imageUrl) image = (await removeBackground(c.imageUrl).catch(() => null)) ?? c.imageUrl
+      }
+      return {
+        color: c.color,
+        hex: c.hex || resolveHex(c.color, ''),
+        displayName: c.displayName,
+        image,
+      }
+    })
+  )
+}
+
 export default async function HomePage() {
   let products: NormalizedProduct[] = []
   try {
@@ -66,6 +96,7 @@ export default async function HomePage() {
         resolveCardImage({ slug, thumbnailUrl: p.thumbnailUrl }),
         withVariants(p),
       ])
+      const colors = await buildCarouselColors(slug, detailed, image)
       return {
         slug,
         name: p.name,
@@ -73,11 +104,7 @@ export default async function HomePage() {
         provider: p.provider,
         productId: p.id,
         currency: detailed.currency,
-        colors: detailed.colors.map((c) => ({
-          color: c.color,
-          hex: c.hex,
-          displayName: c.displayName,
-        })),
+        colors,
         variants: detailed.variants.map((v) => ({
           id: v.id,
           color: v.color,
