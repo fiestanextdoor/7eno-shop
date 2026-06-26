@@ -1,14 +1,15 @@
 /* ── Product carousel (latest products, manual horizontal scroll) ── */
 .carouselSection {
   background: var(--paper);
-  padding: 56px 0 40px;
+  padding: 28px 0 18px;
 }
 
 /* ── Line blocks: 7ENO Daily / 7ENO Sport ── */
+/* Same --paper background as the carousel above, so the two sections flow into
+   one another (no top border separating them). */
 .categoryStrip {
-  background: var(--bone);
-  padding: 64px var(--gutter);
-  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  background: var(--paper);
+  padding: 40px var(--gutter) 64px;
   border-bottom: 1px solid rgba(17, 17, 17, 0.08);
 }
 

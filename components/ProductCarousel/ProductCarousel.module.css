@@ -4,7 +4,7 @@
   /* Snap each card to the start as you scroll. */
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
-  padding: 4px var(--gutter) 22px;
+  padding: 2px var(--gutter) 14px;
   /* Always-visible horizontal scrollbar (Firefox). */
   scrollbar-width: thin;
   scrollbar-color: var(--oxblood) rgba(17, 17, 17, 0.12);
@@ -48,72 +48,4 @@
 .slide {
   flex-shrink: 0;
   scroll-snap-align: start;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  width: 280px;
-  max-width: 70vw;
-  background: var(--bone);
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.imageWrap {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background: var(--oxblood);
-}
-
-.image {
-  object-fit: contain;
-  object-position: center;
-  padding: 22px;
-  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.card:hover .image {
-  transform: scale(1.05);
-}
-
-.placeholder {
-  position: absolute;
-  inset: 0;
-  background: var(--oxblood);
-}
-
-.name {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.2;
-  color: var(--ink);
-  padding: 14px 16px 18px;
-  border-top: 1px solid rgba(17, 17, 17, 0.07);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-}
-
-.card:focus-visible {
-  outline: 2px solid var(--oxblood);
-  outline-offset: 3px;
-}
-
-/* Touch devices: never zoom on tap (no real hover). */
-@media (hover: none) {
-  .card:hover .image {
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .image {
-    transition: none;
-  }
 }

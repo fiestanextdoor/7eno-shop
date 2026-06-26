@@ -1,11 +1,31 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import type { Provider } from '@/types/catalog'
+import QuickAddCard from './QuickAddCard'
 import styles from './ProductCarousel.module.css'
+
+export interface CarouselColor {
+  color: string
+  hex: string
+  displayName: string
+}
+
+export interface CarouselVariant {
+  id: string
+  color: string
+  size: string
+  name: string
+  priceCents: number
+  inStock: boolean
+}
 
 export interface CarouselItem {
   slug: string
   name: string
   image: string | null
+  provider: Provider
+  productId: string
+  currency: string
+  colors: CarouselColor[]
+  variants: CarouselVariant[]
 }
 
 interface ProductCarouselProps {
@@ -16,6 +36,7 @@ interface ProductCarouselProps {
  * A horizontally scrollable belt of product cards. There is no auto-scroll: the
  * row is dragged/scrolled by hand and always shows a visible horizontal scrollbar
  * so the affordance is obvious. Cards snap as you scroll for a tidy resting state.
+ * Each card carries a quick-add control (see QuickAddCard).
  */
 export default function ProductCarousel({ items }: ProductCarouselProps) {
   if (items.length === 0) return null
@@ -30,22 +51,7 @@ export default function ProductCarousel({ items }: ProductCarouselProps) {
       <ul className={styles.track}>
         {items.map((item, i) => (
           <li key={`${item.slug}-${i}`} className={styles.slide}>
-            <Link href={`/shop/${item.slug}`} className={styles.card}>
-              <div className={styles.imageWrap}>
-                {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className={styles.image}
-                    sizes="(max-width: 640px) 60vw, 280px"
-                  />
-                ) : (
-                  <div className={styles.placeholder} />
-                )}
-              </div>
-              <span className={styles.name}>{item.name}</span>
-            </Link>
+            <QuickAddCard item={item} />
           </li>
         ))}
       </ul>

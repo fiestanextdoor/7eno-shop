@@ -1,0 +1,202 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  max-width: 60vw;
+  background: var(--bone);
+  color: var(--ink);
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--oxblood);
+}
+
+.imageLink {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+}
+
+.image {
+  object-fit: contain;
+  object-position: center;
+  padding: 16px;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background: var(--oxblood);
+}
+
+.imageLink:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: -4px;
+}
+
+/* ── Quick-add control ── */
+.addArea {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.addBtn {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--ink);
+  background: var(--bone);
+  color: var(--ink);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.addBtn:hover {
+  background: var(--oxblood);
+  color: var(--bone);
+  border-color: var(--oxblood);
+}
+
+.addBtn:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.sizePopover {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+  max-width: 210px;
+  padding: 8px;
+  background: var(--bone);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.card:hover .sizePopover,
+.addAreaOpen .sizePopover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.sizeChip {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  min-width: 34px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(17, 17, 17, 0.3);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.sizeChip:hover {
+  background: var(--ink);
+  color: var(--bone);
+  border-color: var(--ink);
+}
+
+.sizeChip:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 1px;
+}
+
+/* ── Info: name + colour swatches ── */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px 14px 14px;
+  border-top: 1px solid rgba(17, 17, 17, 0.07);
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--ink);
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  padding: 0;
+  border: 1px solid rgba(17, 17, 17, 0.25);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatchActive {
+  box-shadow: 0 0 0 2px var(--bone), 0 0 0 3px var(--ink);
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .card:hover .image {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image,
+  .addBtn,
+  .sizePopover,
+  .sizeChip,
+  .swatch {
+    transition: none;
+  }
+}

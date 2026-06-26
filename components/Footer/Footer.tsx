@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { LogoWordmark } from '@/components/Logo/Logo'
 import styles from './Footer.module.css'
 
 const LINKS = {
@@ -20,19 +19,6 @@ const LINKS = {
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      {/* Top: wordmark centered */}
-      <div className={styles.top}>
-        <Link href="/" aria-label="7ENO home">
-          <LogoWordmark variant="butter" height={36} align="center" />
-        </Link>
-        <p className={styles.tagline}>Divine Authority · MMXXVI</p>
-        <p className={styles.about}>
-          7ENO is the official online streetwear store. Create an account or
-          sign in with Google to place orders, track your shipments and manage
-          your details.
-        </p>
-      </div>
-
       {/* Links grid */}
       <div className={styles.grid}>
         <div className={styles.col}>

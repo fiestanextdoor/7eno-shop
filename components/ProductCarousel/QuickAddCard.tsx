@@ -1,0 +1,141 @@
+'use client'
+
+import { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useCartStore } from '@/store/cart'
+import type { CarouselItem, CarouselVariant } from './ProductCarousel'
+import styles from './QuickAddCard.module.css'
+
+// Mirror the size filter used on the product detail page so the carousel never
+// offers sizes the rest of the shop hides.
+const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
+
+interface QuickAddCardProps {
+  item: CarouselItem
+}
+
+/**
+ * A carousel product card with an inline quick-add control: colour swatches pick
+ * the variant family, a "+" button bottom-right reveals the available sizes on
+ * hover/tap, and clicking a size adds it to the cart and opens the drawer.
+ */
+export default function QuickAddCard({ item }: QuickAddCardProps) {
+  const addItem = useCartStore((s) => s.addItem)
+  const openCart = useCartStore((s) => s.openCart)
+
+  const colors = item.colors.filter((c) => c.color)
+  const hasColors = colors.length > 1
+  const [activeColor, setActiveColor] = useState<string>(colors[0]?.color ?? '')
+  const [open, setOpen] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
+
+  // Variants for the active colour (or all, when the product has no colours).
+  const colorVariants = hasColors
+    ? item.variants.filter((v) => v.color === activeColor)
+    : item.variants
+
+  const allOutOfStock = colorVariants.length > 0 && colorVariants.every((v) => v.inStock === false)
+  const isAvailable = (v: CarouselVariant) => (allOutOfStock ? true : v.inStock !== false)
+
+  // Unique, in-stock sizes for the active colour, excluding the hidden sizes.
+  const sizes = Array.from(new Map(colorVariants.map((v) => [v.size || v.name, v])).values())
+    .filter((v) => !EXCLUDED_SIZES.has(v.size) && isAvailable(v))
+
+  const canQuickAdd = sizes.length > 0
+  const label = (v: CarouselVariant) => (v.size || v.name || 'One size')
+
+  function handleAdd(variant: CarouselVariant) {
+    addItem({
+      provider: item.provider,
+      variantId: variant.id,
+      productId: item.productId,
+      productName: item.name,
+      variantName: variant.name,
+      price: (variant.priceCents / 100).toFixed(2),
+      currency: item.currency,
+      quantity: 1,
+      imageUrl: item.image,
+    })
+    setOpen(false)
+    setJustAdded(true)
+    openCart()
+  }
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.imageWrap}>
+        <Link href={`/shop/${item.slug}`} className={styles.imageLink} aria-label={item.name}>
+          {item.image ? (
+            <Image
+              src={item.image}
+              alt={item.name}
+              fill
+              className={styles.image}
+              sizes="(max-width: 640px) 55vw, 240px"
+            />
+          ) : (
+            <span className={styles.placeholder} />
+          )}
+        </Link>
+
+        {canQuickAdd && (
+          <div
+            className={`${styles.addArea} ${open ? styles.addAreaOpen : ''}`}
+            onMouseLeave={() => setOpen(false)}
+          >
+            <div className={styles.sizePopover} role="menu" aria-label={`Choose a size for ${item.name}`}>
+              {sizes.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  role="menuitem"
+                  className={styles.sizeChip}
+                  onClick={() => handleAdd(v)}
+                >
+                  {label(v)}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className={styles.addBtn}
+              aria-label={`Quick add ${item.name}`}
+              aria-expanded={open}
+              onClick={() => setOpen((o) => !o)}
+              onMouseEnter={() => setOpen(true)}
+            >
+              {justAdded ? '✓' : '+'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.info}>
+        <Link href={`/shop/${item.slug}`} className={styles.name}>
+          {item.name}
+        </Link>
+
+        {hasColors && (
+          <div className={styles.swatches} aria-label="Available colours">
+            {colors.map((c) => (
+              <button
+                key={c.color}
+                type="button"
+                className={`${styles.swatch} ${activeColor === c.color ? styles.swatchActive : ''}`}
+                style={{ backgroundColor: c.hex || '#ccc' }}
+                aria-label={c.displayName || c.color}
+                aria-pressed={activeColor === c.color}
+                title={c.displayName || c.color}
+                onClick={() => {
+                  setActiveColor(c.color)
+                  setJustAdded(false)
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
