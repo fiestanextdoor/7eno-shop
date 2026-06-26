@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 // and 7ENO Sport. Drop background photos at these paths to fill the tiles; until
 // then each falls back to its logo/title on a solid brand colour (page.module.css).
 const CATEGORIES: { num: string; name: string; href: string; image: string; logo?: string }[] = [
-  { num: '01', name: 'Nieuwe Drop', href: '/shop', image: '/categories/drop.jpg' },
+  { num: '01', name: 'Olympian', href: '/shop', image: '/categories/drop.jpg', logo: '/logos/olympian.png' },
   { num: '02', name: '7ENO Daily', href: '/shop?line=daily', image: '/categories/daily.jpg', logo: '/logos/7eno-daily.png' },
   { num: '03', name: '7ENO Sport', href: '/shop?line=sport', image: '/categories/sport.jpg', logo: '/logos/7eno-sport.png' },
 ]

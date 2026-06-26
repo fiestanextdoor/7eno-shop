@@ -136,7 +136,13 @@
   margin: auto 0;
 }
 
-/* Text title for tiles without a logo (e.g. "Nieuwe Drop"). */
+/* The wide hero tile (Olympian) carries a long wordmark, so give it more room. */
+.categoryCard:first-child .categoryLogo {
+  width: 360px;
+  max-width: 72%;
+}
+
+/* Text title for tiles without a logo. */
 .categoryTitle {
   font-family: var(--font-serif);
   font-style: italic;
