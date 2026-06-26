@@ -43,6 +43,10 @@
     flex-grow: 0;
     flex-basis: auto;
   }
+  /* Stacked tiles are shorter and scale down with the screen. */
+  .categoryCard {
+    min-height: clamp(260px, 44vw, 400px);
+  }
 }
 
 .categoryCard {
@@ -51,8 +55,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* Taller blocks than before; scale with viewport. */
-  min-height: clamp(360px, 40vw, 480px);
+  /* Scales with the viewport: noticeably taller on large screens, compact on
+     small ones (and the section stacks below 700px, see the media query). */
+  min-height: clamp(380px, 34vw, 620px);
   padding: 34px 34px 30px;
   text-decoration: none;
   color: var(--bone);
@@ -175,12 +180,10 @@
   font-size: 0.6rem;
   letter-spacing: 2px;
   color: var(--bone);
-  margin-top: auto;
 }
 
 @media (max-width: 480px) {
   .categoryCard {
-    min-height: 300px;
     padding: 26px 22px 22px;
   }
 
