@@ -99,7 +99,9 @@ export default function CartDrawer() {
           <p className={styles.empty}>Your cart is empty.</p>
         ) : (
           <>
-            <ul className={styles.items}>
+            {/* data-lenis-prevent: let this list scroll natively instead of the
+                global Lenis smooth-scroll hijacking the wheel to the page. */}
+            <ul className={styles.items} data-lenis-prevent>
               {[...bundleGroups.entries()].map(([bundleId, group]) => (
                 <li key={`group-${bundleId}`} className={styles.group}>
                   <span className={styles.groupTitle}>{group[0].bundleTitle ?? 'Set'}</span>
