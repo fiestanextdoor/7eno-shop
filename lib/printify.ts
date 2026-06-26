@@ -37,6 +37,11 @@ export interface PrintifyProduct {
   description: string | null
   tags: string[]
   visible: boolean
+  // True while a publish is still pending/in progress; such products are not yet live.
+  is_locked?: boolean
+  // Printify populates this once publishing to the store has succeeded. Absent on
+  // products that have never been published (even when `visible` is true).
+  external?: { id: string; handle: string } | null
   blueprint_id: number
   print_provider_id: number
   options: PrintifyOption[]
@@ -186,7 +191,20 @@ function headers(): Record<string, string> {
   }
 }
 
-/** All visible products in the shop, mapped to the normalized model. */
+/**
+ * Whether a product is published and live in the shop. It must be visible, not
+ * locked (a locked product has a publish still pending), and carry the `external`
+ * marker Printify sets once publishing has succeeded. A product can be `visible`
+ * yet still unpublished, so visibility alone is not enough.
+ */
+export function isPublished(raw: PrintifyProduct): boolean {
+  if (raw.visible === false) return false
+  if (raw.is_locked === true) return false
+  if (raw.external == null) return false
+  return true
+}
+
+/** All published products in the shop, mapped to the normalized model. */
 export async function getProducts(): Promise<NormalizedProduct[]> {
   const shopId = getShopId()
   const out: NormalizedProduct[] = []
@@ -199,7 +217,7 @@ export async function getProducts(): Promise<NormalizedProduct[]> {
     if (!res.ok) throw new Error(`Printify products error: ${res.status}`)
     const data: PrintifyListResponse = await res.json()
     for (const raw of data.data) {
-      if (raw.visible === false) continue
+      if (!isPublished(raw)) continue
       out.push(mapPrintifyProduct(raw))
     }
     if (data.current_page >= data.last_page || data.data.length === 0) break

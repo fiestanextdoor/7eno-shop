@@ -1,5 +1,6 @@
 import {
   mapPrintifyProduct,
+  isPublished,
   splitName,
   buildPrintifyOrderItems,
   type PrintifyProduct,
@@ -11,6 +12,8 @@ const raw: PrintifyProduct = {
   description: 'desc',
   tags: [],
   visible: true,
+  is_locked: false,
+  external: { id: '', handle: '' },
   blueprint_id: 5,
   print_provider_id: 9,
   options: [
@@ -73,6 +76,22 @@ describe('mapPrintifyProduct', () => {
   })
 })
 
+describe('isPublished', () => {
+  it('accepts a visible, unlocked, published product', () => {
+    expect(isPublished(raw)).toBe(true)
+  })
+  it('rejects a hidden product', () => {
+    expect(isPublished({ ...raw, visible: false })).toBe(false)
+  })
+  it('rejects a locked product (publish still pending)', () => {
+    expect(isPublished({ ...raw, is_locked: true })).toBe(false)
+  })
+  it('rejects a product that has never been published (no external marker)', () => {
+    expect(isPublished({ ...raw, external: undefined })).toBe(false)
+    expect(isPublished({ ...raw, external: null })).toBe(false)
+  })
+})
+
 describe('splitName', () => {
   it('splits a full name into first and last', () => {
     expect(splitName('Jan Jansen')).toEqual({ first_name: 'Jan', last_name: 'Jansen' })
@@ -118,5 +137,25 @@ describe('getProducts (paginated)', () => {
     const products = await getProducts()
     expect(products.map((p) => p.id)).toEqual(['p1', 'p2'])
     expect(calls).toHaveLength(2)
+  })
+
+  it('skips products that are not published (locked or no external marker)', async () => {
+    process.env.PRINTIFY_API_KEY = 'k'
+    process.env.PRINTIFY_SHOP_ID = '42'
+    global.fetch = jest.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        current_page: 1, last_page: 1, total: 3, per_page: 50,
+        data: [
+          { ...raw, id: 'published' },
+          { ...raw, id: 'locked', is_locked: true },
+          { ...raw, id: 'unpublished', external: undefined },
+        ],
+      }),
+    })) as unknown as typeof fetch
+
+    const { getProducts } = await import('./printify')
+    const products = await getProducts()
+    expect(products.map((p) => p.id)).toEqual(['published'])
   })
 })
