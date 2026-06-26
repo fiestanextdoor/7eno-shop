@@ -11,6 +11,22 @@ import styles from './QuickAddCard.module.css'
 // offers sizes the rest of the shop hides.
 const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
 
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+      <path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 interface QuickAddCardProps {
   item: CarouselItem
 }
@@ -105,7 +121,7 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
               onClick={() => setOpen((o) => !o)}
               onMouseEnter={() => setOpen(true)}
             >
-              {justAdded ? '✓' : '+'}
+              {justAdded ? <CheckIcon /> : <PlusIcon />}
             </button>
           </div>
         )}

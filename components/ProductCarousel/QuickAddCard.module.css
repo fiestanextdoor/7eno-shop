@@ -55,47 +55,56 @@
   gap: 8px;
 }
 
+/* Bare icon, no circle: just the glyph with a drop-shadow so it reads on both
+   the product and the dark backdrop. */
 .addBtn {
-  width: 38px;
-  height: 38px;
   flex-shrink: 0;
-  border-radius: 999px;
-  border: 1px solid var(--ink);
-  background: var(--bone);
-  color: var(--ink);
-  font-size: 1.3rem;
-  line-height: 1;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  color: var(--bone);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  transition: background 0.2s, color 0.2s, transform 0.2s;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6));
+  transition: transform 0.2s ease;
+}
+
+.addBtn svg {
+  display: block;
+  width: 26px;
+  height: 26px;
 }
 
 .addBtn:hover {
-  background: var(--oxblood);
-  color: var(--bone);
-  border-color: var(--oxblood);
+  transform: scale(1.18);
 }
 
 .addBtn:focus-visible {
-  outline: 2px solid var(--oxblood);
+  outline: 2px solid var(--bone);
   outline-offset: 2px;
 }
 
+/* Sizes as a tidy vertical menu (one per row) instead of ragged wrapping chips,
+   so products with many sizes stay clean. Caps its height and scrolls vertically
+   for very long size runs — vertical scroll never fights the horizontal carousel. */
 .sizePopover {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 5px;
-  max-width: 210px;
-  padding: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 70px;
+  max-height: 196px;
+  overflow-y: auto;
+  padding: 6px;
   background: var(--bone);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.24);
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--oxblood) transparent;
 }
 
 .card:hover .sizePopover,
@@ -107,26 +116,26 @@
 
 .sizeChip {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 7px 10px;
-  min-width: 34px;
+  text-align: center;
+  white-space: nowrap;
+  padding: 8px 14px;
   background: transparent;
   color: var(--ink);
-  border: 1px solid rgba(17, 17, 17, 0.3);
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  border: none;
+  transition: background 0.15s, color 0.15s;
 }
 
 .sizeChip:hover {
   background: var(--ink);
   color: var(--bone);
-  border-color: var(--ink);
 }
 
 .sizeChip:focus-visible {
   outline: 2px solid var(--oxblood);
-  outline-offset: 1px;
+  outline-offset: -2px;
 }
 
 /* ── Info: name + colour swatches ── */
