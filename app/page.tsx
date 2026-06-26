@@ -18,11 +18,13 @@ export const metadata: Metadata = {
     '7ENO is the official online streetwear store. Sign in with Google to place orders, track your shipments and manage your account.',
 }
 
-// Drop background photos at these paths to fill the line blocks; until then each
-// block falls back to its logo on a solid brand colour (see page.module.css).
-const CATEGORIES = [
-  { num: '01', name: '7ENO Daily', href: '/shop?line=daily', logo: '/logos/7eno-daily.png', image: '/categories/daily.jpg' },
-  { num: '02', name: '7ENO Sport', href: '/shop?line=sport', logo: '/logos/7eno-sport.png', image: '/categories/sport.jpg' },
+// Line blocks laid out 50 / 25 / 25: a wide "Nieuwe Drop" tile, then 7ENO Daily
+// and 7ENO Sport. Drop background photos at these paths to fill the tiles; until
+// then each falls back to its logo/title on a solid brand colour (page.module.css).
+const CATEGORIES: { num: string; name: string; href: string; image: string; logo?: string }[] = [
+  { num: '01', name: 'Nieuwe Drop', href: '/shop', image: '/categories/drop.jpg' },
+  { num: '02', name: '7ENO Daily', href: '/shop?line=daily', image: '/categories/daily.jpg', logo: '/logos/7eno-daily.png' },
+  { num: '03', name: '7ENO Sport', href: '/shop?line=sport', image: '/categories/sport.jpg', logo: '/logos/7eno-sport.png' },
 ]
 
 // Newest products lead the carousel. Only Printify exposes a creation date at
@@ -139,8 +141,12 @@ export default async function HomePage() {
                 aria-hidden
               />
               <span className={styles.categoryNum}>{cat.num}</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cat.logo} alt={cat.name} className={styles.categoryLogo} />
+              {cat.logo ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={cat.logo} alt={cat.name} className={styles.categoryLogo} />
+              ) : (
+                <span className={styles.categoryTitle}>{cat.name}</span>
+              )}
               <span className={styles.categoryArrow}>Shop →</span>
             </Link>
           ))}

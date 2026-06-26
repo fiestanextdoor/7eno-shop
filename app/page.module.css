@@ -17,13 +17,14 @@
   max-width: var(--max-width);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* 50 / 25 / 25: wide "Nieuwe Drop" tile, then Daily and Sport. */
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 2px;
 }
 
 /* Stack the line blocks on phones so they never get cramped on narrower devices
    (the layout must look the same across all phone widths). */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .categoryStripInner {
     grid-template-columns: 1fr;
   }
@@ -46,6 +47,10 @@
 
 .categoryCard:nth-child(2) {
   background: var(--ink);
+}
+
+.categoryCard:nth-child(3) {
+  background: #3d1212;
 }
 
 /* Background photo layer (set inline per card). 404s fall back to the card
@@ -96,13 +101,25 @@
 }
 
 .categoryLogo {
-  width: 220px;
-  max-width: 70%;
+  width: 200px;
+  max-width: 82%;
   height: auto;
   object-fit: contain;
   /* Black source logo → white over the photo. */
   filter: invert(1);
   margin: auto 0;
+}
+
+/* Text title for tiles without a logo (e.g. "Nieuwe Drop"). */
+.categoryTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.95;
+  color: var(--bone);
+  margin: auto 0;
+  max-width: 92%;
 }
 
 .categoryArrow {
