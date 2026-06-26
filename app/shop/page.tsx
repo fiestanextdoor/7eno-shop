@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
-import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
+import { getCatalogProducts, getCatalogProduct, isInStock } from '@/lib/catalog'
 import { getProductCardImages } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
@@ -216,12 +216,19 @@ export default async function ShopPage({ searchParams }: Props) {
                 return { ...s, imageUrl: processed ?? s.imageUrl }
               })
             )
-            return { id: p.id, swatches, priceCents: detail.priceCents, currency: detail.currency }
+            return { id: p.id, swatches, priceCents: detail.priceCents, currency: detail.currency, inStock: isInStock(detail) }
           })
-          .catch(() => ({ id: p.id, swatches: [], priceCents: undefined, currency: undefined as string | undefined }))
+          // On a detail-fetch error, keep the product visible (don't hide on missing data).
+          .catch(() => ({ id: p.id, swatches: [], priceCents: undefined, currency: undefined as string | undefined, inStock: true }))
       )
     ).then((entries) => Object.fromEntries(entries.map((e) => [e.id, e]))),
   ])
+
+  // Auto-disable out-of-stock products: drop any with no in-stock variant.
+  // bgRemovedUrls is parallel to `products`, so zip before filtering to stay aligned.
+  const visibleCards = products
+    .map((p, i) => ({ product: p, bgUrl: bgRemovedUrls[i] }))
+    .filter(({ product }) => productInfoMap[product.id]?.inStock !== false)
 
   const genderFilters = [
     { label: 'All',   href: buildHref({ line, category }),                   active: !gender },
@@ -250,7 +257,7 @@ export default async function ShopPage({ searchParams }: Props) {
   if (line && lineLabels[line] && !NO_LINE_CATEGORIES.has(category)) titleParts.push(lineLabels[line])
   const categoryLabels: Record<string, string> = { tees: 'Tees', shorts: 'Shorts', swimwear: 'Swimwear', accessories: 'Accessories' }
   if (category && categoryLabels[category]) titleParts.push(categoryLabels[category])
-  const pageTitle = titleParts.length > 0 ? titleParts.join(' ') : 'The Collection'
+  const pageTitle = titleParts.length > 0 ? titleParts.join(' ') : 'The OG Collection'
 
   return (
     <main className={styles.page}>
@@ -269,24 +276,24 @@ export default async function ShopPage({ searchParams }: Props) {
             { label: 'Category', items: categoryFilters },
           ]}
           featured={{ label: 'Deals', href: '/deals' }}
-          resultCount={products.length}
+          resultCount={visibleCards.length}
         />
       </header>
 
-      {products.length === 0 ? (
+      {visibleCards.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyTitle}>No products yet.</p>
           <p className={styles.emptySub}>The collection is being assembled. Check back soon.</p>
         </div>
       ) : (
         <div className={styles.grid}>
-          {products.map((p, i) => {
+          {visibleCards.map(({ product: p, bgUrl }, i) => {
             const slug = productSlug(p.name)
             // A local front photo replaces the provider thumbnail as the card
             // image (the men's tees whose only Printful mockup is the back, and
             // the multi-colour women's tee); the back becomes the hover image.
             const cardImages = getProductCardImages(slug)
-            const cardImage = cardImages.front ?? bgRemovedUrls[i]
+            const cardImage = cardImages.front ?? bgUrl
             const cardHover = cardImages.hover ?? null
             return (
               <ProductCard key={`${p.provider}:${p.id}`} product={p} index={i} imageUrl={cardImage} hoverImageUrl={cardHover} colorSwatches={productInfoMap[p.id]?.swatches} priceCents={productInfoMap[p.id]?.priceCents} currency={productInfoMap[p.id]?.currency} dealLabel={dealLabelFor(p.id, slug, productInfoMap[p.id]?.currency ?? p.currency)} />

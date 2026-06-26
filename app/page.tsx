@@ -1,7 +1,7 @@
 import Hero from '@/components/Hero/Hero'
 import Marquee from '@/components/Marquee/Marquee'
 import ProductCarousel, { type CarouselItem } from '@/components/ProductCarousel/ProductCarousel'
-import { getCatalogProducts, getCatalogProduct } from '@/lib/catalog'
+import { getCatalogProducts, getCatalogProduct, isInStock } from '@/lib/catalog'
 import { resolveCardImage } from '@/lib/card-image'
 import { getProductImageOverride } from '@/lib/product-images'
 import { removeBackground } from '@/lib/remove-bg'
@@ -91,13 +91,15 @@ export default async function HomePage() {
   // Build the carousel cards: the (background-removed) card image plus the
   // variants/colours the quick-add control needs. Image resolution reuses the
   // same Supabase cache as /shop, so it adds no extra remove.bg calls.
-  const carouselItems: CarouselItem[] = await Promise.all(
-    latest.map(async (p) => {
+  // Out-of-stock products (no available variant) are dropped from the carousel.
+  const built = await Promise.all(
+    latest.map(async (p): Promise<CarouselItem | null> => {
       const slug = productSlug(p.name)
       const [image, detailed] = await Promise.all([
         resolveCardImage({ slug, thumbnailUrl: p.thumbnailUrl }),
         withVariants(p),
       ])
+      if (!isInStock(detailed)) return null
       const colors = await buildCarouselColors(slug, detailed, image)
       return {
         slug,
@@ -118,6 +120,7 @@ export default async function HomePage() {
       }
     })
   )
+  const carouselItems: CarouselItem[] = built.filter((i): i is CarouselItem => i !== null)
 
   return (
     <main>

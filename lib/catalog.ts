@@ -21,6 +21,18 @@ export function mergeCatalogs(
   return out
 }
 
+/**
+ * Whether a product has at least one variant in stock. Out-of-stock products
+ * (every variant unavailable at the provider — Printful `in_stock` / Printify
+ * `is_available`) are hidden from the shop. A product whose variants are not
+ * loaded yet (list-level Printful) is treated as in stock, so it is never hidden
+ * on missing data; pass a detail-level product to get a real answer.
+ */
+export function isInStock(product: NormalizedProduct): boolean {
+  if (product.variants.length === 0) return true
+  return product.variants.some((v) => v.inStock !== false)
+}
+
 /** Find a product in a merged list by its name-based slug. */
 export function findBySlug(products: NormalizedProduct[], slug: string): NormalizedProduct | null {
   const matches = products.filter((p) => productSlug(p.name) === slug)

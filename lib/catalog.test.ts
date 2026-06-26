@@ -33,3 +33,22 @@ describe('findBySlug', () => {
     expect(findBySlug([pf, pi], 'nope')).toBeNull()
   })
 })
+
+describe('isInStock', () => {
+  const variant = (inStock: boolean) => ({
+    provider: 'printful' as const, productId: '1', id: 'v', name: 'M', size: 'M',
+    color: '', colorCode: '', priceCents: 1000, currency: 'EUR', inStock, imageUrl: null,
+  })
+  it('treats a product with no loaded variants as in stock (never hides on missing data)', async () => {
+    const { isInStock } = await import('./catalog')
+    expect(isInStock(pf)).toBe(true)
+  })
+  it('is in stock when at least one variant is available', async () => {
+    const { isInStock } = await import('./catalog')
+    expect(isInStock({ ...pf, variants: [variant(false), variant(true)] })).toBe(true)
+  })
+  it('is out of stock when every variant is unavailable', async () => {
+    const { isInStock } = await import('./catalog')
+    expect(isInStock({ ...pf, variants: [variant(false), variant(false)] })).toBe(false)
+  })
+})
