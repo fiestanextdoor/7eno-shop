@@ -167,7 +167,10 @@ export default async function HomePage() {
           <p className={styles.dealsSub}>
             Premium 7ENO pieces bundled at a combined price. Limited sets, while they last.
           </p>
-          <Link href="/deals" className={styles.dealsCta}>Shop deals →</Link>
+          <Link href="/deals" className={styles.dealsCta}>
+            <span>Shop deals</span>
+            <span className={styles.dealsCtaArrow} aria-hidden>→</span>
+          </Link>
         </div>
       </section>
     </main>

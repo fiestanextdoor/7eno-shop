@@ -13,8 +13,11 @@
   border-bottom: 1px solid rgba(17, 17, 17, 0.08);
 }
 
+/* Wider than the global --max-width so the line blocks read bolder on large
+   screens. The section keeps its --gutter padding (.categoryStrip), so the strip
+   never touches the viewport edges and shrinks gracefully on smaller screens. */
 .categoryStripInner {
-  max-width: var(--max-width);
+  max-width: 1600px;
   margin: 0 auto;
   display: flex;
   gap: 2px;
@@ -68,7 +71,8 @@
      of snapping forward at the start. */
   flex: 1 1 0;
   min-width: 0;
-  transition: flex-grow 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: flex-grow 0.65s cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 0.5s ease;
 }
 
 /* Default 50 / 25 / 25: the first tile (Nieuwe Drop) is twice as wide. */
@@ -91,7 +95,10 @@
   inset: 0;
   z-index: 0;
   background-size: cover;
-  background-position: center;
+  /* Anchor toward the top so the subject's face stays in frame when the tile
+     widens on hover (cover then crops vertically) and when the photo zooms. */
+  background-position: center 20%;
+  transform-origin: center top;
   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -110,7 +117,11 @@
   );
 }
 
-.categoryCard > * {
+/* Lift the tile content (number, logo, arrow) above the scrim. The media layer
+   is excluded so it keeps its own `position: absolute; z-index: 0` and stays a
+   full-bleed background behind the scrim; without :not() this broad `> *` rule
+   overrides .categoryMedia and collapses the background photo to 0 height. */
+.categoryCard > *:not(.categoryMedia) {
   position: relative;
   z-index: 2;
 }
@@ -122,6 +133,17 @@
 .categoryCard:focus-visible {
   outline: 2px solid var(--bone);
   outline-offset: -4px;
+}
+
+/* Red brand glow on the hovered/focused tile. The z-index lift keeps the glow
+   above the neighbouring tiles instead of being clipped by them. */
+.categoryCard:hover,
+.categoryCard:focus-visible {
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(168, 38, 38, 0.6),
+    0 0 26px rgba(150, 30, 30, 0.55),
+    0 0 60px rgba(122, 22, 22, 0.45);
 }
 
 .categoryNum {
@@ -258,22 +280,55 @@
 }
 
 .dealsCta {
-  margin-top: 10px;
+  position: relative;
+  isolation: isolate;
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 3px;
+  font-size: 0.66rem;
+  letter-spacing: 3.5px;
   text-transform: uppercase;
-  color: var(--ink);
-  background: var(--bone);
+  color: var(--bone);
+  background: transparent;
   text-decoration: none;
-  padding: 16px 44px;
-  border: 1px solid var(--bone);
-  transition: background 0.2s, color 0.2s;
+  padding: 17px 46px;
+  border: 1px solid rgba(246, 243, 236, 0.55);
+  transition: color 0.45s ease, border-color 0.45s ease;
 }
 
-.dealsCta:hover {
-  background: transparent;
-  color: var(--bone);
+/* Directional fill wipe: bone sweeps in from the left on hover. */
+.dealsCta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--bone);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.dealsCta:hover,
+.dealsCta:focus-visible {
+  color: var(--ink);
+  border-color: var(--bone);
+}
+
+.dealsCta:hover::before,
+.dealsCta:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.dealsCtaArrow {
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.dealsCta:hover .dealsCtaArrow,
+.dealsCta:focus-visible .dealsCtaArrow {
+  transform: translateX(5px);
 }
 
 .dealsCta:focus-visible {
@@ -284,5 +339,7 @@
 @media (prefers-reduced-motion: reduce) {
   .categoryCard,
   .categoryMedia,
-  .dealsCta { transition: none; }
+  .dealsCta,
+  .dealsCta::before,
+  .dealsCtaArrow { transition: none; }
 }

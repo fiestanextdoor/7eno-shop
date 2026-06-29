@@ -11,6 +11,13 @@ import styles from './QuickAddCard.module.css'
 // offers sizes the rest of the shop hides.
 const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
 
+// Same money formatting as ProductCard / the product page, so the carousel
+// price reads identically to the rest of the shop (e.g. "€29.95").
+function formatPrice(cents: number, currency: string): string {
+  const symbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency || ''
+  return `${symbol}${(cents / 100).toFixed(2)}`
+}
+
 function PlusIcon() {
   return (
     <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
@@ -60,6 +67,16 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
 
   const canQuickAdd = sizes.length > 0
   const label = (v: CarouselVariant) => (v.size || v.name || 'One size')
+
+  // Lowest in-stock price for the active colour. Only prefix "from" when sizes
+  // actually carry different prices, so single-price products read clean.
+  const pricePool = sizes.length ? sizes : colorVariants
+  const prices = pricePool.map((v) => v.priceCents).filter((c) => c > 0)
+  const minPrice = prices.length ? Math.min(...prices) : null
+  const priceLabel =
+    minPrice != null
+      ? `${Math.max(...prices) > minPrice ? 'from ' : ''}${formatPrice(minPrice, item.currency)}`
+      : null
 
   // The shown photo follows the selected colour (falls back to the card image).
   const activeColorObj = colors.find((c) => c.color === activeColor)
@@ -123,7 +140,7 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
         {canQuickAdd && (
           <div
             className={`${styles.addArea} ${open ? styles.addAreaOpen : ''}`}
-            onMouseLeave={() => setOpen(false)}
+            onPointerLeave={(e) => { if (e.pointerType === 'mouse') setOpen(false) }}
           >
             {/* data-lenis-prevent: let the size menu scroll natively instead of the
                 global Lenis smooth-scroll hijacking the wheel to the page. */}
@@ -146,7 +163,7 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
               aria-label={`Quick add ${item.name}`}
               aria-expanded={open}
               onClick={() => setOpen((o) => !o)}
-              onMouseEnter={() => setOpen(true)}
+              onPointerEnter={(e) => { if (e.pointerType === 'mouse') setOpen(true) }}
             >
               {justAdded ? <CheckIcon /> : <PlusIcon />}
             </button>
@@ -155,9 +172,12 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
       </div>
 
       <div className={styles.info}>
-        <Link href={`/shop/${item.slug}`} className={styles.name}>
-          {item.name}
-        </Link>
+        <div className={styles.meta}>
+          <Link href={`/shop/${item.slug}`} className={styles.name}>
+            {item.name}
+          </Link>
+          {priceLabel && <span className={styles.price}>{priceLabel}</span>}
+        </div>
       </div>
     </div>
   )

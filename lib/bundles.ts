@@ -47,6 +47,26 @@ const BUNDLES: Bundle[] = [
       { provider: 'printful', productId: '433350977', slug: 'ink-blood-sport-shorts-unisex' },
     ],
   },
+  {
+    id: 'stone-sport-set',
+    title: 'Stone Sport Set',
+    description: 'Ink/Stone sport tee with matching Butter/Stone shorts.',
+    discountCents: 500,
+    products: [
+      { provider: 'printful', productId: '433345296', slug: 'ink-stone-sport-tee-unisex' },
+      { provider: 'printful', productId: '433350867', slug: 'butter-stone-sport-shorts-unisex' },
+    ],
+  },
+  {
+    id: 'life4hsp-sport-set',
+    title: 'Life4HSP Sport Set',
+    description: 'X Life4HSP sport tee with Butter/Blood shorts.',
+    discountCents: 500,
+    products: [
+      { provider: 'printful', productId: '438808675', slug: 'x-life4hsp-sport-tee' },
+      { provider: 'printful', productId: '433351139', slug: 'butter-blood-sport-shorts-unisex' },
+    ],
+  },
 ]
 
 // Dev-time guard: a bundle definition must not list the same product twice

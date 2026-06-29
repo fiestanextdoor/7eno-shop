@@ -57,29 +57,34 @@
   gap: 8px;
 }
 
-/* Bare icon, no circle: just the glyph with a drop-shadow so it reads on both
-   the product and the dark backdrop. */
+/* A solid, sharp-edged add button (matching the brand's rectangular buttons):
+   bone at rest so it's unmissable on the photo, inverting to oxblood on hover.
+   This is the primary add-to-cart trigger, so the affordance is deliberate. */
 .addBtn {
   flex-shrink: 0;
-  padding: 2px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
   border: none;
-  background: transparent;
-  color: var(--bone);
+  background: var(--bone);
+  color: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6));
-  transition: transform 0.2s ease;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.32);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
 .addBtn svg {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .addBtn:hover {
-  transform: scale(1.18);
+  background: var(--ink);
+  color: var(--bone);
+  transform: translateY(-2px);
 }
 
 .addBtn:focus-visible {
@@ -153,7 +158,18 @@
   border-top: 1px solid rgba(17, 17, 17, 0.07);
 }
 
+/* Name (italic serif) and price (mono) share a baseline row, price pinned right
+   — a boutique price-tag rhythm that makes the cost legible at a glance. */
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 600;
@@ -161,15 +177,22 @@
   line-height: 1.2;
   color: var(--ink);
   text-decoration: none;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .name:hover {
   text-decoration: underline;
+}
+
+.price {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 /* Colour swatches overlay the bottom-left of the photo (opposite the + button),

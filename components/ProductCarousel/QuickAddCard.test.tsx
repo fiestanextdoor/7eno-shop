@@ -56,6 +56,21 @@ describe('QuickAddCard quick-add', () => {
     expect(useCartStore.getState().isCartOpen).toBe(true)
   })
 
+  it('shows the product price on the card', () => {
+    render(<QuickAddCard item={item} />)
+    expect(screen.getByText('€29.95')).toBeInTheDocument()
+  })
+
+  it('opens the size menu on a mobile tap (synthetic mouseenter + click must not cancel out)', () => {
+    render(<QuickAddCard item={item} />)
+    const addBtn = screen.getByRole('button', { name: /quick add/i })
+    // A tap on a touch device emits a synthetic mouseenter immediately before
+    // the click. The control must end up open, not flip back closed.
+    fireEvent.mouseEnter(addBtn)
+    fireEvent.click(addBtn)
+    expect(addBtn).toHaveAttribute('aria-expanded', 'true')
+  })
+
   it('swaps the photo and the added variant when another colour is picked', () => {
     render(<QuickAddCard item={multiColour} />)
     expect(screen.getByRole('img')).toHaveAccessibleName(/Black/)

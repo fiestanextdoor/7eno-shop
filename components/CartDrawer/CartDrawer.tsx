@@ -1,8 +1,10 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
 import { cartItemKey } from '@/lib/cart-key'
+import { productSlug } from '@/lib/slug'
 import { getBundle } from '@/lib/bundles'
 import { resolveBundleDiscountCents } from '@/lib/bundle-discount'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping'
@@ -41,17 +43,22 @@ export default function CartDrawer() {
     }
   }
 
-  const renderItem = (item: CartItem) => (
+  const renderItem = (item: CartItem) => {
+    // Link each line back to its product page. The slug is derived from the
+    // product name the same way the catalog builds it, so no slug needs storing
+    // on the cart item itself.
+    const href = `/shop/${productSlug(item.productName)}`
+    return (
     <li key={cartItemKey(item.provider, item.variantId, item.bundleId, item.productId)} className={styles.item}>
       {item.imageUrl ? (
-        <div className={styles.thumb}>
+        <Link href={href} className={styles.thumb} onClick={closeCart} aria-label={item.productName}>
           <Image src={item.imageUrl} alt={item.productName} fill style={{ objectFit: 'cover' }} />
-        </div>
+        </Link>
       ) : (
-        <div className={styles.thumbPlaceholder} />
+        <Link href={href} className={styles.thumbPlaceholder} onClick={closeCart} aria-label={item.productName} />
       )}
       <div className={styles.itemInfo}>
-        <div className={styles.itemName}>{item.productName}</div>
+        <Link href={href} className={styles.itemName} onClick={closeCart}>{item.productName}</Link>
         <div className={styles.itemVariant}>{item.variantName}</div>
         <div className={styles.itemPrice}>
           {item.currency} {(parseFloat(item.price) * item.quantity).toFixed(2)}
@@ -68,7 +75,8 @@ export default function CartDrawer() {
         </svg>
       </button>
     </li>
-  )
+    )
+  }
 
   return (
     <>
