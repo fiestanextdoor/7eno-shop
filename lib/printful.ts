@@ -325,6 +325,7 @@ export function isAutoConfirmEnabled(): boolean {
 export async function createOrder(
   recipient: PrintfulOrderRecipient,
   items: PrintfulOrderItem[],
+  externalId: string,
   shippingMethodId?: string
 ): Promise<{ id: number }> {
   // confirm=1 submits the order straight to fulfillment; without it Printful
@@ -334,6 +335,9 @@ export async function createOrder(
     method: 'POST',
     headers: buildPrintfulHeaders(getApiKey()),
     body: JSON.stringify({
+      // external_id = Stripe session id, zodat de status-webhook de order
+      // terug kan matchen naar onze rij (net als bij Printify).
+      external_id: externalId,
       recipient,
       items,
       ...(shippingMethodId ? { shipping: shippingMethodId } : {}),

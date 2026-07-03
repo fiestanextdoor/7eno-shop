@@ -69,6 +69,8 @@ export interface Database {
           currency: string
           items: Json
           shipping_address: Json | null
+          fulfillments: Json
+          customer_email: string | null
           created_at: string
         }
         Insert: {
@@ -81,11 +83,15 @@ export interface Database {
           currency?: string
           items: Json
           shipping_address?: Json | null
+          fulfillments?: Json
+          customer_email?: string | null
           created_at?: string
         }
         Update: {
           printful_order_id?: string | null
           status?: string
+          fulfillments?: Json
+          customer_email?: string | null
         }
       }
       coupon_redemptions: {
@@ -116,3 +122,18 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Address = Database['public']['Tables']['addresses']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
 export type CouponRedemption = Database['public']['Tables']['coupon_redemptions']['Row']
+
+/**
+ * Eén fulfillment binnen een order. Een order (één Stripe-sessie) kan door meer
+ * providers worden vervuld, dus dit staat als jsonb-array in orders.fulfillments.
+ * De tracking-velden worden gevuld door de provider-webhooks bij verzending.
+ */
+export interface Fulfillment {
+  provider: string
+  order_id: string
+  status: string
+  tracking_number?: string | null
+  tracking_url?: string | null
+  carrier?: string | null
+  shipped_at?: string | null
+}

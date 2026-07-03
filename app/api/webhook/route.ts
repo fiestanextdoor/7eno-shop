@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     if (pfItems.length) {
       try {
-        const order = await createPrintfulOrder(printfulRecipient, pfItems, shipMethod) as unknown as { id?: number | string }
+        const order = await createPrintfulOrder(printfulRecipient, pfItems, session.id, shipMethod) as unknown as { id?: number | string }
         fulfillments.push({ provider: 'printful', order_id: String(order?.id ?? ''), status: 'processing' })
         console.log('[Webhook] Printful order created for session', session.id,
           isPrintfulAutoConfirm() ? '(auto-submitted)' : '(draft)')
@@ -150,6 +150,7 @@ export async function POST(req: NextRequest) {
         user_id: userId,
         stripe_session_id: session.id,
         printful_order_id: printfulOrderId,
+        customer_email: customer.email ?? null,
         fulfillments,
         status: fulfillmentError ? 'fulfillment_failed' : 'processing',
         total_amount: session.amount_total ?? 0,
