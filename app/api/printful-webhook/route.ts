@@ -70,9 +70,13 @@ export async function POST(req: NextRequest) {
   const newStatus = mapPrintfulStatus(type, order?.status)
   const shipment = extractShipment(payload.data ?? {})
 
-  // Was de Printful-fulfillment al verzonden? Zo ja: geen dubbele verzend-mail.
+  // De verzend-mail hangt aan het eerste moment dat tracking binnenkomt, niet aan
+  // de status. Printful kan namelijk order_updated(fulfilled) vóór package_shipped
+  // sturen; zou de mail aan de status "shipped" hangen, dan zou de tracking-mail
+  // daarna onterecht worden overgeslagen. Zo sturen we exact één keer, wanneer we
+  // voor het eerst een tracking-nummer hebben.
   const existing = fulfillments.find((f) => f.provider === 'printful')
-  const wasShipped = existing?.status === 'shipped' || existing?.status === 'delivered'
+  const hadTracking = Boolean(existing?.tracking_number)
 
   const updated: Fulfillment[] = fulfillments.map((f) =>
     f.provider === 'printful'
@@ -94,9 +98,9 @@ export async function POST(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase.from('orders') as any).update({ fulfillments: updated }).eq('id', row.id)
 
-  // Verzend-mail bij de transitie naar "shipped". Best-effort: een mailfout mag
-  // de webhook nooit laten falen (anders blijft Printful retryen).
-  if (newStatus === 'shipped' && !wasShipped && row.customer_email && shipment) {
+  // Verzend-mail zodra we voor het eerst tracking hebben. Best-effort: een
+  // mailfout mag de webhook nooit laten falen (anders blijft Printful retryen).
+  if (shipment && !hadTracking && row.customer_email) {
     try {
       const ship = (row.shipping_address ?? {}) as {
         name?: string
