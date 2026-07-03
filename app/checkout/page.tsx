@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { useCartStore } from '@/store/cart'
 import { cartItemKey } from '@/lib/cart-key'
 import {
@@ -40,6 +41,19 @@ export default function CheckoutPage() {
   const [agreed, setAgreed] = useState(false)
   const [payLoading, setPayLoading] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
+
+  // Detect auth so we only nudge guests to create an account. null = not yet
+  // resolved, so we never flash the notice for logged-in customers. Mirrors the
+  // AccountButton pattern (getUser + onAuthStateChange).
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null)
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setLoggedIn(!!data.user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session?.user)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   // Discount code state. The code is single-use per account and not combinable
   // with bundle deals, so it is hidden when the cart contains a bundle; the
@@ -378,6 +392,33 @@ export default function CheckoutPage() {
           <span className={styles.totalLabel}>Total</span>
           <span className={styles.totalAmount}>&euro;{grandTotal.toFixed(2)}</span>
         </div>
+
+        {loggedIn === false && (
+          <div className={styles.guestNotice}>
+            <svg
+              className={styles.guestNoticeIcon}
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.6" />
+            </svg>
+            <p className={styles.guestNoticeText}>
+              Checking out as a guest.{' '}
+              <Link href="/account/login?redirect=/checkout" className={styles.agreeLink}>
+                Log in
+              </Link>{' '}
+              or{' '}
+              <Link href="/account/register" className={styles.agreeLink}>
+                create an account
+              </Link>{' '}
+              to track your order and check out faster next time. You can still pay as a guest below.
+            </p>
+          </div>
+        )}
 
         {payError && <p className={styles.error} aria-live="polite">{payError}</p>}
 
