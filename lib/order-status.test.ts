@@ -1,4 +1,4 @@
-import { statusMeta, deriveOrderStatus, STEP_LABELS } from './order-status'
+import { statusMeta, deriveOrderStatus, STEP_LABELS, statusRank, isTerminalStatus } from './order-status'
 import type { Fulfillment } from './supabase/types'
 
 const ff = (status: string, provider = 'printful'): Fulfillment => ({
@@ -52,4 +52,20 @@ describe('deriveOrderStatus', () => {
 
 test('STEP_LABELS has the four progression steps', () => {
   expect(STEP_LABELS).toEqual(['Ordered', 'In production', 'Shipped', 'Delivered'])
+})
+
+describe('statusRank / isTerminalStatus', () => {
+  test('shipped ranks above in_production', () => {
+    expect(statusRank('shipped')).toBeGreaterThan(statusRank('in_production'))
+  })
+  test('unknown status ranks 0', () => {
+    expect(statusRank('mystery')).toBe(0)
+  })
+  test('cancelled and failed are terminal', () => {
+    expect(isTerminalStatus('cancelled')).toBe(true)
+    expect(isTerminalStatus('failed')).toBe(true)
+  })
+  test('shipped is not terminal', () => {
+    expect(isTerminalStatus('shipped')).toBe(false)
+  })
 })

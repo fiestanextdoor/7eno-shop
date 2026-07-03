@@ -67,4 +67,16 @@ describe('extractShipment', () => {
   test('null when shipment lacks tracking number', () => {
     expect(extractShipment({ shipment: { carrier: 'USPS' } })).toBeNull()
   })
+  test('reads from a shipments[] array', () => {
+    const s = extractShipment({ shipments: [{ carrier: 'DHL', tracking_number: 'JD1' }] })
+    expect(s).toMatchObject({ carrier: 'DHL', tracking_number: 'JD1' })
+  })
+  test('reads from order.shipments[] as last resort', () => {
+    const s = extractShipment({ order: { shipments: [{ tracking_number: 'X9' }] } })
+    expect(s?.tracking_number).toBe('X9')
+  })
+  test('converts numeric shipped_at to ISO', () => {
+    const s = extractShipment({ shipment: { tracking_number: '1', shipped_at: 1751500800 } })
+    expect(s?.shipped_at).toMatch(/^2025-/)
+  })
 })

@@ -1,4 +1,8 @@
 import { sendEmail, type SendEmailResult } from './send'
+import {
+  INK, BONE, PAPER, OXBLOOD, STONE, RULE, SERIF, MONO,
+  escapeHtml, firstName, emailBaseUrl, type RenderedEmail,
+} from './brand'
 
 export interface ShippedEmailData {
   /** Human-facing reference, e.g. the fulfillment order id or a short code. */
@@ -16,42 +20,9 @@ export interface ShippedEmailData {
   }
 }
 
-// ── Brand palette (mirrors styles/globals.css) ──────────────────────────────
-const INK = '#111111'
-const BONE = '#F6F3EC'
-const PAPER = '#EDE8DD'
-const OXBLOOD = '#5C1A1B'
-const STONE = '#8A8275'
-const RULE = '#C8C1B2'
-const SERIF = "Georgia, 'Times New Roman', Times, serif"
-const MONO = "'Courier New', Courier, monospace"
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-function firstName(fullName: string): string {
-  const token = fullName.trim().split(/\s+/)[0]
-  return token || 'there'
-}
-
-export interface RenderedEmail {
-  subject: string
-  html: string
-  text: string
-}
-
 export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
   const subject = 'Your 7ENO order is on its way'
-
-  // Email clients can't resolve relative URLs, so logos need an absolute origin.
-  // Mirrors the order-confirmation handling, production domain as fallback.
-  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.7eno.shop').replace(/\/+$/, '')
+  const baseUrl = emailBaseUrl()
 
   const addr = data.shippingAddress
   const addressHtml = [addr.name, addr.line1, `${addr.postalCode} ${addr.city}`, addr.country]

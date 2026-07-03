@@ -56,6 +56,20 @@ const RANK: Record<string, number> = {
 const rankOf = (status: string): number => RANK[status] ?? 0
 
 /**
+ * Voortgangsrang van een status (hoger = verder in het proces, negatief =
+ * probleemstaat). Gebruikt door webhooks om te voorkomen dat out-of-order events
+ * een order terugzetten (bijv. een late order_updated ná package_shipped).
+ */
+export function statusRank(status: string): number {
+  return rankOf(status)
+}
+
+/** Terminale probleemstatussen die altijd gezet mogen worden, ook "achteruit". */
+export function isTerminalStatus(status: string): boolean {
+  return status === 'cancelled' || status === 'failed'
+}
+
+/**
  * Bepaalt één status voor een order op basis van al zijn fulfillments. Een order
  * is pas "verzonden" als alle onderdelen minstens verzonden zijn, dus we tonen de
  * minst-gevorderde actieve fulfillment. Een mislukte fulfillment (of een

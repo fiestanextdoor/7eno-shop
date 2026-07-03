@@ -54,22 +54,28 @@ export interface ExtractedShipment {
   shipped_at: string | null
 }
 
+interface ShipmentLike {
+  carrier?: string
+  tracking_number?: string
+  tracking_url?: string
+  ship_date?: string
+  shipped_at?: number
+}
+
 /**
  * Haalt de tracking-gegevens uit de `data` van een package_shipped-payload.
- * Geeft null terug als er geen shipment met tracking-nummer is (dan is er niets
- * te tonen). `ship_date` is een datumstring; `shipped_at` een unix-seconde
- * timestamp als fallback.
+ * Printful kan de shipment op meerdere plekken leveren, dus we accepteren zowel
+ * `data.shipment` (enkelvoud) als een `shipments[]`-array en de shipments op de
+ * order zelf. Geeft null terug als er geen shipment met tracking-nummer is (dan
+ * is er niets te tonen). `ship_date` is een datumstring; `shipped_at` een
+ * unix-seconde timestamp als fallback.
  */
 export function extractShipment(data: {
-  shipment?: {
-    carrier?: string
-    tracking_number?: string
-    tracking_url?: string
-    ship_date?: string
-    shipped_at?: number
-  }
+  shipment?: ShipmentLike
+  shipments?: ShipmentLike[]
+  order?: { shipments?: ShipmentLike[] }
 }): ExtractedShipment | null {
-  const s = data?.shipment
+  const s = data?.shipment ?? data?.shipments?.[0] ?? data?.order?.shipments?.[0]
   if (!s || !s.tracking_number) return null
   return {
     carrier: s.carrier ?? '',

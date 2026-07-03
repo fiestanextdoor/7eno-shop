@@ -1,4 +1,8 @@
 import { sendEmail, type SendEmailResult } from './send'
+import {
+  INK, BONE, PAPER, OXBLOOD, STONE, RULE, SERIF, MONO,
+  escapeHtml, firstName, emailBaseUrl, type RenderedEmail,
+} from './brand'
 
 export interface OrderEmailItem {
   name: string
@@ -27,37 +31,11 @@ export interface OrderEmailData {
   }
 }
 
-// ── Brand palette (mirrors styles/globals.css) ──────────────────────────────
-const INK = '#111111'
-const BONE = '#F6F3EC'
-const PAPER = '#EDE8DD'
-const OXBLOOD = '#5C1A1B'
-const STONE = '#8A8275'
-const RULE = '#C8C1B2'
-// Web-safe serif: real Cormorant won't load in mail clients, Georgia carries
-// the same high-contrast, "divine" feel.
-const SERIF = "Georgia, 'Times New Roman', Times, serif"
-const MONO = "'Courier New', Courier, monospace"
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
 function formatMoney(cents: number, currency: string): string {
   const code = currency.toUpperCase()
   const symbol = code === 'EUR' ? '€' : code === 'USD' ? '$' : ''
   const amount = (cents / 100).toFixed(2)
   return symbol ? `${symbol}${amount}` : `${amount} ${code}`
-}
-
-function firstName(fullName: string): string {
-  const token = fullName.trim().split(/\s+/)[0]
-  return token || 'there'
 }
 
 function itemRowHtml(item: OrderEmailItem, currency: string): string {
@@ -87,21 +65,13 @@ function totalRowHtml(label: string, value: string, opts: { strong?: boolean } =
     </tr>`
 }
 
-export interface RenderedEmail {
-  subject: string
-  html: string
-  text: string
-}
-
 export function renderOrderConfirmation(data: OrderEmailData): RenderedEmail {
   const { currency } = data
   const subject = 'Your 7ENO order is confirmed'
 
-  // Email clients can't resolve relative URLs, so logos need an absolute
-  // origin. Mirrors the checkout route's NEXT_PUBLIC_BASE_URL handling, with
-  // the production domain as the fallback (not localhost) so live mail still
-  // renders if the env var is ever missing.
-  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.7eno.shop').replace(/\/+$/, '')
+  // Email clients can't resolve relative URLs, so logos need an absolute origin
+  // (production domain as fallback, not localhost). See lib/email/brand.ts.
+  const baseUrl = emailBaseUrl()
 
   // The "100% donated" promise only holds for the Life4HSP collaboration
   // product, not for the whole shop. Detect it by name (same convention as the

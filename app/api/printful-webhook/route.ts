@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { verifyPrintfulToken, mapPrintfulStatus, extractShipment } from '@/lib/printful-webhook'
+import { statusRank, isTerminalStatus } from '@/lib/order-status'
 import { sendOrderShippedEmail } from '@/lib/email/order-shipped'
 import type { Fulfillment } from '@/lib/supabase/types'
 
@@ -18,17 +19,19 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.text()
+  type ShipmentLike = {
+    carrier?: string
+    tracking_number?: string
+    tracking_url?: string
+    ship_date?: string
+    shipped_at?: number
+  }
   let payload: {
     type?: string
     data?: {
-      order?: { id?: number | string; external_id?: string; status?: string }
-      shipment?: {
-        carrier?: string
-        tracking_number?: string
-        tracking_url?: string
-        ship_date?: string
-        shipped_at?: number
-      }
+      order?: { id?: number | string; external_id?: string; status?: string; shipments?: ShipmentLike[] }
+      shipment?: ShipmentLike
+      shipments?: ShipmentLike[]
     }
   }
   try {
@@ -67,7 +70,7 @@ export async function POST(req: NextRequest) {
   }
 
   const fulfillments: Fulfillment[] = Array.isArray(row.fulfillments) ? row.fulfillments : []
-  const newStatus = mapPrintfulStatus(type, order?.status)
+  const mappedStatus = mapPrintfulStatus(type, order?.status)
   const shipment = extractShipment(payload.data ?? {})
 
   // De verzend-mail hangt aan het eerste moment dat tracking binnenkomt, niet aan
@@ -78,22 +81,35 @@ export async function POST(req: NextRequest) {
   const existing = fulfillments.find((f) => f.provider === 'printful')
   const hadTracking = Boolean(existing?.tracking_number)
 
-  const updated: Fulfillment[] = fulfillments.map((f) =>
-    f.provider === 'printful'
-      ? {
-          ...f,
-          status: newStatus,
-          ...(shipment
-            ? {
-                carrier: shipment.carrier,
-                tracking_number: shipment.tracking_number,
-                tracking_url: shipment.tracking_url,
-                shipped_at: shipment.shipped_at,
-              }
-            : {}),
-        }
-      : f
-  )
+  // Nooit terugvallen: een late/out-of-order event mag een verder gevorderde
+  // status niet verlagen (bijv. order_updated zonder status na package_shipped
+  // zou anders 'shipped' → 'in_production' terugzetten). Terminale
+  // probleemstatussen (cancelled/failed) mogen wél altijd gezet worden.
+  const status =
+    existing?.status && !isTerminalStatus(mappedStatus) && statusRank(mappedStatus) < statusRank(existing.status)
+      ? existing.status
+      : mappedStatus
+
+  const trackingPatch = shipment
+    ? {
+        carrier: shipment.carrier,
+        tracking_number: shipment.tracking_number,
+        tracking_url: shipment.tracking_url,
+        shipped_at: shipment.shipped_at,
+      }
+    : {}
+
+  // Werk de bestaande printful-entry bij; ontbreekt die (nog), voeg 'm toe zodat
+  // status/tracking nooit stil verdwijnt.
+  let touched = false
+  const updated: Fulfillment[] = fulfillments.map((f) => {
+    if (f.provider !== 'printful') return f
+    touched = true
+    return { ...f, status, ...trackingPatch }
+  })
+  if (!touched) {
+    updated.push({ provider: 'printful', order_id: printfulOrderId ?? '', status, ...trackingPatch })
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase.from('orders') as any).update({ fulfillments: updated }).eq('id', row.id)
@@ -110,7 +126,7 @@ export async function POST(req: NextRequest) {
         country?: string
       }
       await sendOrderShippedEmail(row.customer_email, {
-        orderRef: row.printful_order_id ?? String(row.stripe_session_id).slice(-12),
+        orderRef: row.printful_order_id || String(row.stripe_session_id).slice(-12),
         customerName: ship.name ?? 'Customer',
         carrier: shipment.carrier,
         trackingNumber: shipment.tracking_number,
