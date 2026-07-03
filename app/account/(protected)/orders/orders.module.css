@@ -98,11 +98,72 @@
   color: #eb5757;
 }
 
+.statusAmber {
+  background: rgba(224, 168, 0, 0.18);
+  color: #e0a800;
+}
+
 .orderTotal {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 1px;
   color: var(--bone);
+}
+
+/* Voortgangsbalk: vier stappen, mono micro-labels. */
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(246, 243, 236, 0.07);
+}
+
+.step,
+.stepActive,
+.stepDone {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.46rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding-left: 14px;
+}
+
+.step::before,
+.stepActive::before,
+.stepDone::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.step {
+  color: rgba(246, 243, 236, 0.3);
+}
+.step::before {
+  background: rgba(246, 243, 236, 0.2);
+}
+
+.stepDone {
+  color: #6fcf97;
+}
+.stepDone::before {
+  background: #6fcf97;
+}
+
+.stepActive {
+  color: var(--bone);
+}
+.stepActive::before {
+  background: var(--bone);
+  box-shadow: 0 0 0 3px rgba(246, 243, 236, 0.15);
 }
 
 .orderItems {
@@ -111,6 +172,47 @@
   gap: 10px;
   padding-top: 16px;
   border-top: 1px solid rgba(246, 243, 236, 0.07);
+}
+
+/* Tracking-rijen onder de items. */
+.tracking {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(246, 243, 236, 0.07);
+}
+
+.trackRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.trackMeta {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.55);
+}
+
+.trackLink {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.trackLink:hover {
+  color: #6fcf97;
 }
 
 .orderItem {

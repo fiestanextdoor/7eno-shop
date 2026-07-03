@@ -1,17 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import type { Order, Address } from '@/lib/supabase/types'
+import type { Order, Address, Fulfillment } from '@/lib/supabase/types'
+import { deriveOrderStatus } from '@/lib/order-status'
 import styles from './dashboard.module.css'
-
-function statusLabel(status: string) {
-  const map: Record<string, string> = {
-    processing: 'Processing',
-    fulfilled: 'Shipped',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
-  }
-  return map[status] ?? status
-}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -46,7 +37,9 @@ export default async function DashboardPage() {
             <p className={styles.empty}>No orders yet.</p>
           ) : (
             <div className={styles.orderList}>
-              {recentOrders.map((order) => (
+              {recentOrders.map((order) => {
+                const fulfillments = (Array.isArray(order.fulfillments) ? order.fulfillments : []) as unknown as Fulfillment[]
+                return (
                 <div key={order.id} className={styles.orderRow}>
                   <div>
                     <p className={styles.orderDate}>
@@ -54,13 +47,14 @@ export default async function DashboardPage() {
                         day: 'numeric', month: 'long', year: 'numeric',
                       })}
                     </p>
-                    <p className={styles.orderStatus}>{statusLabel(order.status)}</p>
+                    <p className={styles.orderStatus}>{deriveOrderStatus(fulfillments, order.status).label}</p>
                   </div>
                   <p className={styles.orderTotal}>
                     &euro;{(order.total_amount / 100).toFixed(2)}
                   </p>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
           <Link href="/account/orders" className={styles.blockLink}>
