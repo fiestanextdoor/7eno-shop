@@ -16,7 +16,7 @@ import styles from './page.module.css'
 export const metadata: Metadata = {
   title: '7ENO · Premium Streetwear',
   description:
-    '7ENO is the official online streetwear store. Sign in with Google to place orders, track your shipments and manage your account.',
+    '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections, track your shipments and manage your account.',
 }
 
 // Line blocks laid out 50 / 25 / 25: a wide "Nieuwe Drop" tile, then 7ENO Daily

@@ -27,7 +27,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const products = await getCatalogProducts().catch(() => [])
   const match = findBySlug(products, slug)
-  return { title: match ? `${match.name} — 7ENO` : '7ENO' }
+  if (!match) return { title: '7ENO' }
+  const collection = /olympian/i.test(match.name) ? 'Olympian' : 'OG'
+  const description = `${match.name} — ${collection} collection. Official 7ENO (Zeno) streetwear by Abra Entertainment.`
+  return {
+    title: `${match.name} — 7ENO`,
+    description,
+    alternates: { canonical: `/shop/${slug}` },
+    openGraph: {
+      title: `${match.name} — 7ENO`,
+      description,
+      type: 'website',
+      ...(match.thumbnailUrl ? { images: [match.thumbnailUrl] } : {}),
+    },
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -142,8 +155,38 @@ export default async function ProductPage({ params }: Props) {
     discountCents: b.discountCents,
   }))
 
+  // Product structured data: lets search engines show rich results (price,
+  // availability) and ties the product to the 7ENO/"Zeno" brand.
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.7eno.shop').replace(/\/+$/, '')
+  const priceCents = variants.map((v) => v.priceCents).filter((c) => c > 0)
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: detail!.name,
+    ...(productThumbnail ? { image: productThumbnail } : {}),
+    url: `${baseUrl}/shop/${slug}`,
+    brand: { '@type': 'Brand', name: '7ENO', alternateName: 'Zeno' },
+    ...(priceCents.length > 0
+      ? {
+          offers: {
+            '@type': 'AggregateOffer',
+            priceCurrency: detail!.currency || 'EUR',
+            lowPrice: (Math.min(...priceCents) / 100).toFixed(2),
+            highPrice: (Math.max(...priceCents) / 100).toFixed(2),
+            availability: variants.some((v) => v.inStock !== false)
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+          },
+        }
+      : {}),
+  }
+
   return (
     <main className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <ProductDetail
         provider={match.provider}
         productId={match.id}

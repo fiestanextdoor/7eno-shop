@@ -12,7 +12,7 @@ import styles from './shop.module.css'
 
 export const metadata: Metadata = {
   title: 'Shop — 7ENO',
-  description: 'Browse the full 7ENO collection.',
+  description: 'Browse the full 7ENO (Zeno) collection: OG and Olympian streetwear by Abra Entertainment.',
 }
 
 // ── Keyword-based classification ──────────────────────────────────────────────

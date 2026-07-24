@@ -165,6 +165,11 @@ export default function ProductDetail({
 
   const colorLabel = brandNameFor(selectedColor || variants[0]?.color || '')
 
+  // Collection line, mirroring the shop's OG/Olympian split (classify() in
+  // app/shop/page.tsx): anything named "Olympian" is the Olympian capsule, the
+  // rest is the original ("OG") range.
+  const collection = /olympian/i.test(productName) ? 'Olympian' : 'OG'
+
   return (
     <div className={styles.inner}>
 
@@ -220,7 +225,7 @@ export default function ProductDetail({
         </div>
 
         {/* Name */}
-        <p className={styles.label}>7ENO Collection</p>
+        <p className={styles.label}>{collection} Collection</p>
         <h1 className={styles.name}>{productName}</h1>
         <div className={styles.divider} />
 
@@ -381,7 +386,7 @@ export default function ProductDetail({
           </div>
           <div className={styles.detailRow}>
             <span className={styles.detailKey}>Collection</span>
-            <span className={`${styles.detailVal} ${styles.detailValAccent}`}>SS 2026</span>
+            <span className={`${styles.detailVal} ${styles.detailValAccent}`}>{collection} · SS 2026</span>
           </div>
           <div className={styles.detailRow}>
             <span className={styles.detailKey}>Delivery</span>

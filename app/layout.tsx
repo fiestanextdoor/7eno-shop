@@ -28,15 +28,19 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.7eno.shop'),
   title: '7ENO · Divine Authority',
-  description: '7ENO is the official online streetwear store.',
+  // "Zeno" is how the brand name is pronounced; spelling it out in the visible
+  // description ties the search query "zeno" to the store.
+  description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections.',
+  keywords: ['7ENO', 'Zeno', 'Zeno streetwear', 'Zeno shop', 'Zeno kleding', '7eno shop', 'streetwear', 'Abra Entertainment', 'Olympian collection'],
   // Machine-readable site/app name. Keep this identical to the OAuth consent
   // screen app name ("7ENO") so Google's app verification sees a matching name.
   applicationName: '7ENO',
   openGraph: {
     siteName: '7ENO',
     title: '7ENO',
-    description: '7ENO is the official online streetwear store.',
+    description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment.',
     url: 'https://www.7eno.shop',
     type: 'website',
   },
@@ -72,11 +76,25 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: '7ENO',
-              alternateName: '7ENO streetwear store',
-              url: 'https://www.7eno.shop',
-              description: '7ENO is the official online streetwear store.',
+              '@graph': [
+                {
+                  '@type': 'WebSite',
+                  name: '7ENO',
+                  // "Zeno" spellings let search engines link the spoken brand
+                  // name to the store (people hear "Zeno", not "7ENO").
+                  alternateName: ['Zeno', 'Zeno streetwear', 'Zeno shop', '7ENO streetwear store'],
+                  url: 'https://www.7eno.shop',
+                  description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment.',
+                },
+                {
+                  '@type': 'Organization',
+                  name: '7ENO',
+                  alternateName: ['Zeno', 'Zeno by Abra Entertainment'],
+                  url: 'https://www.7eno.shop',
+                  logo: 'https://www.7eno.shop/logos/beeldmerk-zwart.png',
+                  parentOrganization: { '@type': 'Organization', name: 'Abra Entertainment' },
+                },
+              ],
             }),
           }}
         />
