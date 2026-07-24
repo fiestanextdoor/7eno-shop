@@ -156,10 +156,34 @@ const BRAND_SWATCH_OVERRIDES: Array<{ match: string; hex: string; hex2: string }
 ]
 
 /**
+ * Olympian '26 colourways. Each colourway is published as its own Printful
+ * product (the name carries the colourway word, e.g. "Olympian Tee Ocean
+ * Unisex"), so colours can't come from variant data — they map from the name
+ * to the brand palette instead. Array order is the display order for swatches.
+ */
+export const OLYMPIAN_COLORWAYS: Array<{ key: string; name: string; hex: string }> = [
+  { key: 'coconut',  name: 'Coconut',  hex: '#b57446' },
+  { key: 'ocean',    name: 'Ocean',    hex: '#297d95' },
+  { key: 'sand',     name: 'Sand',     hex: '#eddca2' },
+  { key: 'flamingo', name: 'Flamingo', hex: '#eda5b2' },
+]
+
+/** The Olympian colourway named in an Olympian product name, or null. */
+export function olympianColorway(productName: string): { key: string; name: string; hex: string } | null {
+  const n = productName.toLowerCase()
+  if (!n.includes('olympian')) return null
+  return OLYMPIAN_COLORWAYS.find((c) => n.includes(c.key)) ?? null
+}
+
+/**
  * Forced two-tone swatch colours for a product, or null when no override applies.
  * Lets us present brand colourways the provider data can't express on its own.
  */
 export function brandSwatchOverride(productName: string): { hex: string; hex2: string } | null {
+  // Olympian colourways are solid brand colours (hex2 = hex → solid chip).
+  const oly = olympianColorway(productName)
+  if (oly) return { hex: oly.hex, hex2: oly.hex }
+
   const n = productName.toLowerCase()
   for (const o of BRAND_SWATCH_OVERRIDES) {
     if (n.includes(o.match)) return { hex: o.hex, hex2: o.hex2 }
@@ -259,6 +283,10 @@ export function resolveDisplayName(
   finalHex: string,
   productName: string
 ): string {
+  // Olympian products: the colourway in the product name IS the colour.
+  const oly = olympianColorway(productName)
+  if (oly) return oly.name
+
   // Direct Printful → brand name remapping takes priority
   const key = printfulColorName.toLowerCase().trim()
   if (PRINTFUL_TO_BRAND_NAME[key]) return PRINTFUL_TO_BRAND_NAME[key]

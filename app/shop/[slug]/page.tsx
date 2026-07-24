@@ -5,6 +5,7 @@ import { getCatalogProducts, getCatalogProduct, findBySlug } from '@/lib/catalog
 import { variantFrontImage, variantBackImage } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
+import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
@@ -155,6 +156,31 @@ export default async function ProductPage({ params }: Props) {
     discountCents: b.discountCents,
   }))
 
+  // Olympian colourways are separate products (the name carries the colourway,
+  // e.g. "Olympian Tee Ocean Unisex"). Collect the siblings of this product's
+  // family so the detail page can offer colour swatches that link between them,
+  // mirroring the in-product colour switcher the OG products get from variants.
+  const currentColorway = olympianColorway(detail!.name)
+  const colorwayPattern = new RegExp(OLYMPIAN_COLORWAYS.map((c) => c.key).join('|'), 'g')
+  const familyKey = (name: string) =>
+    name.toLowerCase().replace(colorwayPattern, '').replace(/\s+/g, ' ').trim()
+  const colorwaySiblings = currentColorway
+    ? products
+        .filter((p) => olympianColorway(p.name) && familyKey(p.name) === familyKey(detail!.name))
+        .map((p) => {
+          const cw = olympianColorway(p.name)!
+          return {
+            name: cw.name,
+            hex: cw.hex,
+            slug: productSlug(p.name),
+            current: p.id === match.id,
+            order: OLYMPIAN_COLORWAYS.findIndex((c) => c.key === cw.key),
+          }
+        })
+        .sort((a, b) => a.order - b.order)
+        .map(({ name, hex, slug: s, current }) => ({ name, hex, slug: s, current }))
+    : []
+
   // Product structured data: lets search engines show rich results (price,
   // availability) and ties the product to the 7ENO/"Zeno" brand.
   const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.7eno.shop').replace(/\/+$/, '')
@@ -203,6 +229,7 @@ export default async function ProductPage({ params }: Props) {
         extraImages={extraImages}
         deals={deals}
         charityPartner={isLife4Hsp}
+        colorwaySiblings={colorwaySiblings}
       />
     </main>
   )

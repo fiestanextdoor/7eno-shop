@@ -43,6 +43,11 @@ interface ProductDetailProps {
   deals?: { id: string; title: string; discountCents: number }[]
   /** When true (the Life4HSP collaboration product), show the donation banner. */
   charityPartner?: boolean
+  /**
+   * Olympian colourway family: each colourway is its own product, so these
+   * swatches link between the sibling product pages (incl. the current one).
+   */
+  colorwaySiblings?: { name: string; hex: string; slug: string; current: boolean }[]
 }
 
 export default function ProductDetail({
@@ -61,6 +66,7 @@ export default function ProductDetail({
   extraImages = [],
   deals = [],
   charityPartner = false,
+  colorwaySiblings = [],
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
   const currency = variants[0]?.currency ?? 'EUR'
@@ -163,7 +169,10 @@ export default function ProductDetail({
     return () => clearTimeout(t)
   }, [added])
 
-  const colorLabel = brandNameFor(selectedColor || variants[0]?.color || '')
+  // Olympian products carry their colour in the product name (one product per
+  // colourway), so that name wins over the variant-derived colour label.
+  const currentColorway = colorwaySiblings.find((s) => s.current)
+  const colorLabel = currentColorway?.name ?? brandNameFor(selectedColor || variants[0]?.color || '')
 
   // Collection line, mirroring the shop's OG/Olympian split (classify() in
   // app/shop/page.tsx): anything named "Olympian" is the Olympian capsule, the
@@ -282,6 +291,40 @@ export default function ProductDetail({
           </>
         )}
 
+        {/* Olympian colourways: sibling products, rendered as the same colour
+            swatch row; picking one navigates to that colourway's product page. */}
+        {!hasColors && colorwaySiblings.length > 1 && (
+          <>
+            <div className={styles.sizeLabelRow}>
+              <span className={styles.sizeLabel}>Color</span>
+              <span className={styles.sizeCount}>{colorLabel}</span>
+            </div>
+            <div className={styles.colorSwatches}>
+              {colorwaySiblings.map((s) =>
+                s.current ? (
+                  <span
+                    key={s.slug}
+                    className={`${styles.colorSwatch} ${styles.colorSwatchSelected}`}
+                    style={{ background: s.hex }}
+                    title={s.name}
+                    aria-label={`${s.name} (selected)`}
+                    aria-current="page"
+                  />
+                ) : (
+                  <Link
+                    key={s.slug}
+                    href={`/shop/${s.slug}`}
+                    className={styles.colorSwatch}
+                    style={{ background: s.hex }}
+                    title={s.name}
+                    aria-label={s.name}
+                  />
+                )
+              )}
+            </div>
+          </>
+        )}
+
         {/* Sizes */}
         {uniqueSizes.length > 1 && (
           <>
@@ -386,7 +429,7 @@ export default function ProductDetail({
           </div>
           <div className={styles.detailRow}>
             <span className={styles.detailKey}>Collection</span>
-            <span className={`${styles.detailVal} ${styles.detailValAccent}`}>{collection} · SS 2026</span>
+            <span className={`${styles.detailVal} ${styles.detailValAccent}`}>{collection}</span>
           </div>
           <div className={styles.detailRow}>
             <span className={styles.detailKey}>Delivery</span>
