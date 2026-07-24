@@ -7,12 +7,59 @@ import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor, brandSwatchOverride } from '@/lib/color-utils'
+import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
 import type { NormalizedProduct } from '@/types/catalog'
 import styles from './shop.module.css'
 
-export const metadata: Metadata = {
-  title: 'Shop — 7ENO',
-  description: 'Browse the full 7ENO (Zeno) collection: OG and Olympian streetwear by Abra Entertainment.',
+/**
+ * Per-filter titles and descriptions. A shop that serves one generic title for
+ * every filter combination competes with itself; giving the collection views
+ * their own copy is what lets "Olympian" or "men's streetwear" rank at all.
+ */
+function describeFilters(gender: string, line: string, category: string): { title: string; description: string } {
+  const lineLabel = line === 'olympian' ? 'Olympian' : line === 'og' ? 'OG' : ''
+  const genderLabel = gender === 'men' ? "Men's" : gender === 'women' ? "Women's" : ''
+  const categoryLabel: Record<string, string> = {
+    tees: 'Tees', shorts: 'Shorts', swimwear: 'Swimwear', accessories: 'Accessories',
+  }
+  const parts = [genderLabel, lineLabel, categoryLabel[category] ?? ''].filter(Boolean)
+
+  if (parts.length === 0) {
+    return {
+      title: 'Shop all streetwear',
+      description:
+        'Browse the full 7ENO (Zeno) collection: OG and Olympian streetwear by Abra Entertainment. Free shipping over €75.',
+    }
+  }
+  const label = parts.join(' ')
+  return {
+    title: `${label} streetwear`,
+    description: `Shop ${label} pieces from 7ENO (Zeno), the official streetwear store by Abra Entertainment. Free shipping over €75.`,
+  }
+}
+
+interface MetaProps {
+  searchParams: Promise<{ gender?: string; line?: string; category?: string }>
+}
+
+export async function generateMetadata({ searchParams }: MetaProps): Promise<Metadata> {
+  const { gender = '', line = '', category = '' } = await searchParams
+  const { title, description } = describeFilters(gender, line, category)
+
+  // Line views are real landing pages and get a self-canonical (they're in the
+  // sitemap). Every other filter combination points back at /shop so the same
+  // products don't compete as near-duplicate URLs.
+  const isLineLanding = (line === 'olympian' || line === 'og') && !gender && !category
+  const canonical = isLineLanding ? `/shop?line=${line}` : '/shop'
+
+  return {
+    title,
+    description,
+    keywords: BRAND_KEYWORDS,
+    alternates: { canonical },
+    openGraph: { title: `${title} · 7ENO (Zeno)`, description, url: absoluteUrl(canonical), type: 'website' },
+    twitter: { card: 'summary_large_image', title: `${title} · 7ENO (Zeno)`, description },
+  }
 }
 
 // ── Keyword-based classification ──────────────────────────────────────────────
@@ -263,8 +310,44 @@ export default async function ShopPage({ searchParams }: Props) {
   if (category && categoryLabels[category]) titleParts.push(categoryLabels[category])
   const pageTitle = titleParts.length > 0 ? titleParts.join(' ') : 'The OG Collection'
 
+  // CollectionPage + ItemList: tells search engines this is a product listing
+  // and which products it holds, so the listing can surface as a rich result
+  // instead of a plain blue link.
+  const { description: collectionDescription } = describeFilters(gender, effectiveLine, category)
+  const collectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${pageTitle} — 7ENO (Zeno)`,
+    description: collectionDescription,
+    url: absoluteUrl('/shop'),
+    isPartOf: { '@id': `${BASE_URL}/#website` },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: visibleCards.length,
+      itemListElement: visibleCards.slice(0, 50).map(({ product: p }, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: p.name,
+        url: absoluteUrl(`/shop/${productSlug(p.name)}`),
+      })),
+    },
+  }
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: pageTitle, path: '/shop' },
+  ])
+
   return (
     <main className={`${styles.page} oly-theme`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div>

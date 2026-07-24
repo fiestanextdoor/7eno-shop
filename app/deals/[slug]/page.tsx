@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav/Nav'
 import { getBundleBySlug, getBundles, computeBundlePricing, lowestVariantPriceCents } from '@/lib/bundles'
 import { getCatalogProduct } from '@/lib/catalog'
+import { absoluteUrl } from '@/lib/seo'
 import BundleConfigurator, { type BundleProductData } from './BundleConfigurator'
 
 interface Props {
@@ -16,7 +17,22 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const bundle = getBundleBySlug(slug)
-  return { title: bundle ? `${bundle.title} — 7ENO` : '7ENO' }
+  if (!bundle) return { title: 'Deal not found' }
+  const description =
+    bundle.description ??
+    `${bundle.title}: a curated 7ENO (Zeno) set at a combined price. Official streetwear by Abra Entertainment.`
+  return {
+    title: bundle.title,
+    description,
+    alternates: { canonical: `/deals/${slug}` },
+    openGraph: {
+      title: `${bundle.title} · 7ENO (Zeno)`,
+      description,
+      url: absoluteUrl(`/deals/${slug}`),
+      type: 'website',
+    },
+    twitter: { card: 'summary_large_image', title: `${bundle.title} · 7ENO (Zeno)`, description },
+  }
 }
 
 export default async function DealPage({ params }: Props) {

@@ -7,16 +7,33 @@ import { resolveCardImage } from '@/lib/card-image'
 import { getProductImageOverride } from '@/lib/product-images'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex } from '@/lib/color-utils'
+import { absoluteUrl } from '@/lib/seo'
 import { productSlug } from '@/lib/slug'
 import type { NormalizedProduct } from '@/types/catalog'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import styles from './page.module.css'
 
+const HOME_DESCRIPTION =
+  '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections — free shipping over €75, 14-day returns.'
+
 export const metadata: Metadata = {
-  title: '7ENO · Premium Streetwear',
-  description:
-    '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections, track your shipments and manage your account.',
+  // `absolute` overrides the layout template: the homepage carries the full
+  // brand phrase itself rather than "… · 7ENO (Zeno)" twice.
+  title: { absolute: '7ENO (Zeno) · Premium Streetwear by Abra Entertainment' },
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: '7ENO (Zeno) · Premium Streetwear',
+    description: HOME_DESCRIPTION,
+    url: absoluteUrl('/'),
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '7ENO (Zeno) · Premium Streetwear',
+    description: HOME_DESCRIPTION,
+  },
 }
 
 // Line blocks laid out 50 / 25 / 25: a wide "Nieuwe Drop" tile, then 7ENO Daily

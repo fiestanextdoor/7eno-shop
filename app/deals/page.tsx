@@ -6,11 +6,23 @@ import BundleCover from '@/components/BundleCover/BundleCover'
 import { getBundles, computeBundlePricing, lowestVariantPriceCents } from '@/lib/bundles'
 import { getCatalogProduct } from '@/lib/catalog'
 import { resolveCardImage } from '@/lib/card-image'
+import { absoluteUrl } from '@/lib/seo'
 import styles from './deals.module.css'
 
+const DEALS_DESCRIPTION =
+  'Curated 7ENO (Zeno) sets at a combined price: matching streetwear pieces bundled with a discount. Free shipping over €75.'
+
 export const metadata: Metadata = {
-  title: 'Deals — 7ENO',
-  description: 'Curated 7ENO sets at a combined price.',
+  title: 'Deals — bundled streetwear sets',
+  description: DEALS_DESCRIPTION,
+  alternates: { canonical: '/deals' },
+  openGraph: {
+    title: 'Deals · 7ENO (Zeno)',
+    description: DEALS_DESCRIPTION,
+    url: absoluteUrl('/deals'),
+    type: 'website',
+  },
+  twitter: { card: 'summary_large_image', title: 'Deals · 7ENO (Zeno)', description: DEALS_DESCRIPTION },
 }
 
 export default async function DealsPage() {

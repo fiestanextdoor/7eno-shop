@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import CartProvider from '@/components/CartProvider/CartProvider'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
 import PageTransition from '@/components/PageTransition/PageTransition'
+import { BASE_URL, BRAND_KEYWORDS, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
 
 // Cormorant Garamond is the site-wide typeface for headings and body: a soft,
@@ -27,22 +28,56 @@ const spaceMono = Space_Mono({
   display: 'swap',
 })
 
+const SITE_DESCRIPTION =
+  '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections, with free shipping over €75.'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.7eno.shop'),
-  title: '7ENO · Divine Authority',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    // Every page sets its own short title; the template keeps the brand (and
+    // the "Zeno" spelling) in every SERP entry without repeating it by hand.
+    default: '7ENO (Zeno) · Premium Streetwear Store',
+    template: '%s · 7ENO (Zeno)',
+  },
   // "Zeno" is how the brand name is pronounced; spelling it out in the visible
   // description ties the search query "zeno" to the store.
-  description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections.',
-  keywords: ['7ENO', 'Zeno', 'Zeno streetwear', 'Zeno shop', 'Zeno kleding', '7eno shop', 'streetwear', 'Abra Entertainment', 'Olympian collection'],
+  description: SITE_DESCRIPTION,
+  keywords: BRAND_KEYWORDS,
   // Machine-readable site/app name. Keep this identical to the OAuth consent
   // screen app name ("7ENO") so Google's app verification sees a matching name.
   applicationName: '7ENO',
+  alternates: { canonical: '/' },
+  authors: [{ name: 'Abra Entertainment' }],
+  creator: 'Abra Entertainment',
+  publisher: '7ENO',
+  category: 'shopping',
+  // Let Google show full-size image previews and untruncated snippets. Without
+  // max-image-preview:large, product photos are shown as thumbnails (or not at
+  // all) in Search and Discover — the single highest-impact robots directive
+  // for a webshop.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     siteName: '7ENO',
-    title: '7ENO',
-    description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment.',
-    url: 'https://www.7eno.shop',
+    title: '7ENO (Zeno) · Premium Streetwear Store',
+    description: SITE_DESCRIPTION,
+    url: BASE_URL,
     type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '7ENO (Zeno) · Premium Streetwear Store',
+    description: SITE_DESCRIPTION,
   },
   // Google Search Console ownership verification (needed for Google OAuth app
   // verification). Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the token from
@@ -66,7 +101,14 @@ export default function RootLayout({
     <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
-        {/* Explicit site name for crawlers (matches the OAuth consent screen app name "7ENO").
+        {/* Product photos are served from the print providers' CDNs; warming the
+            connections early shaves a round trip off the largest image (LCP). */}
+        <link rel="preconnect" href="https://files.cdn.printful.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://files.cdn.printful.com" />
+        <link rel="dns-prefetch" href="https://images-api.printify.com" />
+        {/* Site-wide entity graph: who the brand is and what the site is. The
+            "Zeno" spellings let search engines link the spoken brand name to the
+            store (people hear "Zeno", not "7ENO").
             suppressHydrationWarning: some browser extensions inject a `src`/rewrite this
             <script> before React hydrates, which otherwise throws a hydration-mismatch
             warning. The server-rendered JSON-LD (what crawlers read) is unaffected. */}
@@ -76,25 +118,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@graph': [
-                {
-                  '@type': 'WebSite',
-                  name: '7ENO',
-                  // "Zeno" spellings let search engines link the spoken brand
-                  // name to the store (people hear "Zeno", not "7ENO").
-                  alternateName: ['Zeno', 'Zeno streetwear', 'Zeno shop', '7ENO streetwear store'],
-                  url: 'https://www.7eno.shop',
-                  description: '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment.',
-                },
-                {
-                  '@type': 'Organization',
-                  name: '7ENO',
-                  alternateName: ['Zeno', 'Zeno by Abra Entertainment'],
-                  url: 'https://www.7eno.shop',
-                  logo: 'https://www.7eno.shop/logos/beeldmerk-zwart.png',
-                  parentOrganization: { '@type': 'Organization', name: 'Abra Entertainment' },
-                },
-              ],
+              '@graph': [webSiteJsonLd(), organizationJsonLd()],
             }),
           }}
         />

@@ -6,13 +6,19 @@ export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.videoWrap} aria-hidden="true">
+        {/* poster paints immediately so the hero has a real Largest Contentful
+            Paint instead of waiting on the trailer; preload="metadata" keeps the
+            initial download small (the clip itself is several MB) while autoplay
+            still starts it. Both are Core Web Vitals wins, which Search uses as
+            a ranking signal. */}
         <video
           className={styles.video}
           autoPlay
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster="/olympian/hero-poster.jpg"
         >
           <source src="/olympian-trailer.mp4" type="video/mp4" />
         </video>

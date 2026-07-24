@@ -6,6 +6,8 @@ import { variantFrontImage, variantBackImage } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
+import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd, merchantPolicyJsonLd } from '@/lib/seo'
+import { FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES } from '@/lib/shipping'
 import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
@@ -28,17 +30,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const products = await getCatalogProducts().catch(() => [])
   const match = findBySlug(products, slug)
-  if (!match) return { title: '7ENO' }
+  if (!match) return { title: 'Product not found' }
   const collection = /olympian/i.test(match.name) ? 'Olympian' : 'OG'
-  const description = `${match.name} — ${collection} collection. Official 7ENO (Zeno) streetwear by Abra Entertainment.`
+  const description = `Buy the ${match.name} from the 7ENO (Zeno) ${collection} collection. Official streetwear by Abra Entertainment — free shipping over €75, 14-day returns.`
   return {
-    title: `${match.name} — 7ENO`,
+    title: match.name,
     description,
+    keywords: [match.name, `${match.name} 7ENO`, `${match.name} Zeno`, ...BRAND_KEYWORDS],
     alternates: { canonical: `/shop/${slug}` },
     openGraph: {
-      title: `${match.name} — 7ENO`,
+      title: `${match.name} · 7ENO (Zeno)`,
       description,
       type: 'website',
+      url: absoluteUrl(`/shop/${slug}`),
+      ...(match.thumbnailUrl ? { images: [{ url: match.thumbnailUrl, alt: match.name }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${match.name} · 7ENO (Zeno)`,
+      description,
       ...(match.thumbnailUrl ? { images: [match.thumbnailUrl] } : {}),
     },
   }
@@ -182,16 +192,37 @@ export default async function ProductPage({ params }: Props) {
     : []
 
   // Product structured data: lets search engines show rich results (price,
-  // availability) and ties the product to the 7ENO/"Zeno" brand.
-  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.7eno.shop').replace(/\/+$/, '')
+  // availability, return + shipping terms) and ties the product to the
+  // 7ENO/"Zeno" brand. Google ranks free product listings that carry return and
+  // shipping details above ones that don't, so those are included.
+  const collectionName = /olympian/i.test(detail!.name) ? 'Olympian' : 'OG'
   const priceCents = variants.map((v) => v.priceCents).filter((c) => c > 0)
+  const inStock = variants.some((v) => v.inStock !== false)
+  // Every distinct photo we resolved, so image search has more than one crop.
+  const schemaImages = [
+    ...new Set(
+      [productThumbnail, ...Object.values(colorImages), ...extraImages].filter(
+        (u): u is string => typeof u === 'string' && u.length > 0,
+      ),
+    ),
+  ].slice(0, 8)
+  const sizes = [...new Set(variants.map((v) => v.size).filter(Boolean))]
+  const colorNames = [...new Set(variants.map((v) => v.color).filter(Boolean))]
+
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
+    '@id': `${absoluteUrl(`/shop/${slug}`)}#product`,
     name: detail!.name,
-    ...(productThumbnail ? { image: productThumbnail } : {}),
-    url: `${baseUrl}/shop/${slug}`,
+    description: `${detail!.name} from the 7ENO (Zeno) ${collectionName} collection, by Abra Entertainment.`,
+    ...(schemaImages.length > 0 ? { image: schemaImages } : {}),
+    url: absoluteUrl(`/shop/${slug}`),
+    sku: `${match.provider}-${match.id}`,
     brand: { '@type': 'Brand', name: '7ENO', alternateName: 'Zeno' },
+    ...(colorNames.length > 0 ? { color: colorNames.join(', ') } : {}),
+    ...(sizes.length > 0 ? { size: sizes } : {}),
+    ...(materials.length > 0 ? { material: materials.join(', ') } : {}),
+    isPartOf: { '@id': `${BASE_URL}/#website` },
     ...(priceCents.length > 0
       ? {
           offers: {
@@ -199,19 +230,35 @@ export default async function ProductPage({ params }: Props) {
             priceCurrency: detail!.currency || 'EUR',
             lowPrice: (Math.min(...priceCents) / 100).toFixed(2),
             highPrice: (Math.max(...priceCents) / 100).toFixed(2),
-            availability: variants.some((v) => v.inStock !== false)
+            offerCount: variants.length,
+            url: absoluteUrl(`/shop/${slug}`),
+            availability: inStock
               ? 'https://schema.org/InStock'
               : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            seller: { '@id': `${BASE_URL}/#organization` },
+            ...merchantPolicyJsonLd(FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES),
           },
         }
       : {}),
   }
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+    { name: `${collectionName} collection`, path: `/shop?line=${collectionName.toLowerCase()}` },
+    { name: detail!.name, path: `/shop/${slug}` },
+  ])
 
   return (
     <main className={styles.page}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
       <ProductDetail
         provider={match.provider}
