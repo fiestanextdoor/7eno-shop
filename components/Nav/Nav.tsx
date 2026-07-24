@@ -14,6 +14,9 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const isHome = pathname === '/'
+  // The redesigned surfaces (homepage + shop list) get the Olympian palette, so
+  // the header turns teal there. Every other page keeps the original red header.
+  const themed = pathname === '/' || pathname === '/shop'
   const itemCount = useCartStore((s) => s.itemCount())
   const openCart = useCartStore((s) => s.openCart)
 
@@ -28,7 +31,7 @@ export default function Nav() {
   const visible = !isHome || scrolled
 
   return (
-    <nav className={`${styles.nav} ${visible ? styles.navVisible : ''}`} aria-label="Main navigation">
+    <nav className={`${styles.nav} ${visible ? styles.navVisible : ''} ${themed ? 'oly-palette' : ''}`} aria-label="Main navigation">
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="7ENO home">
           <LogoWordmark variant="butter" height={88} />

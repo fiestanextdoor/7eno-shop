@@ -7,12 +7,34 @@
   height: var(--nav-height);
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: background 0.35s ease, border-color 0.35s ease;
+  transition: background 0.35s ease, border-color 0.35s ease,
+    backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease;
 }
 
 .navVisible {
   background: var(--oxblood);
   border-bottom: 1px solid rgba(246, 243, 236, 0.1);
+}
+
+/* Olympian surfaces (home + shop) get a frosted-glass header instead of a solid
+   fill: a dark translucent tint keeps the bone icons/labels legible while the
+   blur reveals the video/page moving underneath, so it still reads clearly as a
+   header. It only applies once scrolled (.navVisible), so at the very top of the
+   homepage the header stays fully transparent with no blur. */
+.navVisible:global(.oly-palette) {
+  background: rgba(17, 17, 17, 0.42);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  border-bottom: 1px solid rgba(246, 243, 236, 0.14);
+  box-shadow: 0 1px 24px rgba(17, 17, 17, 0.25);
+}
+
+/* Graceful fallback: if the browser can't blur the backdrop, lean on a more
+   opaque tint so the header never turns into unreadable low-contrast glass. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .navVisible:global(.oly-palette) {
+    background: rgba(17, 17, 17, 0.82);
+  }
 }
 
 .inner {

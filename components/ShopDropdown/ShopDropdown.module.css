@@ -41,10 +41,13 @@
   top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
-  width: min(600px, 96vw);
-  background: var(--oxblood);
-  border: 1px solid rgba(246, 243, 236, 0.1);
-  padding: 32px 36px 36px;
+  width: min(460px, 96vw);
+  /* Frosted dark panel to match the header treatment (no teal fill). */
+  background: rgba(17, 17, 17, 0.82);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(246, 243, 236, 0.12);
+  padding: 16px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -57,78 +60,31 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* ── Row 1: Gender ── */
-.genderRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(246, 243, 236, 0.1);
-}
-
-.genderLink {
-  font-family: var(--font-mono);
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--bone);
-  text-decoration: none;
-  transition: opacity 0.15s;
-}
-
-.genderLink:hover {
-  opacity: 0.65;
-}
-
-.genderDivider {
-  display: block;
-  width: 1px;
-  height: 18px;
-  background: rgba(246, 243, 236, 0.2);
-}
-
-/* ── Row 2: 4 line tiles ── */
-.tilesRow {
+/* ── Two collection tiles ── */
+.tiles {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 0;
-}
-
-@media (max-width: 640px) {
-  .tilesRow {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .tile {
-  background: rgba(246, 243, 236, 0.06);
-  border: 1px solid rgba(246, 243, 236, 0.1);
-  color: rgba(246, 243, 236, 0.7);
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 14px 8px;
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 128px;
+  padding: 26px 18px;
+  background: rgba(246, 243, 236, 0.05);
+  border: 1px solid rgba(246, 243, 236, 0.12);
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
 .tile:hover {
-  background: rgba(246, 243, 236, 0.12);
-  color: var(--bone);
-  border-color: rgba(246, 243, 236, 0.25);
-}
-
-.tileActive {
-  background: rgba(246, 243, 236, 0.15);
-  color: var(--bone);
-  border-color: rgba(246, 243, 236, 0.35);
+  background: rgba(246, 243, 236, 0.1);
+  border-color: rgba(246, 243, 236, 0.3);
+  transform: translateY(-2px);
 }
 
 .tile:focus-visible {
@@ -136,81 +92,41 @@
   outline-offset: 2px;
 }
 
-/* ── Row 3: Subcategories ── */
-.subRow {
+/* 7ENO wordmark cell: caps the logo height so both marks read at a similar
+   optical weight. */
+.tileMark {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 4px 0;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0;
-  transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.2s ease;
+  height: 34px;
 }
 
-.subRowVisible {
-  max-height: 80px;
-  opacity: 1;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(246, 243, 236, 0.1);
+/* Olympian mark rendered as a butter-filled mask (same technique as the hero),
+   so it matches the wordmark's colour rather than showing its raw fill. */
+.tileOlympian {
+  display: block;
+  width: min(170px, 78%);
+  aspect-ratio: 3784 / 472;
+  background-color: var(--butter);
+  -webkit-mask: url(/logos/olympian.png) center / contain no-repeat;
+  mask: url(/logos/olympian.png) center / contain no-repeat;
 }
 
-.subItem {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  color: rgba(246, 243, 236, 0.75);
-  text-decoration: none;
-  padding: 4px 16px;
-  transition: color 0.15s;
-  border-right: 1px solid rgba(246, 243, 236, 0.12);
-}
-
-.subItem:last-child {
-  border-right: none;
-}
-
-.subItem:first-child {
-  padding-left: 16px;
-}
-
-.subItem:hover {
-  color: var(--bone);
-}
-
-.subItem:focus-visible {
-  outline: 2px solid var(--bone);
-  outline-offset: 2px;
-}
-
-/* ── Accessories row ── */
-.accessoriesRow {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(246, 243, 236, 0.1);
-  text-align: center;
-}
-
-.accessoriesLink {
+.tileLabel {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.6);
-  text-decoration: none;
+  color: rgba(246, 243, 236, 0.72);
   transition: color 0.15s;
 }
 
-.accessoriesLink:hover {
+.tile:hover .tileLabel {
   color: var(--bone);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dropdown  { transition: none; }
-  .trigger   { transition: none; }
-  .tile      { transition: none; }
-  .genderLink { transition: none; }
-  .subRow    { transition: none; }
-  .subItem   { transition: none; }
+  .dropdown { transition: none; }
+  .trigger  { transition: none; }
+  .tile     { transition: none; }
 }

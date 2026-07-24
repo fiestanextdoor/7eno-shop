@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Nav from '@/components/Nav/Nav'
 import CartDrawer from '@/components/CartDrawer/CartDrawer'
 import Footer from '@/components/Footer/Footer'
+import CheckoutHeader from '@/components/CheckoutHeader/CheckoutHeader'
 import StoreHydration from '@/components/StoreHydration/StoreHydration'
 import CookieBanner from '@/components/CookieBanner/CookieBanner'
 
@@ -17,6 +18,19 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   // (nothing to navigate to while the shop is locked).
   if (pathname === '/coming-soon') {
     return <>{children}</>
+  }
+
+  // Checkout is a sealed step: no nav, cart drawer or footer, only the centred
+  // logo, so the customer stays in the flow until the order is placed.
+  // StoreHydration stays so the cart the checkout reads is still loaded.
+  if (pathname === '/checkout') {
+    return (
+      <>
+        <StoreHydration />
+        <CheckoutHeader />
+        {children}
+      </>
+    )
   }
 
   return (

@@ -9,7 +9,9 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--oxblood);
+  /* Olympian '26 teal, applied site-wide (the preloader is recoloured on every
+     route; only the header keeps red on the unchanged pages). */
+  background: var(--oly-teal);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -2,38 +2,11 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { LogoWordmark } from '@/components/Logo/Logo'
 import styles from './ShopDropdown.module.css'
-
-const LINES = [
-  {
-    id: 'men-daily',
-    label: 'Men Daily',
-    href: '/shop?gender=men&line=daily',
-    items: ['Tees', 'Shorts', 'Swimwear'],
-  },
-  {
-    id: 'men-sport',
-    label: 'Men Sport',
-    href: '/shop?gender=men&line=sport',
-    items: ['Tees', 'Shorts'],
-  },
-  {
-    id: 'women-daily',
-    label: 'Women Daily',
-    href: '/shop?gender=women&line=daily',
-    items: ['Tees', 'Shorts', 'Swimwear'],
-  },
-  {
-    id: 'women-sport',
-    label: 'Women Sport',
-    href: '/shop?gender=women&line=sport',
-    items: ['Tees', 'Shorts'],
-  },
-]
 
 export default function ShopDropdown() {
   const [open, setOpen] = useState(false)
-  const [activeLine, setActiveLine] = useState<string | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleEnter = () => {
@@ -42,18 +15,10 @@ export default function ShopDropdown() {
   }
 
   const handleLeave = () => {
-    closeTimer.current = setTimeout(() => {
-      setOpen(false)
-      setActiveLine(null)
-    }, 120)
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
   }
 
-  const close = () => {
-    setOpen(false)
-    setActiveLine(null)
-  }
-
-  const activeLineData = LINES.find((l) => l.id === activeLine)
+  const close = () => setOpen(false)
 
   return (
     <div
@@ -70,51 +35,31 @@ export default function ShopDropdown() {
         className={`${styles.dropdown} ${open ? styles.dropdownOpen : ''}`}
         role="menu"
       >
-        {/* Row 1: Gender links */}
-        <div className={styles.genderRow}>
-          <Link href="/shop?gender=men" className={styles.genderLink} onClick={close}>
-            Men
+        <div className={styles.tiles}>
+          {/* The 7ENO wordmark leads to the original range. */}
+          <Link
+            href="/shop?line=og"
+            className={styles.tile}
+            onClick={close}
+            role="menuitem"
+            aria-label="OG Collection"
+          >
+            <span className={styles.tileMark}>
+              <LogoWordmark variant="butter" height={34} align="center" />
+            </span>
+            <span className={styles.tileLabel}>OG Collection</span>
           </Link>
-          <span className={styles.genderDivider} aria-hidden="true" />
-          <Link href="/shop?gender=women" className={styles.genderLink} onClick={close}>
-            Women
-          </Link>
-        </div>
 
-        {/* Row 2: 4 line tiles */}
-        <div className={styles.tilesRow}>
-          {LINES.map((line) => (
-            <button
-              key={line.id}
-              className={`${styles.tile} ${activeLine === line.id ? styles.tileActive : ''}`}
-              onMouseEnter={() => setActiveLine(line.id)}
-              onClick={() => setActiveLine(activeLine === line.id ? null : line.id)}
-            >
-              {line.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Row 3: Subcategories */}
-        <div className={`${styles.subRow} ${activeLineData ? styles.subRowVisible : ''}`}>
-          {activeLineData
-            ? activeLineData.items.map((item) => (
-                <Link
-                  key={item}
-                  href={`${activeLineData.href}&category=${item.toLowerCase()}`}
-                  className={styles.subItem}
-                  onClick={close}
-                >
-                  {item}
-                </Link>
-              ))
-            : null}
-        </div>
-
-        {/* Accessories */}
-        <div className={styles.accessoriesRow}>
-          <Link href="/shop?category=accessories" className={styles.accessoriesLink} onClick={close}>
-            Accessories
+          {/* The Olympian mark leads to the Olympian capsule. */}
+          <Link
+            href="/shop?line=olympian"
+            className={styles.tile}
+            onClick={close}
+            role="menuitem"
+            aria-label="Olympian Collection"
+          >
+            <span className={styles.tileOlympian} aria-hidden="true" />
+            <span className={styles.tileLabel}>Olympian Collection</span>
           </Link>
         </div>
       </div>

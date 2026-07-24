@@ -1,24 +1,27 @@
 import Link from 'next/link'
+import OlympianMark from './OlympianMark'
 import styles from './Hero.module.css'
 
 export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.videoWrap} aria-hidden="true">
-        <iframe
-          src="https://player.vimeo.com/video/1193664281?background=1&autoplay=1&loop=1&muted=1&playsinline=1"
+        <video
           className={styles.video}
-          allow="autoplay; fullscreen"
-          title=""
-        />
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src="/olympian-trailer.mp4" type="video/mp4" />
+        </video>
       </div>
       <div className={styles.overlay} />
 
       <div className={styles.content}>
-        <p className={styles.label}>Immortality is not a gift. It is a refusal</p>
-        <h1 className={styles.heading}>
-          Divine<br />Authority
-        </h1>
+        <p className={styles.label}>Endure trials, Become legend</p>
+        <OlympianMark />
         <div className={styles.buttons}>
           <Link href="/shop?gender=men" className={styles.btn}>
             Men

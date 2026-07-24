@@ -1,7 +1,9 @@
 .page {
-  min-height: calc(100vh - var(--nav-height));
+  /* Checkout runs under its own minimal logo header (no fixed site nav), so the
+     top padding no longer needs to clear the nav height. */
+  min-height: 60vh;
   background: var(--bone);
-  padding: calc(var(--nav-height) + 60px) var(--gutter) 60px;
+  padding: 48px var(--gutter) 60px;
 }
 
 .inner {

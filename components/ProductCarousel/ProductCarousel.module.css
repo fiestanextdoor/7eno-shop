@@ -7,11 +7,11 @@
   padding: 2px var(--gutter) 14px;
   /* Always-visible horizontal scrollbar (Firefox). */
   scrollbar-width: thin;
-  scrollbar-color: var(--oxblood) rgba(17, 17, 17, 0.12);
+  scrollbar-color: #111 rgba(17, 17, 17, 0.12);
 }
 
 .viewport:focus-visible {
-  outline: 2px solid var(--oxblood);
+  outline: 2px solid var(--ink);
   outline-offset: -2px;
 }
 
@@ -28,12 +28,12 @@
 }
 
 .viewport::-webkit-scrollbar-thumb {
-  background: var(--oxblood);
+  background: #111;
   border-radius: 999px;
 }
 
 .viewport::-webkit-scrollbar-thumb:hover {
-  background: #7a2223;
+  background: #000;
 }
 
 .track {

@@ -37,6 +37,37 @@
   }
 }
 
+/* ── Olympian '26 palette ──────────────────────────────────────────────────
+   The four brand colours plus a warm wheat ground. Applied ONLY through the
+   .oly-theme class, which is set on the homepage and /shop <main>. That class
+   re-defines the shared tokens for its subtree, so the nav, off-canvas cart,
+   footer and the account / checkout / deals pages keep the original look. */
+:root {
+  --oly-clay:  #b57446; /* clay (lookbook colourway) */
+  --oly-teal:  #297d95; /* primary / interactive accent */
+  --oly-wheat: #eddca2; /* tonal fills */
+  --oly-rosa:  #eda5b2; /* highlight / pop */
+  --oly-bg:    #F7EED6; /* page ground: the cream, lightened */
+}
+
+/* Token overrides shared by the page bodies (.oly-theme) and by chrome such as
+   the header and preloader (.oly-palette). Teal is the primary accent; the old
+   clay is dropped from the UI and survives only as one lookbook colourway. */
+.oly-theme,
+.oly-palette {
+  --paper:   #F1E7C6; /* warm wheat section ground */
+  --oxblood: var(--oly-teal); /* teal is the primary accent (was clay) */
+  --ink:     #241A12; /* warm espresso text */
+  --stone:   #8A7B5F; /* warm muted */
+  --rule:    #E4D6AE; /* wheat hairline */
+}
+
+/* Page bodies also carry the wheat ground; .oly-palette stays transparent so
+   the nav/preloader only inherit the recoloured tokens, not a background. */
+.oly-theme {
+  background: var(--oly-bg);
+}
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;

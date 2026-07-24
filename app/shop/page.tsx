@@ -32,6 +32,7 @@ interface Classification {
   isAccessory: boolean
   isClothing: boolean
   isSport: boolean
+  isOlympian: boolean
 }
 
 const ACCESSORY_KEYWORDS = [
@@ -66,7 +67,10 @@ function classify(name: string): Classification {
   const isAccessory = ACCESSORY_KEYWORDS.some((k) => n.includes(k))
   const isClothing = isTee || isShorts || isSwim
   const isSport = n.includes('sport') || n.includes('life4hsp')
-  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport }
+  // Collection split: anything named "Olympian" is the Olympian capsule; the
+  // rest is the original ("OG") 7ENO range.
+  const isOlympian = n.includes('olympian')
+  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport, isOlympian }
 }
 
 function inGender(gender: string, c: Classification): boolean {
@@ -78,8 +82,8 @@ function inGender(gender: string, c: Classification): boolean {
 }
 
 function inLine(line: string, c: Classification): boolean {
-  if (line === 'sport') return c.isSport
-  if (line === 'daily') return c.isClothing && !c.isSport
+  if (line === 'olympian') return c.isOlympian
+  if (line === 'og') return !c.isOlympian
   return true
 }
 
@@ -237,9 +241,9 @@ export default async function ShopPage({ searchParams }: Props) {
   ]
 
   const lineFilters = [
-    { label: 'All lines', href: buildHref({ gender, category }),                   active: !line || NO_LINE_CATEGORIES.has(category) },
-    { label: 'Daily',     href: buildHref({ gender, line: 'daily', category }),    active: line === 'daily' && !NO_LINE_CATEGORIES.has(category) },
-    { label: 'Sport',     href: buildHref({ gender, line: 'sport', category }),    active: line === 'sport' && !NO_LINE_CATEGORIES.has(category) },
+    { label: 'All lines', href: buildHref({ gender, category }),                      active: !line || NO_LINE_CATEGORIES.has(category) },
+    { label: 'OG',        href: buildHref({ gender, line: 'og', category }),           active: line === 'og' && !NO_LINE_CATEGORIES.has(category) },
+    { label: 'Olympian',  href: buildHref({ gender, line: 'olympian', category }),     active: line === 'olympian' && !NO_LINE_CATEGORIES.has(category) },
   ]
 
   const categoryFilters = [
@@ -253,14 +257,14 @@ export default async function ShopPage({ searchParams }: Props) {
   const titleParts: string[] = []
   if (gender === 'men') titleParts.push('Men')
   else if (gender === 'women') titleParts.push('Women')
-  const lineLabels: Record<string, string> = { daily: 'Daily', sport: 'Sport' }
+  const lineLabels: Record<string, string> = { og: 'OG', olympian: 'Olympian' }
   if (line && lineLabels[line] && !NO_LINE_CATEGORIES.has(category)) titleParts.push(lineLabels[line])
   const categoryLabels: Record<string, string> = { tees: 'Tees', shorts: 'Shorts', swimwear: 'Swimwear', accessories: 'Accessories' }
   if (category && categoryLabels[category]) titleParts.push(categoryLabels[category])
   const pageTitle = titleParts.length > 0 ? titleParts.join(' ') : 'The OG Collection'
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} oly-theme`}>
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div>

@@ -5,12 +5,17 @@
   max-width: 60vw;
   background: var(--bone);
   color: var(--ink);
+  /* Hairline frame so each product reads as a defined tile on the wheat section
+     ground now that the image area is a light neutral rather than a teal block. */
+  border: 1px solid var(--rule);
 }
 
 .imageWrap {
   position: relative;
   aspect-ratio: 4 / 5;
-  background: var(--oxblood);
+  /* Neutral bone canvas instead of the teal fill: keeps the merchandise the only
+     saturated thing on the card and matches the product detail gallery. */
+  background: var(--bone);
 }
 
 /* The image clips here (for the hover zoom) instead of on .imageWrap, so the
@@ -37,7 +42,7 @@
 .placeholder {
   position: absolute;
   inset: 0;
-  background: var(--oxblood);
+  background: var(--bone);
 }
 
 .imageLink:focus-visible {
@@ -58,20 +63,21 @@
 }
 
 /* A solid, sharp-edged add button (matching the brand's rectangular buttons):
-   bone at rest so it's unmissable on the photo, inverting to oxblood on hover.
-   This is the primary add-to-cart trigger, so the affordance is deliberate. */
+   ink at rest so it stays unmissable on the light neutral canvas, inverting to
+   bone on hover. This is the primary add-to-cart trigger, so the affordance is
+   deliberate. */
 .addBtn {
   flex-shrink: 0;
   width: 42px;
   height: 42px;
   padding: 0;
   border: none;
-  background: var(--bone);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--bone);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
@@ -82,8 +88,8 @@
 }
 
 .addBtn:hover {
-  background: var(--ink);
-  color: var(--bone);
+  background: var(--bone);
+  color: var(--ink);
   transform: translateY(-2px);
 }
 
@@ -113,7 +119,25 @@
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
   scrollbar-width: thin;
-  scrollbar-color: var(--oxblood) transparent;
+  scrollbar-color: #111 transparent;
+}
+
+.sizePopover::-webkit-scrollbar {
+  width: 6px;
+  -webkit-appearance: none;
+}
+
+.sizePopover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sizePopover::-webkit-scrollbar-thumb {
+  background: #111;
+  border-radius: 999px;
+}
+
+.sizePopover::-webkit-scrollbar-thumb:hover {
+  background: #000;
 }
 
 /* Opens only when the + icon is hovered/tapped (state-driven), never on a
@@ -145,7 +169,7 @@
 }
 
 .sizeChip:focus-visible {
-  outline: 2px solid var(--oxblood);
+  outline: 2px solid var(--ink);
   outline-offset: -2px;
 }
 

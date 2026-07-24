@@ -1,16 +1,143 @@
-/* ── Product carousel (latest products, manual horizontal scroll) ── */
-.carouselSection {
-  background: var(--paper);
-  padding: 28px 0 18px;
+/* ── Olympian '26 lookbook cards — four gap-less product cards under the hero.
+   Carousel-card structure: the model photo shows by default, the flat product
+   shot on hover, with the name + price below. ── */
+.olympianBand {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  background: var(--oly-bg);
 }
 
-/* ── Line blocks: 7ENO Daily / 7ENO Sport ── */
-/* Same --paper background as the carousel above, so the two sections flow into
-   one another (no top border separating them). */
+.olyCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.olyCardImage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  display: block;
+  text-decoration: none;
+}
+
+/* Colourway tint behind the photos: the backdrop the flat product shot floats
+   on when hovered, and the fallback until the photos are dropped in. */
+.olyClay  { background: var(--oly-clay); }
+.olyTeal  { background: var(--oly-teal); }
+.olyWheat { background: var(--oly-wheat); }
+.olyRosa  { background: var(--oly-rosa); }
+
+.olyMediaModel,
+.olyMediaProduct {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-repeat: no-repeat;
+  transition: opacity 0.5s ease, transform 0.6s ease;
+}
+
+/* Default: the model photo fills the card, anchored high to keep the face in. */
+.olyMediaModel {
+  background-size: cover;
+  background-position: center 12%;
+}
+
+/* Hover: the flat product shot floats (contained) on the colourway tint. */
+.olyMediaProduct {
+  background-size: 74%;
+  background-position: center;
+  opacity: 0;
+}
+
+.olyCard:hover .olyMediaModel,
+.olyCard:focus-within .olyMediaModel { opacity: 0; }
+
+.olyCard:hover .olyMediaProduct,
+.olyCard:focus-within .olyMediaProduct { opacity: 1; }
+
+/* Cards without a flat product shot (olyNoFlip) keep the model photo on hover
+   with a subtle zoom instead of cross-fading to the bare colourway tint. Placed
+   after the fade rules so it wins the equal-specificity tie. */
+.olyNoFlip:hover .olyMediaModel,
+.olyNoFlip:focus-within .olyMediaModel {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.olyCardImage:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: -4px;
+}
+
+/* Name + price row. Sits on the same off-white (--bone) as the standard shop
+   product cards, so the label strip under the photos reads as a clean white
+   card footer rather than the cream band ground. */
+.olyCardInfo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px 16px;
+  background: var(--bone);
+}
+
+.olyCardName {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--ink);
+  text-decoration: none;
+  /* Wrap to at most two lines rather than truncating on one: these four cards
+     differ only by colourway (Flamingo/Ocean/Sand/Coconut), which sits at the
+     end of the name and must stay visible on narrow cards. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.olyCardName:hover { text-decoration: underline; }
+
+.olyCardPrice {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+
+/* Two-up on phones; four thin slivers would be unreadable. Still gap-less. */
+@media (max-width: 700px) {
+  .olympianBand { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .olyMediaModel,
+  .olyMediaProduct { transition: none; }
+  .olyNoFlip:hover .olyMediaModel,
+  .olyNoFlip:focus-within .olyMediaModel { transform: none; }
+}
+
+/* ── Line blocks: 7ENO Daily / Olympian / 7ENO Sport — directly under the
+   lookbook band. ── */
 .categoryStrip {
   background: var(--paper);
-  padding: 40px var(--gutter) 64px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  padding: 40px var(--gutter) 30px;
+}
+
+/* ── Product carousel (latest products, manual horizontal scroll) — sits below
+   the line blocks on the same --paper ground so the two flow into one another;
+   the extra bottom padding sets it off from the dark Deals band that follows. ── */
+.carouselSection {
+  background: var(--paper);
+  padding: 28px 0 48px;
 }
 
 /* Wider than the global --max-width so the line blocks read bolder on large
@@ -135,15 +262,15 @@
   outline-offset: -4px;
 }
 
-/* Red brand glow on the hovered/focused tile. The z-index lift keeps the glow
+/* Teal brand glow on the hovered/focused tile. The z-index lift keeps the glow
    above the neighbouring tiles instead of being clipped by them. */
 .categoryCard:hover,
 .categoryCard:focus-visible {
   z-index: 1;
   box-shadow:
-    0 0 0 1px rgba(168, 38, 38, 0.6),
-    0 0 26px rgba(150, 30, 30, 0.55),
-    0 0 60px rgba(122, 22, 22, 0.45);
+    0 0 0 1px rgba(41, 125, 149, 0.6),
+    0 0 26px rgba(41, 125, 149, 0.5),
+    0 0 60px rgba(31, 95, 114, 0.42);
 }
 
 .categoryNum {
@@ -219,40 +346,36 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: var(--oxblood);
+  /* Solid ink ground (the old teal base + photo scrim are gone): a dark
+     contrast moment that makes the light set tiles pop. */
+  background: var(--ink);
   color: var(--bone);
-  padding: clamp(72px, 12vw, 132px) var(--gutter);
-  text-align: center;
+  padding: clamp(56px, 9vw, 108px) var(--gutter);
 }
 
-/* Optional background photo: drop one at /categories/deals.jpg. Missing → the
-   oxblood band + scrim still reads as an intentional design. */
-.dealsMedia {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: url(/categories/deals.jpg);
-  background-size: cover;
-  background-position: center;
-}
-
-.dealsBand::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(180deg, rgba(40, 9, 10, 0.72), rgba(20, 5, 5, 0.82));
+/* Copy on the left, the featured sets on the right; stacks on smaller screens. */
+.dealsInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) 1.5fr;
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
 }
 
 .dealsContent {
-  position: relative;
-  z-index: 2;
-  max-width: 640px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 18px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .dealsInner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 .dealsLabel {
@@ -336,10 +459,123 @@
   outline-offset: 4px;
 }
 
+/* Featured set tiles: light cards on the dark band, same tile language as the
+   carousel, so the sets read as merchandise and pop against the ink. */
+.dealsSets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.dealSet {
+  min-width: 0;
+}
+
+.dealSetLink {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.dealSetLink:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.dealSetLink:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}
+
+.dealSetCover {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--bone);
+}
+
+/* Blood-red savings badge: an on-brand accent (not the teal) that reads as a
+   deal at a glance. */
+.dealSetSave {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  background: #5c1a1b;
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+}
+
+.dealSetInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 13px 13px;
+  border-top: 1px solid rgba(17, 17, 17, 0.07);
+}
+
+.dealSetTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.98rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.dealSetPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dealSetFrom {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--stone);
+}
+
+.dealSetNow {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+/* Phones: let the three sets scroll horizontally instead of shrinking to
+   unreadable thirds. */
+@media (max-width: 620px) {
+  .dealsSets {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 4px var(--gutter);
+  }
+  .dealSet {
+    flex: 0 0 62%;
+    max-width: 240px;
+    scroll-snap-align: start;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .categoryCard,
   .categoryMedia,
   .dealsCta,
   .dealsCta::before,
-  .dealsCtaArrow { transition: none; }
+  .dealsCtaArrow,
+  .dealSetLink { transition: none; }
 }

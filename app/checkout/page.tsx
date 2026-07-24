@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useCartStore } from '@/store/cart'
 import { cartItemKey } from '@/lib/cart-key'
@@ -35,7 +34,6 @@ const EMPTY_FORM: AddressForm = {
 }
 
 export default function CheckoutPage() {
-  const router = useRouter()
   const { items, total } = useCartStore()
   const [form, setForm] = useState<AddressForm>(EMPTY_FORM)
   const [agreed, setAgreed] = useState(false)
@@ -168,16 +166,6 @@ export default function CheckoutPage() {
     <main className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.titleRow}>
-          <button
-            type="button"
-            className={styles.backBtn}
-            onClick={() => router.back()}
-            aria-label="Go back to the previous page"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
           <h1 className={styles.title}>Checkout</h1>
         </div>
         <span className={styles.label}>
