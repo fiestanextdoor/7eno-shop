@@ -47,7 +47,10 @@ export async function getProducts(): Promise<SyncProduct[]> {
   while (true) {
     const res = await fetch(
       `${PRINTFUL_BASE}/store/products?limit=${limit}&offset=${offset}`,
-      { headers: buildHeaders(getApiKey()), next: { revalidate: 3600 } }
+      // Short TTL on the product LIST so newly published or deleted products
+      // show up / disappear within a few minutes instead of a stale hour. The
+      // per-product detail below keeps the 1h cache (details rarely change).
+      { headers: buildHeaders(getApiKey()), next: { revalidate: 300 } }
     )
     if (!res.ok) throw new Error(`Printful error: ${res.status}`)
     const data: PrintfulListResponse<SyncProduct> = await res.json()

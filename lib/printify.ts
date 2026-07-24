@@ -215,7 +215,9 @@ export async function getProducts(): Promise<NormalizedProduct[]> {
   while (true) {
     const res = await fetch(
       `${PRINTIFY_BASE}/shops/${shopId}/products.json?page=${page}&limit=50`,
-      { headers: headers(), next: { revalidate: 3600 } }
+      // Short TTL on the product LIST (see printful.ts getProducts) so add/remove
+      // in the store reflects within minutes; details keep the 1h cache below.
+      { headers: headers(), next: { revalidate: 300 } }
     )
     if (!res.ok) throw new Error(`Printify products error: ${res.status}`)
     const data: PrintifyListResponse = await res.json()
