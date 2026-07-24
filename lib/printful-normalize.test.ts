@@ -3,6 +3,7 @@ import {
   normalizePrintfulDetail,
   variantFrontImage,
   variantBackImage,
+  variantMockupImages,
 } from './printful-normalize'
 import type { SyncProduct, PrintfulProductDetail, SyncVariant, PrintfulFile } from '@/types/printful'
 
@@ -117,5 +118,40 @@ describe('normalizePrintfulDetail', () => {
   })
   it('exposes a default price for cards', () => {
     expect(p.priceCents).toBe(4999)
+  })
+})
+
+describe('variantMockupImages', () => {
+  const FLAT = 'https://files.cdn.printful.com/files/ccc/tee-white-flat_preview.png'
+  const MODEL = 'https://files.cdn.printful.com/files/ddd/tee-white-mens-2_preview.png'
+
+  it('returns every mockup, never the raw print file', () => {
+    const v = variant([
+      file('front_dtf', 'art.png', PRINTFILE),
+      file('preview', 'tee-white-front.jpg', FRONT_MOCKUP),
+      file('mockup', 'tee-white-flat.jpg', FLAT),
+      file('mockup', 'tee-white-mens-2.jpg', MODEL),
+    ])
+    expect(variantMockupImages(v)).toEqual([FRONT_MOCKUP, FLAT, MODEL])
+  })
+
+  it('orders back angles last so the gallery leads with front views', () => {
+    const v = variant([
+      file('mockup', 'tee-white-back.jpg', BACK_MOCKUP),
+      file('mockup', 'tee-white-flat.jpg', FLAT),
+    ])
+    expect(variantMockupImages(v)).toEqual([FLAT, BACK_MOCKUP])
+  })
+
+  it('deduplicates a mockup that repeats across placements', () => {
+    const v = variant([
+      file('preview', 'tee-white-front.jpg', FRONT_MOCKUP),
+      file('mockup', 'tee-white-front-copy.jpg', FRONT_MOCKUP),
+    ])
+    expect(variantMockupImages(v)).toEqual([FRONT_MOCKUP])
+  })
+
+  it('is empty when the variant only carries print artwork', () => {
+    expect(variantMockupImages(variant([file('front_dtf', 'art.png', PRINTFILE)]))).toEqual([])
   })
 })

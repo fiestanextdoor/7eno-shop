@@ -45,6 +45,18 @@ export function variantBackImage(variant: SyncVariant): string | null {
   return back?.preview_url ?? null
 }
 
+/**
+ * Every generated mockup for a variant, deduplicated, front angles first and
+ * back angles last. Printful can carry several mockup styles per variant (flat,
+ * on-model, folded, detail crops); `variantFrontImage`/`variantBackImage` only
+ * ever surface two of them, so the product gallery uses this to show the rest.
+ */
+export function variantMockupImages(variant: SyncVariant): string[] {
+  const mocks = mockupFiles(variant)
+  const ordered = [...mocks.filter((f) => !isBackMockup(f)), ...mocks.filter(isBackMockup)]
+  return [...new Set(ordered.map((f) => f.preview_url).filter((u): u is string => Boolean(u)))]
+}
+
 /** List-level product (no variants) → normalized shell used for cards/grids. */
 export function normalizePrintfulProduct(p: SyncProduct): NormalizedProduct {
   return {

@@ -32,6 +32,12 @@ interface ProductDetailProps {
   baseImageUrl?: string | null
   colorImages?: Record<string, string>
   colorBackImages?: Record<string, string>
+  /**
+   * Remaining provider mockups per colour (flat, on-model, folded, detail
+   * crops), shown in the gallery after the front/back. Kept per colour so
+   * switching colour swaps the whole gallery, not just the main photo.
+   */
+  colorGalleryImages?: Record<string, string[]>
   /** Local front image that replaces the provider mockup for every colour. */
   frontOverride?: string | null
   /** Local back image used when the provider has no genuine back mockup. */
@@ -58,6 +64,7 @@ export default function ProductDetail({
   baseImageUrl = null,
   colorImages = {},
   colorBackImages = {},
+  colorGalleryImages = {},
   frontOverride = null,
   backOverride = null,
   euSizeMap = {},
@@ -106,8 +113,19 @@ export default function ProductDetail({
 
   const frontImageUrl = frontFor(selectedColor)
   const backImageUrl = backFor(selectedColor)
-  // Provider front/back mockups first, then any local lifestyle photos.
-  const gallery = [frontImageUrl, backImageUrl, ...extraImages].filter((u): u is string => Boolean(u))
+  // Front/back mockup first, then the colour's remaining provider mockups
+  // (flat, on-model, detail crops), then any local lifestyle photos. Deduped so
+  // a mockup that already serves as the front/back isn't repeated.
+  const gallery = [
+    ...new Set(
+      [
+        frontImageUrl,
+        backImageUrl,
+        ...(colorGalleryImages[selectedColor] ?? []),
+        ...extraImages,
+      ].filter((u): u is string => Boolean(u)),
+    ),
+  ]
 
   const colorVariants = hasColors && selectedColor
     ? variants.filter((v) => v.color === selectedColor)

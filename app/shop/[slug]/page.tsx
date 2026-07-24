@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
 import { getCatalogProducts, getCatalogProduct, findBySlug } from '@/lib/catalog'
-import { variantFrontImage, variantBackImage } from '@/lib/printful-normalize'
+import { variantFrontImage, variantBackImage, variantMockupImages } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
@@ -108,6 +108,7 @@ export default async function ProductPage({ params }: Props) {
   let materials: string[] = []
   let sizeGuide = null
   const colorBackImages: Record<string, string> = {}
+  const colorGalleryImages: Record<string, string[]> = {}
 
   if (match.provider === 'printful') {
     const detailPf = await getPrintfulProduct(match.id)
@@ -143,6 +144,19 @@ export default async function ProductPage({ params }: Props) {
         colorBackImages[color] = processed ?? url
       })
     )
+
+    // Remaining mockups per colour (flat, on-model, folded, detail crops) for
+    // the gallery. Used as-is: these are photographed scenes, so cutting the
+    // background out would ruin them — and it would spend remove.bg credits on
+    // images that don't need it. The front/back are dropped since the gallery
+    // already leads with those.
+    for (const variant of syncVariants) {
+      if (!variant.color || colorGalleryImages[variant.color]) continue
+      const front = variantFrontImage(variant)
+      const back = variantBackImage(variant)
+      const rest = variantMockupImages(variant).filter((u) => u !== front && u !== back)
+      if (rest.length > 0) colorGalleryImages[variant.color] = rest
+    }
   }
 
   // Local image overrides (used as-is, no remove.bg): front/back replacements
@@ -201,7 +215,12 @@ export default async function ProductPage({ params }: Props) {
   // Every distinct photo we resolved, so image search has more than one crop.
   const schemaImages = [
     ...new Set(
-      [productThumbnail, ...Object.values(colorImages), ...extraImages].filter(
+      [
+        productThumbnail,
+        ...Object.values(colorImages),
+        ...Object.values(colorGalleryImages).flat(),
+        ...extraImages,
+      ].filter(
         (u): u is string => typeof u === 'string' && u.length > 0,
       ),
     ),
@@ -268,6 +287,7 @@ export default async function ProductPage({ params }: Props) {
         baseImageUrl={bgRemovedBase}
         colorImages={colorImages}
         colorBackImages={colorBackImages}
+        colorGalleryImages={colorGalleryImages}
         frontOverride={imageOverride?.frontImage ?? null}
         backOverride={imageOverride?.backImage ?? null}
         euSizeMap={euSizeMap}
