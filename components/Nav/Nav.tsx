@@ -14,9 +14,11 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const isHome = pathname === '/'
-  // The redesigned surfaces (homepage + shop list) get the Olympian palette, so
-  // the header turns teal there. Every other page keeps the original red header.
-  const themed = pathname === '/' || pathname === '/shop'
+  // The redesigned surfaces (homepage, shop list and the content landing pages)
+  // get the Olympian palette, so the header turns teal there. Every other page
+  // — account, checkout, deals, the legal pages — keeps the original red header.
+  const THEMED_ROUTES = ['/', '/shop', '/olympian', '/about', '/size-guide', '/faq']
+  const themed = THEMED_ROUTES.includes(pathname)
   const itemCount = useCartStore((s) => s.itemCount())
   const openCart = useCartStore((s) => s.openCart)
 

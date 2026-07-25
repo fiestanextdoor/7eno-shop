@@ -2,11 +2,13 @@ import Link from 'next/link'
 import styles from './Footer.module.css'
 
 const LINKS = {
+  // The line filter is og | olympian; the old daily/sport values no longer
+  // match anything and silently fell through to "show everything".
   shop: [
     { label: 'Men', href: '/shop?gender=men' },
     { label: 'Women', href: '/shop?gender=women' },
-    { label: '7ENO Daily', href: '/shop?line=daily' },
-    { label: '7ENO Sport', href: '/shop?line=sport' },
+    { label: 'OG collection', href: '/shop?line=og' },
+    { label: "Olympian '26", href: '/olympian' },
   ],
   account: [
     { label: 'Sign in', href: '/account/login' },
@@ -15,6 +17,18 @@ const LINKS = {
     { label: 'Contact', href: 'mailto:info@7eno.shop' },
   ],
 }
+
+// Bottom bar: the content pages sit alongside the legal ones so every page is
+// reachable from anywhere on the site (crawlers follow these too).
+const BOTTOM_LINKS = [
+  { label: 'About', href: '/about' },
+  { label: 'Size guide', href: '/size-guide' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Deals', href: '/deals' },
+  { label: 'Terms & Conditions', href: '/terms' },
+  { label: 'Returns', href: '/returns' },
+  { label: 'Privacy Policy', href: '/privacy' },
+]
 
 export default function Footer() {
   return (
@@ -81,19 +95,12 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className={styles.bottom}>
         <span className={styles.copy}>© 2026 7ENO · KvK 42081073 · All rights reserved.</span>
-        <div style={{ display: 'flex', gap: '24px' }}>
-          <Link href="/deals" className={styles.copy} style={{ textDecoration: 'none' }}>
-            Deals
-          </Link>
-          <Link href="/terms" className={styles.copy} style={{ textDecoration: 'none' }}>
-            Terms &amp; Conditions
-          </Link>
-          <Link href="/returns" className={styles.copy} style={{ textDecoration: 'none' }}>
-            Returns
-          </Link>
-          <Link href="/privacy" className={styles.copy} style={{ textDecoration: 'none' }}>
-            Privacy Policy
-          </Link>
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+          {BOTTOM_LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className={styles.copy} style={{ textDecoration: 'none' }}>
+              {l.label}
+            </Link>
+          ))}
         </div>
       </div>
     </footer>

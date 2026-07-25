@@ -109,6 +109,23 @@ export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
 }
 
 /**
+ * FAQPage node. Google can expand these straight into the search result, which
+ * takes up more of the page and answers the question before the click — so the
+ * answers here must match the visible text on the page exactly.
+ */
+export function faqJsonLd(entries: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: entries.map((e) => ({
+      '@type': 'Question',
+      name: e.question,
+      acceptedAnswer: { '@type': 'Answer', text: e.answer },
+    })),
+  }
+}
+
+/**
  * Return + shipping policy nodes. Google shows these directly in free product
  * listings, and a product without them is ranked below one that has them.
  * Values mirror the /returns page and lib/shipping.ts.

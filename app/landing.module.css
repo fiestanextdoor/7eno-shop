@@ -1,0 +1,479 @@
+/* Shared editorial styling for the content landing pages (/olympian, /about,
+   /size-guide, /faq). One module for all four so they read as one family and
+   the shop's Olympian palette carries straight through from a search result
+   into the product pages. */
+
+.page {
+  background: var(--oly-bg);
+  min-height: 100vh;
+  padding: calc(var(--nav-height) + 32px) var(--gutter) 96px;
+  color: var(--ink);
+}
+
+.inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.innerWide {
+  max-width: 1180px;
+}
+
+/* ── Hero ── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--oly-teal);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: clamp(1.08rem, 2.2vw, 1.3rem);
+  line-height: 1.7;
+  color: var(--ink);
+  max-width: 62ch;
+  opacity: 0.86;
+}
+
+/* Four-colour band: the same lock-up as the lookbook and the OG image, so a
+   visitor landing from search meets the collection's palette immediately. */
+.band {
+  display: flex;
+  height: 10px;
+  width: min(360px, 60%);
+  overflow: hidden;
+  border-radius: 99px;
+}
+
+.band span { flex: 1; }
+
+/* ── Sections ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+
+.h2 {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.body {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--ink);
+  opacity: 0.82;
+  max-width: 68ch;
+}
+
+.body + .body { margin-top: -4px; }
+
+.link {
+  color: var(--oly-teal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover { opacity: 0.75; }
+
+/* ── Call to action ── */
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.cta,
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 16px 34px;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.cta {
+  background: var(--oly-teal);
+  color: #fff;
+  border: 1px solid var(--oly-teal);
+}
+
+.cta:hover { background: #1f5f72; border-color: #1f5f72; }
+
+.ctaGhost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.ctaGhost:hover { border-color: var(--oly-teal); color: var(--oly-teal); }
+
+.cta:focus-visible,
+.ctaGhost:focus-visible {
+  outline: 2px solid var(--oly-teal);
+  outline-offset: 3px;
+}
+
+/* ── Colourway cards (Olympian) ── */
+.colourways {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.colourway {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 220px;
+  padding: 20px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.4s ease;
+}
+
+.colourway:hover { transform: translateY(-4px); }
+
+.colourway:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+}
+
+.colourwayName {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.35rem;
+}
+
+.colourwayNote {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Light colourways keep espresso text; the two dark ones flip to bone. */
+.onDark { color: #F7EED6; }
+
+/* ── Product grid ── */
+.products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* The card is built from <a>/<span>, which are inline by default — without an
+   explicit display the image box collapses and aspect-ratio never applies. */
+.product {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.productImage {
+  display: block;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--paper);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.productImage img {
+  object-fit: contain;
+  padding: 12px;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product:hover .productImage img { transform: scale(1.05); }
+
+.productName {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.productPrice {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--stone);
+  margin-top: 3px;
+}
+
+/* ── Facts / trust grid ── */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.fact {
+  background: var(--oly-bg);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.factKey {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--oly-teal);
+}
+
+.factVal {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* ── Size tables ── */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 460px;
+}
+
+.table caption {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--stone);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.table th,
+.table td {
+  padding: 11px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+
+.table thead th {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td { border-bottom: none; }
+
+/* ── Steps ── */
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.stepNum {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  color: #fff;
+  background: var(--oly-teal);
+  width: 30px;
+  height: 30px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepBody { font-size: 1.02rem; line-height: 1.7; opacity: 0.85; }
+
+.stepTitle {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.15rem;
+  opacity: 1;
+  margin-bottom: 4px;
+}
+
+/* ── FAQ accordion (native details/summary: works without JS, and the answers
+       stay in the HTML so the FAQPage structured data matches what's shown) ── */
+.faqGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--rule);
+}
+
+.faqQuestion {
+  cursor: pointer;
+  list-style: none;
+  padding: 18px 40px 18px 0;
+  position: relative;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.faqQuestion::-webkit-details-marker { display: none; }
+
+.faqQuestion::after {
+  content: '+';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--oly-teal);
+  transition: transform 0.25s ease;
+}
+
+.faqItem[open] .faqQuestion::after {
+  content: '−';
+}
+
+.faqQuestion:focus-visible {
+  outline: 2px solid var(--oly-teal);
+  outline-offset: 2px;
+}
+
+.faqAnswer {
+  padding: 0 0 20px;
+  font-size: 1.02rem;
+  line-height: 1.75;
+  opacity: 0.82;
+  max-width: 68ch;
+}
+
+/* ── Cross links between the landing pages ── */
+.related {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.relatedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 20px;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.relatedCard:hover {
+  border-color: var(--oly-teal);
+  transform: translateY(-3px);
+}
+
+.relatedTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.relatedNote {
+  font-size: 0.92rem;
+  opacity: 0.72;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .colourways { grid-template-columns: repeat(2, 1fr); }
+  .products { grid-template-columns: repeat(2, 1fr); }
+  .facts { grid-template-columns: 1fr; }
+  .related { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .inner { gap: 44px; }
+  .section { padding-top: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .colourway,
+  .productImage img,
+  .relatedCard,
+  .cta,
+  .ctaGhost,
+  .faqQuestion::after { transition: none; }
+  .colourway:hover,
+  .relatedCard:hover { transform: none; }
+}
