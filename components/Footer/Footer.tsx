@@ -1,34 +1,47 @@
 import Link from 'next/link'
 import styles from './Footer.module.css'
 
-const LINKS = {
-  // The line filter is og | olympian; the old daily/sport values no longer
-  // match anything and silently fell through to "show everything".
+interface FooterLink {
+  label: string
+  href: string
+  /** mailto/external: rendered as a plain anchor rather than a route link. */
+  external?: boolean
+}
+
+// The account pages (sign in, register, profile) used to sit here. They are
+// personal, carry noindex, and are already one click away from the account
+// button in the header — so the column now holds the pages a visitor actually
+// wants before buying. The line filter is og | olympian; the old daily/sport
+// values matched nothing and silently fell through to "show everything".
+const LINKS: Record<'shop' | 'help', FooterLink[]> = {
   shop: [
     { label: 'Men', href: '/shop?gender=men' },
     { label: 'Women', href: '/shop?gender=women' },
     { label: 'OG collection', href: '/shop?line=og' },
     { label: "Olympian '26", href: '/olympian' },
+    { label: 'Deals', href: '/deals' },
   ],
-  account: [
-    { label: 'Sign in', href: '/account/login' },
-    { label: 'Register', href: '/account/register' },
-{ label: 'Profile', href: '/account/profile' },
-    { label: 'Contact', href: 'mailto:info@7eno.shop' },
+  help: [
+    { label: 'Size guide', href: '/size-guide' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Returns & refunds', href: '/returns' },
+    { label: 'Contact', href: 'mailto:info@7eno.shop', external: true },
   ],
 }
 
-// Bottom bar: the content pages sit alongside the legal ones so every page is
-// reachable from anywhere on the site (crawlers follow these too).
-const BOTTOM_LINKS = [
-  { label: 'About', href: '/about' },
-  { label: 'Size guide', href: '/size-guide' },
-  { label: 'FAQ', href: '/faq' },
-  { label: 'Deals', href: '/deals' },
+// Bottom bar: the brand story and the legal pages, reachable from every page.
+const BOTTOM_LINKS: FooterLink[] = [
+  { label: 'About 7ENO', href: '/about' },
   { label: 'Terms & Conditions', href: '/terms' },
-  { label: 'Returns', href: '/returns' },
   { label: 'Privacy Policy', href: '/privacy' },
 ]
+
+function FooterLinkItem({ link, className }: { link: FooterLink; className: string }) {
+  if (link.external) {
+    return <a href={link.href} className={className}>{link.label}</a>
+  }
+  return <Link href={link.href} className={className}>{link.label}</Link>
+}
 
 export default function Footer() {
   return (
@@ -40,17 +53,17 @@ export default function Footer() {
           <ul className={styles.list}>
             {LINKS.shop.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className={styles.link}>{l.label}</Link>
+                <FooterLinkItem link={l} className={styles.link} />
               </li>
             ))}
           </ul>
         </div>
         <div className={styles.col}>
-          <p className={styles.colTitle}>Account</p>
+          <p className={styles.colTitle}>Help</p>
           <ul className={styles.list}>
-            {LINKS.account.map((l) => (
+            {LINKS.help.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className={styles.link}>{l.label}</Link>
+                <FooterLinkItem link={l} className={styles.link} />
               </li>
             ))}
           </ul>
