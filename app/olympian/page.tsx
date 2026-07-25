@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getCatalogProducts } from '@/lib/catalog'
 import { resolveCardImage } from '@/lib/card-image'
-import { classify } from '@/lib/product-classify'
+import { classify, olympianSortRank } from '@/lib/product-classify'
 import { OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
 import { productSlug } from '@/lib/slug'
 import { absoluteUrl, BASE_URL, breadcrumbJsonLd } from '@/lib/seo'
@@ -51,7 +51,11 @@ export default async function OlympianPage() {
     // Catalogue unavailable: the editorial content below still stands on its own.
   }
 
-  const olympian = products.filter((p) => classify(p.name).isOlympian)
+  // Same order as the shop's Olympian view: knitted tees, then tees, then
+  // backpacks, each in a fixed colourway sequence so colours line up in columns.
+  const olympian = products
+    .filter((p) => classify(p.name).isOlympian)
+    .sort((a, b) => olympianSortRank(a.name) - olympianSortRank(b.name))
 
   const cards = await Promise.all(
     olympian.map(async (p) => {

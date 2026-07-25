@@ -40,6 +40,28 @@ const GENDER_OVERRIDES: Array<{ match: string; gender: 'men' | 'women' | 'unisex
   { match: 'swim shorts', gender: 'men' },
 ]
 
+/**
+ * Display order inside the Olympian collection.
+ *
+ * The grid is four columns wide on desktop and the collection has exactly four
+ * colourways, so ordering type-major (knitted tees, then tees, then backpacks)
+ * and colour-minor puts one product type on each row and one colourway in each
+ * column — the pieces line up vertically by colour.
+ *
+ * Anything that matches neither list sorts to the end of its group rather than
+ * jumping to the front, so a newly published Olympian piece never breaks the
+ * grid before it is given a place here.
+ */
+const OLYMPIAN_COLOUR_ORDER = ['ocean', 'coconut', 'sand', 'flamingo']
+
+export function olympianSortRank(name: string): number {
+  const n = name.toLowerCase()
+  // "Knitted Tee" also contains "tee", so the knitted check has to come first.
+  const type = n.includes('knitted') ? 0 : n.includes('backpack') ? 2 : 1
+  const colour = OLYMPIAN_COLOUR_ORDER.findIndex((c) => n.includes(c))
+  return type * 10 + (colour === -1 ? OLYMPIAN_COLOUR_ORDER.length : colour)
+}
+
 export function classify(name: string): Classification {
   const n = name.toLowerCase()
   const genderOverride = GENDER_OVERRIDES.find((o) => n.includes(o.match))?.gender

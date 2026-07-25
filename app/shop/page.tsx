@@ -8,7 +8,7 @@ import { productSlug } from '@/lib/slug'
 import { removeBackground } from '@/lib/remove-bg'
 import { resolveHex, applyBrandOverride, resolveDisplayName, isNearWhite, resolveLogoColor, brandSwatchOverride } from '@/lib/color-utils'
 import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
-import { classify, type Classification } from '@/lib/product-classify'
+import { classify, olympianSortRank, type Classification } from '@/lib/product-classify'
 import type { NormalizedProduct } from '@/types/catalog'
 import styles from './shop.module.css'
 
@@ -160,7 +160,14 @@ export default async function ShopPage({ searchParams }: Props) {
   const LIFE4HSP_SORT = 9.5
   const sortPriority = (p: NormalizedProduct) =>
     /life4hsp/i.test(p.name) ? LIFE4HSP_SORT : (SORT_PRIORITY[p.id] ?? 99)
-  products.sort((a, b) => sortPriority(a) - sortPriority(b))
+
+  if (effectiveLine === 'olympian') {
+    // The Olympian view gets its own order so the capsule reads as a grid:
+    // one product type per row, one colourway per column (see olympianSortRank).
+    products.sort((a, b) => olympianSortRank(a.name) - olympianSortRank(b.name))
+  } else {
+    products.sort((a, b) => sortPriority(a) - sortPriority(b))
+  }
 
   // Remove.bg + color swatches in parallel for all filtered products
   const [bgRemovedUrls, productInfoMap] = await Promise.all([
