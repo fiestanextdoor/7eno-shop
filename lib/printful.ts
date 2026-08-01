@@ -328,9 +328,14 @@ export function isAutoConfirmEnabled(): boolean {
 export async function createOrder(
   recipient: PrintfulOrderRecipient,
   items: PrintfulOrderItem[],
-  externalId: string,
   shippingMethodId?: string
 ): Promise<{ id: number }> {
+  // Bewust GEEN external_id. Printful begrenst dat veld op 32 tekens en een
+  // live Stripe-sessie-id is er 66, dus elke order werd geweigerd met
+  // "Invalid External ID specified" (400) en bereikte Printful nooit. De
+  // status-webhook matcht daarom op printful_order_id; zie
+  // app/api/printful-webhook/route.ts, dat daar al op terugvalt.
+  //
   // confirm=1 submits the order straight to fulfillment; without it Printful
   // keeps the order as a draft awaiting manual confirmation in the dashboard.
   const url = `${PRINTFUL_BASE}/orders${isAutoConfirmEnabled() ? '?confirm=1' : ''}`
@@ -338,9 +343,6 @@ export async function createOrder(
     method: 'POST',
     headers: buildPrintfulHeaders(getApiKey()),
     body: JSON.stringify({
-      // external_id = Stripe session id, zodat de status-webhook de order
-      // terug kan matchen naar onze rij (net als bij Printify).
-      external_id: externalId,
       recipient,
       items,
       ...(shippingMethodId ? { shipping: shippingMethodId } : {}),

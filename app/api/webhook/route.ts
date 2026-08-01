@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     if (pfItems.length) {
       try {
-        const order = await createPrintfulOrder(printfulRecipient, pfItems, session.id, shipMethod) as unknown as { id?: number | string }
+        const order = await createPrintfulOrder(printfulRecipient, pfItems, shipMethod) as unknown as { id?: number | string }
         fulfillments.push({ provider: 'printful', order_id: String(order?.id ?? ''), status: 'processing' })
         console.log('[Webhook] Printful order created for session', session.id,
           isPrintfulAutoConfirm() ? '(auto-submitted)' : '(draft)')
