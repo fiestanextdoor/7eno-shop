@@ -6,7 +6,7 @@ import { buildVariantLookup as buildPrintifyLookup } from '@/lib/printify'
 import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
 import { getBundle } from '@/lib/bundles'
 import { resolveBundleDiscountCents, type BundleMemberItem } from '@/lib/bundle-discount'
-import { PROMO_CODE, PROMO_PERCENT_OFF, isValidPromoCode } from '@/lib/promo'
+import { findPromoCode, type PromoCode } from '@/lib/promo'
 import { createClient } from '@/lib/supabase/server'
 import type { NormalizedVariant } from '@/types/catalog'
 import type { CartItem } from '@/types/cart'
@@ -147,19 +147,10 @@ export async function POST(req: NextRequest) {
   const bundleDiscountCents = resolveBundleDiscountCents(bundleMembers, subtotalCents, getBundle)
 
   // Flat-rate shipping computed from the server-trusted subtotal: free above the
-  // threshold, otherwise the fixed fee. Never read from the client.
-  const shippingCents = computeShippingCents(subtotalCents)
-  const shippingOption: NonNullable<CheckoutParams['shipping_options']>[number] = {
-    shipping_rate_data: {
-      type: 'fixed_amount',
-      fixed_amount: { amount: shippingCents, currency },
-      display_name: shippingCents === 0 ? 'Free shipping' : 'Standard shipping',
-      delivery_estimate: {
-        minimum: { unit: 'business_day', value: 5 },
-        maximum: { unit: 'business_day', value: 10 },
-      },
-    },
-  }
+  // threshold, otherwise the fixed fee. Never read from the client. A discount
+  // code carrying freeShipping can still waive it below, once the code itself
+  // has been validated.
+  const baseShippingCents = computeShippingCents(subtotalCents)
 
   const cartJson = JSON.stringify(cartMeta)
   // Stripe metadata values are limited to 500 characters.
@@ -194,9 +185,10 @@ export async function POST(req: NextRequest) {
   // so it requires a signed-in account (that is how "one use per account" is
   // enforced — see coupon_redemptions). Every check is repeated here, never
   // trusting the client or the /api/promo/validate pre-check.
-  let appliedPromoCode: string | null = null
+  let appliedPromo: PromoCode | null = null
   if (typeof promoCode === 'string' && promoCode.trim() !== '') {
-    if (!isValidPromoCode(promoCode)) {
+    const promo = findPromoCode(promoCode)
+    if (!promo) {
       return NextResponse.json({ error: 'This discount code is not valid.' }, { status: 400 })
     }
     if (bundleMembers.length > 0) {
@@ -215,7 +207,7 @@ export async function POST(req: NextRequest) {
       .from('coupon_redemptions')
       .select('id')
       .eq('user_id', user.id)
-      .eq('code', PROMO_CODE)
+      .eq('code', promo.code)
       .maybeSingle()
     if (redeemed) {
       return NextResponse.json(
@@ -223,7 +215,21 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       )
     }
-    appliedPromoCode = PROMO_CODE
+    appliedPromo = promo
+  }
+
+  // Only a validated code can waive shipping, so this sits after the checks above.
+  const shippingCents = appliedPromo?.freeShipping ? 0 : baseShippingCents
+  const shippingOption: NonNullable<CheckoutParams['shipping_options']>[number] = {
+    shipping_rate_data: {
+      type: 'fixed_amount',
+      fixed_amount: { amount: shippingCents, currency },
+      display_name: shippingCents === 0 ? 'Free shipping' : 'Standard shipping',
+      delivery_estimate: {
+        minimum: { unit: 'business_day', value: 5 },
+        maximum: { unit: 'business_day', value: 10 },
+      },
+    },
   }
 
   const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
@@ -242,7 +248,7 @@ export async function POST(req: NextRequest) {
         cart: cartJson,
         ship_addr: JSON.stringify(addr),
         ...(user ? { user_id: user.id } : {}),
-        ...(appliedPromoCode ? { promo_code: appliedPromoCode } : {}),
+        ...(appliedPromo ? { promo_code: appliedPromo.code } : {}),
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/checkout`,
@@ -264,15 +270,17 @@ export async function POST(req: NextRequest) {
         name: 'Combi-deal',
       })
       sessionParams.discounts = [{ coupon: coupon.id }]
-    } else if (appliedPromoCode) {
+    } else if (appliedPromo) {
       // Validated discount code (not combinable with bundles, hence else-if).
       // A fresh single-use coupon is created per session; the account-level
-      // single-use is enforced separately via coupon_redemptions.
+      // single-use is enforced separately via coupon_redemptions. Free shipping
+      // is handled by the shipping option above, not by this coupon: a Stripe
+      // percent_off coupon only ever discounts line items.
       const coupon = await stripe.coupons.create({
-        percent_off: PROMO_PERCENT_OFF,
+        percent_off: appliedPromo.percentOff,
         duration: 'once',
         max_redemptions: 1,
-        name: appliedPromoCode,
+        name: appliedPromo.code,
       })
       sessionParams.discounts = [{ coupon: coupon.id }]
     }

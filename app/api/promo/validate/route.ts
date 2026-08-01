@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { PROMO_CODE, PROMO_PERCENT_OFF, isValidPromoCode } from '@/lib/promo'
+import { findPromoCode } from '@/lib/promo'
 
 /**
  * Validates a discount code for the signed-in user before checkout, so the page
@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  if (typeof code !== 'string' || !isValidPromoCode(code)) {
+  const promo = typeof code === 'string' ? findPromoCode(code) : null
+  if (!promo) {
     return NextResponse.json({ error: 'This discount code is not valid.' }, { status: 400 })
   }
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     .from('coupon_redemptions')
     .select('id')
     .eq('user_id', user.id)
-    .eq('code', PROMO_CODE)
+    .eq('code', promo.code)
     .maybeSingle()
 
   if (existing) {
@@ -45,5 +46,10 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  return NextResponse.json({ valid: true, code: PROMO_CODE, percentOff: PROMO_PERCENT_OFF })
+  return NextResponse.json({
+    valid: true,
+    code: promo.code,
+    percentOff: promo.percentOff,
+    freeShipping: promo.freeShipping,
+  })
 }

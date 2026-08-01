@@ -59,6 +59,7 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState('')
   const [appliedCode, setAppliedCode] = useState<string | null>(null)
   const [promoPercent, setPromoPercent] = useState(0)
+  const [promoFreeShipping, setPromoFreeShipping] = useState(false)
   const [promoMsg, setPromoMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
   const [promoNeedsLogin, setPromoNeedsLogin] = useState(false)
   const [promoLoading, setPromoLoading] = useState(false)
@@ -77,7 +78,9 @@ export default function CheckoutPage() {
   // subtotal, so it is known immediately, without an extra "calculate" step or
   // a round-trip for the destination.
   const subtotal = total()
-  const shippingCost = computeShippingCents(Math.round(subtotal * 100)) / 100
+  // A discount code can waive the fee outright; otherwise it follows the
+  // subtotal threshold. The server recomputes this, the page only displays it.
+  const shippingCost = promoFreeShipping ? 0 : computeShippingCents(Math.round(subtotal * 100)) / 100
   const freeShipping = shippingCost === 0
   const remainingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
   // Display only: the discount applies to the product subtotal (not shipping).
@@ -106,10 +109,15 @@ export default function CheckoutPage() {
       if (res.ok && data.valid) {
         setAppliedCode(data.code)
         setPromoPercent(data.percentOff)
-        setPromoMsg({ type: 'success', text: `Code ${data.code} applied — ${data.percentOff}% off.` })
+        setPromoFreeShipping(Boolean(data.freeShipping))
+        setPromoMsg({
+          type: 'success',
+          text: `Code ${data.code} applied: ${data.percentOff}% off${data.freeShipping ? ' and free shipping' : ''}.`,
+        })
       } else {
         setAppliedCode(null)
         setPromoPercent(0)
+        setPromoFreeShipping(false)
         setPromoNeedsLogin(res.status === 401)
         setPromoMsg({ type: 'error', text: data.error ?? 'Could not apply this code.' })
       }
@@ -123,6 +131,7 @@ export default function CheckoutPage() {
   const removePromo = () => {
     setAppliedCode(null)
     setPromoPercent(0)
+    setPromoFreeShipping(false)
     setPromoInput('')
     setPromoMsg(null)
     setPromoNeedsLogin(false)
@@ -300,6 +309,7 @@ export default function CheckoutPage() {
             <div className={styles.promoApplied}>
               <span className={styles.promoAppliedText}>
                 Code <strong>{appliedCode}</strong> · {promoPercent}% off
+                {promoFreeShipping ? ' · free shipping' : ''}
               </span>
               <button type="button" className={styles.promoRemove} onClick={removePromo}>
                 Remove
@@ -370,9 +380,11 @@ export default function CheckoutPage() {
             </span>
           </div>
           <p className={styles.shippingNote}>
-            {freeShipping
-              ? `✓ You qualify for free shipping (orders over €${FREE_SHIPPING_THRESHOLD.toFixed(0)}).`
-              : `Flat €${FLAT_SHIPPING_RATE.toFixed(2)} shipping. Add €${remainingForFree.toFixed(2)} more for free shipping.`}
+            {promoFreeShipping
+              ? `✓ Free shipping included with code ${appliedCode}.`
+              : freeShipping
+                ? `✓ You qualify for free shipping (orders over €${FREE_SHIPPING_THRESHOLD.toFixed(0)}).`
+                : `Flat €${FLAT_SHIPPING_RATE.toFixed(2)} shipping. Add €${remainingForFree.toFixed(2)} more for free shipping.`}
           </p>
         </div>
 
