@@ -23,7 +23,7 @@
 
 .headerLabel {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.75rem;
   letter-spacing: 4px;
   text-transform: uppercase;
   color: var(--oxblood);
@@ -41,7 +41,7 @@
 
 .count {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.75rem;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--stone);
