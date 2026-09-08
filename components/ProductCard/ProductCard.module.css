@@ -244,19 +244,36 @@
 
 .swatches {
   display: flex;
-  gap: 6px;
+  gap: 0;
   align-items: center;
   flex-shrink: 0;
 }
 
+/* 24px visual chip inside a 44px tap zone: the padding is the hit area,
+   background-clip keeps the colour on the chip only. */
 .swatch {
   display: block;
   width: 24px;
   height: 24px;
+  padding: 10px;
+  box-sizing: content-box;
+  background-clip: content-box;
   border-radius: 3px;
   flex-shrink: 0;
+  position: relative;
+}
+
+.swatch + .swatch {
+  margin-left: -4px;
+}
+
+.swatch::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 3px;
   box-shadow: 0 0 0 1.5px rgba(17, 17, 17, 0.22);
-  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Touch devices have no real hover: never reveal the slide-up "View Product"

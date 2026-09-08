@@ -63,6 +63,10 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
             src={baseSrc}
             alt={product.name}
             fill
+            // The first row sits above the fold: lazy images there stayed blank
+            // until the visitor scrolled (Lenis-driven page, see ux audit
+            // 2026-09-08). Eager + high fetch priority also covers the LCP.
+            priority={index < 4}
             className={styles.image}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />

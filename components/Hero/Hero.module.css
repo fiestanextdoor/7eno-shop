@@ -57,11 +57,11 @@
 
 .label {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 5px;
+  font-size: 0.8rem;
+  letter-spacing: 4px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.7);
-  text-shadow: 0 1px 12px rgba(17, 17, 17, 0.9);
+  color: var(--bone);
+  text-shadow: 0 1px 12px rgba(17, 17, 17, 0.9), 0 0 2px rgba(17, 17, 17, 0.8);
   margin-bottom: 16px;
 }
 
@@ -195,10 +195,10 @@
 
 .scrollLabel {
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(246, 243, 236, 0.4);
+  color: rgba(246, 243, 236, 0.6);
   writing-mode: vertical-rl;
 }
 
