@@ -66,7 +66,10 @@ export default function ProductCard({ product, index = 0, imageUrl, hoverImageUr
             // The first row sits above the fold: lazy images there stayed blank
             // until the visitor scrolled (Lenis-driven page, see ux audit
             // 2026-09-08). Eager + high fetch priority also covers the LCP.
-            priority={index < 4}
+            // Next 16 deprecates `priority`; loading + fetchPriority is the
+            // documented replacement (docs/01-app/.../image.md).
+            loading={index < 4 ? 'eager' : 'lazy'}
+            fetchPriority={index < 4 ? 'high' : undefined}
             className={styles.image}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
