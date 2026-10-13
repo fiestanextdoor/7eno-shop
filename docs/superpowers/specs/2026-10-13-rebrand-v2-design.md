@@ -1,6 +1,6 @@
 # 7eno.shop rebrand v2: ontwerpspec
 
-Datum: 13-10-2026, besluiten Joep verwerkt (release 1-11-2026, OG volledig weg, logo's volgen). Bron: `docs/research/2026-10-13-rebrand-brief.md`. Branch: `redesign/v2`.
+Datum: 13-10-2026, besluiten Joep verwerkt (release 1-11-2026, OG volledig weg, officieel palet en logo's uit `docs/brand/olympn-marketing-3`). Bron: `docs/research/2026-10-13-rebrand-brief.md`. Branch: `redesign/v2`.
 
 ## 1. Doel en kaders
 
@@ -14,33 +14,36 @@ Datum: 13-10-2026, besluiten Joep verwerkt (release 1-11-2026, OG volledig weg, 
 
 ## 2. Merk en design-tokens
 
-**Palet.** Afgeleid uit de hoodie-kleuren. Rose Red is het enige UI-accent. De overige hoodie-kleuren zijn alleen vlakken en swatches, nooit tekst.
+**Palet.** Het officiële OLYMPN-palet uit `docs/brand/olympn-marketing-3/pallet.png` (aangeleverd door Joep 13-10), aangevuld met navy en oranje uit de logo-ads. Dit vervangt het eerder uit de hoodie-kleuren afgeleide palet. Periwinkle is de merkkleur (het OLYMPN SPORT-woordmerk), oranje de "live"-kleur. Pastels halen op crème geen tekstcontrast: ze zijn vlakken, badges en swatches, nooit lopende tekst. Tekst is altijd navy.
 
 | Token | Waarde | Rol |
 |---|---|---|
-| `--c-bg` | `#F4EEE3` | Pagina-achtergrond (warm crème) |
-| `--c-surface` | `#EAE2D2` | Kaarten, productvlak, drawer |
-| `--c-dune` | `#C3B99C` | Tonale vlakken, Dune-swatch |
-| `--c-text` | `#0E0B0B` | Tekst, primaire knop (Obsidian), 16,97:1 op bg |
-| `--c-text-muted` | `#5E574C` | Meta, labels, 6,18:1 op bg |
-| `--c-border` | `#CFC4AD` | Haarlijnen (decoratief) |
-| `--c-border-strong` | `#766C5B` | Invoervelden, chips, 4,47:1 op bg, 4,01:1 op surface |
-| `--c-accent` | `#621926` | Rose Red: accentknop, badges, links in hover, 10,78:1 op bg |
-| `--c-olive` | `#3C3D2E` | Secundair donker vlak |
-| `--c-inverse-bg` | `#0E0B0B` | Donkere secties (OLYMPN Sport-landing) |
-| `--c-inverse-text` | `#C3B99C` | Tekst op donker, 10,02:1 |
-| `--c-success` | `#3E5A2E` | Succes, 6,72:1 op bg |
-| `--c-error` | `#A32020` | Fout, 6,53:1, altijd met tekst of icoon |
-| `--c-focus` | `#0E0B0B` | Focusring op licht (op donker: `--c-bg`) |
-| `--c-swatch-*` | `#621926` rose, `#9CAF92` pistachio, `#9E7551` mocha, `#0E0B0B` obsidian, `#C3B99C` dune, `#3C3D2E` olive, `#071429` maritime | Alleen swatches en drop-thema's |
+| `--c-bg` | `#F7F1DA` | Pagina-achtergrond (crème uit het palet) |
+| `--c-surface` | `#FFFFFF` | Kaarten, productvlak, drawer |
+| `--c-stone` | `#C4C4B5` | Tonale vlakken, haarlijnen (decoratief), Dune-swatch |
+| `--c-text` | `#2D3A4F` | Tekst, primaire knop (navy uit het 7ENO-logo), 9,6:1 op bg |
+| `--c-text-muted` | `#5B5A58` | Meta, labels, 5,6:1 op bg (donkere taupe; `#AAA1A1` zelf is te licht voor tekst) |
+| `--c-border-strong` | `#8A897F` | Invoervelden, chips, 3,3:1 op bg (UI-component-contrast) |
+| `--c-accent` | `#7995C7` | Periwinkle: merkkleur, accentvlakken, actieve chips, grote koppen op navy |
+| `--c-accent-ink` | `#3E5A8F` | Periwinkle verdonkerd voor links en tekst op crème, 5,0:1 |
+| `--c-live` | `#FEAB27` | Oranje: "Live now", aftelklok-cijfers op navy, nooit tekst op crème |
+| `--c-sage` | `#BACCB1` | Teaser-vlak ("Something is coming"), succes-vlak |
+| `--c-rose` | `#E8697D` | Sold out, fout-vlak (altijd met tekst of icoon) |
+| `--c-peach` | `#F5C190` | Secundair warm vlak, New in-badge |
+| `--c-inverse-bg` | `#2D3A4F` | Donkere secties (OLYMPN Sport-landing, footer) |
+| `--c-inverse-text` | `#F7F1DA` | Tekst op navy, 9,6:1 |
+| `--c-success` | `#3E5A2E` | Succes-tekst, 6,7:1 op bg |
+| `--c-error` | `#A32020` | Fout-tekst, 6,5:1 op bg |
+| `--c-focus` | `#2D3A4F` | Focusring op licht (op navy: `--c-live`) |
+| `--c-swatch-*` | hoodie-kleuren `#621926` rose red, `#9CAF92` pistachio, `#9E7551` mocha, `#0E0B0B` obsidian, `#C3B99C` dune, `#3C3D2E` olive, `#071429` maritime | Alleen kleurswatches van producten |
 
 **Typografie.** Google Fonts via `next/font/google`, zelf gehost.
 
 | Token | Waarde | Rol |
 |---|---|---|
-| `--f-display` | Archivo (variabel, `wght` 900, `wdth` 125) | Koppen, drop-titels; sluit aan op de "OLYMPN SPORT"-print. Terugval: Archivo Black |
+| `--f-display` | Archivo (variabel, `wght` 900, `wdth` 125, cursief voor drop-titels) | Koppen, drop-titels; sluit aan op het OLYMPN SPORT-woordmerk (brede cursieve sans). Terugval: Archivo Black |
 | `--f-body` | Instrument Sans 400/500/600 | Lopende tekst, UI |
-| `--f-mono` | IBM Plex Mono 400/500 | Labels, editienummers, prijzen in tabellen, klok |
+| `--f-mono` | IBM Plex Mono 400/500 | Labels, editienummers, prijzen in tabellen, klok; zelfde toon als de "SOMETHING IS COMING."-teaser |
 | `--fs-display` | `clamp(2.75rem, 8vw, 7.5rem)` | Hero |
 | `--fs-h1` / `--fs-h2` / `--fs-h3` | `clamp(2rem, 5vw, 4rem)` / `clamp(1.5rem, 3vw, 2.25rem)` / `1.25rem` | Koppen |
 | `--fs-body` / `--fs-small` / `--fs-label` | `1rem` / `0.875rem` / `0.75rem` | Tekst; labels uppercase, `letter-spacing: 0.08em` |
@@ -69,7 +72,7 @@ Koppen uppercase met `line-height: 0.95`. Body `line-height: 1.5`. Cijfers in kl
 
 Regels: CSS-transities, alleen `transform` en `opacity`. Onder `prefers-reduced-motion: reduce` zet `tokens.css` alle duren op `0.01ms` en staat de announcement-bar stil. GSAP komt er niet bij: geen onderdeel vraagt om een tijdlijn. Lenis en `PageTransition` vervallen (scroll-a11y, CLS).
 
-**Beeld.** Productbeeld is altijd een mockup op een egaal `--c-surface`-vlak, verhouding 4:5, gecentreerd met `object-fit: contain`. `lib/remove-bg.ts` blijft de achtergrond strippen. Geen campagnebeeld van andere merken. Hero's zonder campagnefoto's zijn typografisch: drop-titel in `--fs-display` op het drop-themavlak, met daaronder een rij vrijstaande mockups in alle kleuren. Olympian gebruikt de eigen modelfoto's uit `public/olympian`. Video alleen met poster (`olympian-trailer.mp4` plus `hero-poster.jpg`), `preload="none"` en niet op mobiel.
+**Beeld.** Productbeeld is altijd een mockup op een egaal `--c-surface`-vlak, verhouding 4:5, gecentreerd met `object-fit: contain`. `lib/remove-bg.ts` blijft de achtergrond strippen. Geen campagnebeeld van andere merken. Hero's: OLYMPN Sport heeft één modelfoto (`docs/brand/olympn-marketing-3/foto/Sam OLYMPN SPORT Dune Relaxed fit.png`, vrijstaand, 2091x3028) en twee ad-video's (`OLYMPN SPORT ad tiktok en insta.mov`, `OLYMPN SPORT ad Tess Pistachio.mov`, in de bronmap in Downloads, nog te transcoderen naar mp4/webm met poster). Hero = modelfoto op periwinkle of navy vlak met de drop-titel; daaronder een rij vrijstaande mockups in alle kleuren (Dune en Pistachio hebben front/back op hoge resolutie in `docs/brand/olympn-marketing-3/mockups`). Olympian gebruikt de eigen modelfoto's uit `public/olympian`. Video alleen met poster (`olympian-trailer.mp4` plus `hero-poster.jpg`), `preload="none"` en niet op mobiel.
 
 **Naast de oude tokens.** `styles/tokens.css` gebruikt nieuwe prefixen (`--c-`, `--f-`, `--fs-`, `--s-`, `--r-`, `--l-`, `--m-`). Die botsen niet met `--ink`, `--bone`, `--gutter`, `--font-sans` of `.oly-theme`. `app/layout.tsx` importeert `tokens.css` na `globals.css`. Nieuwe componenten gebruiken alleen nieuwe tokens. Oude CSS-modules blijven werken tot hun pagina is omgebouwd. In fase 5 verdwijnen de oude tokens, `.oly-theme`, `.oly-palette` en Cormorant/Space Mono.
 
@@ -230,7 +233,7 @@ Branch `redesign/v2`, vanaf master na PR A en B. Elke push geeft een Preview. Ve
 - **SEO:** `lib/seo.ts` en layout-metadata noemen "Olympian and OLYMPN Sport" in plaats van "OG and Olympian". `themeColor` `#0E0B0B`. Per collectiepagina eigen title en description.
 - **OG-image:** `app/opengraph-image.tsx` opnieuw, crème vlak, beeldmerk, titel in Archivo. Het fontbestand staat lokaal in `app/_fonts/` voor `ImageResponse`. Per collectie een eigen `opengraph-image.tsx` met het themavlak.
 - **Favicon en manifest:** `app/icon.tsx` en `app/manifest.ts` op basis van het beeldmerk uit `Onderdelen Beeldmerk 7ENO butter` (bovenkant 7, onderkant 7, bliksem). Manifest `background_color #F4EEE3`, `theme_color #0E0B0B`.
-- **Logo's (`public/logos`):** nieuwe set als SVG: beeldmerk Obsidian en crème, woordmerk Obsidian en crème, lockup "OLYMPN SPORT". Joep levert de vectorbestanden later aan; tot die tijd gebruikt fase 4 de bestaande PNG's uit `public/logos` en `Onderdelen Beeldmerk 7ENO butter` als tijdelijke basis (geen overtrekken). Favicon, OG-image en e-mailwoordmerk worden definitief gemaakt zodra de SVG's er zijn. Oude bestanden blijven tot fase 5 in gebruik, daarna weg.
+- **Logo's (`public/logos`):** bron is `docs/brand/olympn-marketing-3` (13-10): 7ENO-woordmerk (periwinkle op navy, `instagram logo nieuw.png`), OLYMPN SPORT-woordmerk met "BY 7ENO" (`foto/OLYMPN woordmerk oranje ad.png`, 3708x1203), OLYMPN ovaal-badge (`foto/OLYMPN  beeldmerk oranje ad.png`), teaser "SOMETHING IS COMING." (`something is coming.png`). De Affinity-bronnen (`.af`) staan in de Downloads-map; Joep exporteert daaruit SVG's (woordmerk en badge in navy, crème en periwinkle). Tot die tijd gebruikt fase 4 deze PNG's (hoog genoeg voor header en OG-image); favicon wordt definitief bij de SVG's. Oude bestanden in `public/logos` blijven tot fase 5 in gebruik, daarna weg.
 
 ## 9. Testen en kwaliteit
 
