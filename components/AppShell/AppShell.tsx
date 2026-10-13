@@ -10,7 +10,11 @@ import CookieBanner from '@/components/CookieBanner/CookieBanner'
 
 const HIDE_FOOTER = ['/account/login', '/account/register']
 
-export default function CartProvider({ children }: { children: React.ReactNode }) {
+/**
+ * Route chrome around every page: which header, drawer and footer a route
+ * gets. It provides no context; the cart lives in the Zustand store.
+ */
+export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const showFooter = !HIDE_FOOTER.some((p) => pathname.startsWith(p))
 
