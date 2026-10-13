@@ -1,6 +1,6 @@
 # 7eno.shop rebrand v2: ontwerpspec
 
-Datum: 13-10-2026. Bron: `docs/research/2026-10-13-rebrand-brief.md`. Branch: `redesign/v2`.
+Datum: 13-10-2026, besluiten Joep verwerkt (release 1-11-2026, OG volledig weg, logo's volgen). Bron: `docs/research/2026-10-13-rebrand-brief.md`. Branch: `redesign/v2`.
 
 ## 1. Doel en kaders
 
@@ -81,7 +81,7 @@ Regels: CSS-transities, alleen `transform` en `opacity`. Onder `prefers-reduced-
 |---|---|
 | `/` | Blijft, nieuw ontwerp |
 | `/shop` | Blijft. Filters: `?collection=olympian\|olympn-sport`, `?category=tees\|knits\|hoodies\|bags`, `?sort=`. `?gender` en `?line` vervallen |
-| `/shop/[slug]` | Blijft. PDP van een product zonder drop: `permanentRedirect('/archive')` |
+| `/shop/[slug]` | Blijft. PDP van een product zonder drop (OG, Printify): `permanentRedirect('/shop')` |
 | `/collections/[slug]` | Nieuw: drop-landing per collectie |
 | `/archive` | Nieuw: overzicht van alle edities |
 | `/olympian` | Vervalt, 308 naar `/collections/olympian` |
@@ -128,7 +128,7 @@ export function matchDrop(p: Pick<NormalizedProduct, 'id' | 'provider' | 'name'>
 export function isPurchasable(drop: Drop | null, now?: number): boolean
 ```
 
-Olympian: `startsAt` 19-06-2026 19:00 CEST, `endsAt: null`, prefix `Olympian `, `teaser: false`. OLYMPN Sport: prefix `OLYMPN Sport `, `tone: 'dark'`, `teaser: true`, `waitlist: true`, `lineup` met de acht template-mockups uit de JSON, lokaal opgeslagen in `public/drops/olympn-sport/`. De prefix met "OLYMPN" voorkomt een botsing met OG-namen als "Ink/Butter Sport Tee". Sync-id gaat altijd voor op naam. `matchDrop` matcht alleen `provider: 'printful'`.
+Olympian: `startsAt` 19-06-2026 19:00 CEST, `endsAt: null`, prefix `Olympian `, `teaser: false`. OLYMPN Sport: `startsAt` `2026-11-01T12:00:00+01:00` (1 november 2026, 12:00 Nederlandse tijd, besluit Joep 13-10; het uur is aanpasbaar), `endsAt: null`, prefix `OLYMPN Sport `, `tone: 'dark'`, `teaser: true`, `waitlist: true`, `lineup` met de acht template-mockups uit de JSON, lokaal opgeslagen in `public/drops/olympn-sport/`. De prefix met "OLYMPN" voorkomt een botsing met OG-namen als "Ink/Butter Sport Tee". Sync-id gaat altijd voor op naam. `matchDrop` matcht alleen `provider: 'printful'`.
 
 **Catalog.** `lib/catalog.ts` krijgt `getShopProducts(now)`: haalt de catalogus op, koppelt elk product aan `matchDrop` en laat producten zonder drop vallen. Dit is een allow-list van collecties in plaats van een keyword-blacklist: OG, Printify en elk nieuw ongepland product blijven automatisch onzichtbaar. Printify wordt niet meer opgehaald zolang geen drop Printify matcht. Uitverkochte producten worden niet meer weggefilterd maar krijgen `soldOut: true`. `product-classify.ts` doet alleen nog productsoort: `isTee`, `isKnit`, `isHoodie`, `isBag`. `isOlympian`, `isSport`, `olympianSortRank` en `SORT_PRIORITY` vervallen. Sortering: drop-editie aflopend, dan productfamilie (naam zonder kleur), dan `colourOrder`.
 
@@ -160,7 +160,7 @@ Olympian: `startsAt` 19-06-2026 19:00 CEST, `endsAt: null`, prefix `Olympian `, 
 
 **Content.** About, FAQ, Size guide en legal: tekstkolom met grote kop, FAQ als `Accordion`.
 
-**Archive.** Lijst van edities, nieuwste eerst: editienummer, titel, releasevenster, status, beeldstrook, link naar collectie. Gesloten edities blijven hier staan.
+**Archive.** Lijst van edities, nieuwste eerst: editienummer, titel, releasevenster, status, beeldstrook, link naar collectie. Gesloten edities blijven hier staan. De OG-collectie is geen editie en komt hier niet in: OG verdwijnt volledig uit de site (besluit Joep 13-10).
 
 **404.** Grote "404", één zin, links naar de live drops.
 
@@ -217,7 +217,7 @@ Branch `redesign/v2`, vanaf master na PR A en B. Elke push geeft een Preview. Ve
 
 **Go-live-checklist:**
 1. Joep akkoord op de Preview.
-2. Releasedatum OLYMPN Sport definitief in `lib/drops.ts`, sync-id's ingevuld.
+2. Releasedatum OLYMPN Sport (1 november 2026) bevestigd in `lib/drops.ts`, sync-id's ingevuld.
 3. PR `redesign/v2` naar master, CI groen, mergen.
 4. Production-env: `PRINTFUL_ACCOUNT_TOKEN`, `RESEND_WAITLIST_AUDIENCE_ID` (live).
 5. Redirects testen op productie (`/olympian`, `/deals`, `/coming-soon`, `?line=`).
@@ -230,7 +230,7 @@ Branch `redesign/v2`, vanaf master na PR A en B. Elke push geeft een Preview. Ve
 - **SEO:** `lib/seo.ts` en layout-metadata noemen "Olympian and OLYMPN Sport" in plaats van "OG and Olympian". `themeColor` `#0E0B0B`. Per collectiepagina eigen title en description.
 - **OG-image:** `app/opengraph-image.tsx` opnieuw, crème vlak, beeldmerk, titel in Archivo. Het fontbestand staat lokaal in `app/_fonts/` voor `ImageResponse`. Per collectie een eigen `opengraph-image.tsx` met het themavlak.
 - **Favicon en manifest:** `app/icon.tsx` en `app/manifest.ts` op basis van het beeldmerk uit `Onderdelen Beeldmerk 7ENO butter` (bovenkant 7, onderkant 7, bliksem). Manifest `background_color #F4EEE3`, `theme_color #0E0B0B`.
-- **Logo's (`public/logos`):** nieuwe set als SVG: beeldmerk Obsidian en crème, woordmerk Obsidian en crème, lockup "OLYMPN SPORT". Oude bestanden blijven tot fase 5 in gebruik, daarna weg.
+- **Logo's (`public/logos`):** nieuwe set als SVG: beeldmerk Obsidian en crème, woordmerk Obsidian en crème, lockup "OLYMPN SPORT". Joep levert de vectorbestanden later aan; tot die tijd gebruikt fase 4 de bestaande PNG's uit `public/logos` en `Onderdelen Beeldmerk 7ENO butter` als tijdelijke basis (geen overtrekken). Favicon, OG-image en e-mailwoordmerk worden definitief gemaakt zodra de SVG's er zijn. Oude bestanden blijven tot fase 5 in gebruik, daarna weg.
 
 ## 9. Testen en kwaliteit
 
@@ -260,5 +260,5 @@ Branch `redesign/v2`, vanaf master na PR A en B. Elke push geeft een Preview. Ve
 | 1. Fundament | `tokens.css`, fonts, `AppShell` met nieuwe header, announcement-bar, mobiele nav, footer. `lib/drops.ts`, `getShopProducts`, redirects. Shop toont alleen Olympian | Oude pagina's onder nieuwe chrome ogen half. Redirect-syntax van Next 16 |
 | 2. Shop en drops | PLP met filters en griddichtheid, `/collections/*`, `DropBlock`, klok, waitlist, Archive | Resend-audience-limieten. Teaser lekt via sitemap of feed: test |
 | 3. Kopen | PDP met galerij, sticky koopkolom, maten, size guide, sold-out-notify. Cart-drawer, checkout-shell, success | Variantkeuze per kleur-als-product. Regressie in checkout: volledige testbestelling met iDEAL en kaart |
-| 4. Content en merk | Home, About, FAQ, Size guide, legal, account, 404. E-mail, SEO, OG-image, favicon, manifest, logo's | Beeldmerk alleen als PNG beschikbaar. Metadata-regressie in Search Console |
+| 4. Content en merk | Home, About, FAQ, Size guide, legal, account, 404. E-mail, SEO, OG-image, favicon, manifest, logo's | Beeldmerk alleen als PNG tot Joep de SVG's levert: favicon/OG-image dan nog eens bijwerken. Metadata-regressie in Search Console |
 | 5. Afronding | Oude tokens, `.oly-theme`, Cormorant en vervallen componenten weg. Lighthouse, a11y-scan, go-live-checklist klaar | Achtergebleven verwijzingen naar oude tokens: grep op `--ink`, `--bone`, `oly-` moet leeg zijn |
