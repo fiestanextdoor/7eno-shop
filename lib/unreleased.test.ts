@@ -11,7 +11,7 @@ describe('isUnreleasedProductName', () => {
     'OLYMPN SPORT Track Pants Black',
     '  OLYMPN Sport Oversized Hoodie Mocha',
     'OLYMPN  Sport Oversized Hoodie Pistachio',
-    'OLYMPN Sport Oversized Hoodie Dune',
+    'OLYMPN\u00a0Sport Oversized Hoodie Dune',
   ])('treats "%s" as unreleased', (name) => {
     expect(isUnreleasedProductName(name)).toBe(true)
   })
