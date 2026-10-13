@@ -1,9 +1,8 @@
 import { useState } from 'react'
+import { HIDDEN_SIZES } from '@/lib/product-classify'
 
-/** Sizes the shop never offers, on the product page and in quick-add alike. */
-export const HIDDEN_SIZES: ReadonlySet<string> = new Set([
-  '4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large',
-])
+/** Sizes the shop never offers, on the product page and in quick-add alike; one list for client and server. */
+export { HIDDEN_SIZES }
 
 /** The variant fields the picker needs; NormalizedVariant and CarouselVariant both fit. */
 export interface PickableVariant {
