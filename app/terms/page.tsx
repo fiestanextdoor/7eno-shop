@@ -49,7 +49,7 @@ export default function TermsPage() {
             <h2 className={styles.heading}>7. Right of withdrawal (cooling-off period)</h2>
             <p>As a consumer, you have the right to withdraw from your purchase within 14 days of receiving your order, without giving any reason. To exercise this right, contact us at <a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a> before the 14-day period expires.</p>
             <p>The right of withdrawal does not apply to custom-made or personalised products. Standard print-on-demand items without personalisation do qualify.</p>
-            <p>Return shipping costs are at the customer's expense unless the product is defective or incorrect.</p>
+            <p>Return shipping costs are at the customer&apos;s expense unless the product is defective or incorrect.</p>
           </section>
 
           <section className={styles.section}>
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2 className={styles.heading}>10. Liability</h2>
-            <p>7ENO's liability is limited to the amount paid for the order in question. We are not liable for indirect damages, loss of profit, or consequential loss.</p>
+            <p>7ENO&apos;s liability is limited to the amount paid for the order in question. We are not liable for indirect damages, loss of profit, or consequential loss.</p>
           </section>
 
           <section className={styles.section}>

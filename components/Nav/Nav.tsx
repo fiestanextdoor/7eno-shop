@@ -23,6 +23,7 @@ export default function Nav() {
   const openCart = useCartStore((s) => s.openCart)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
     const onScroll = () => setScrolled(window.scrollY > 10)
     onScroll()
