@@ -57,6 +57,25 @@ describe('computeCartTotals', () => {
     expect(t.grandTotal).toBeCloseTo(17)
   })
 
+  it('returns the promo discount unrounded, leaving rounding to the display', () => {
+    const promo: AppliedPromo = { code: 'MAARDANWEL', percentOff: 15, freeShipping: false }
+    const t = computeCartTotals([item('29.95')], promo)
+    expect(t.promoDiscount).toBe(4.4925)
+    expect(t.promoDiscount.toFixed(2)).toBe('4.49')
+  })
+
+  it('clamps the grand total at zero and needs nothing more for free shipping above the threshold', () => {
+    const full: AppliedPromo = { code: 'FULL', percentOff: 100, freeShipping: true }
+    const t = computeCartTotals([item('40.00', 2)], full)
+    expect(t.shippingCost).toBe(0)
+    expect(t.promoDiscount).toBe(80)
+    expect(t.grandTotal).toBe(0)
+    expect(t.remainingForFree).toBe(0)
+    // A discount larger than the subtotal would go negative without the clamp.
+    const over: AppliedPromo = { code: 'OVER', percentOff: 150, freeShipping: true }
+    expect(computeCartTotals([item('40.00', 2)], over).grandTotal).toBe(0)
+  })
+
   it('gives the combi-deal discount only for a complete set', () => {
     const tee = item('30.00', 1, { productId: 'tee', bundleId: 'set' })
     const shorts = item('25.00', 1, { productId: 'shorts', bundleId: 'set' })
