@@ -3,6 +3,7 @@ import { productSlug } from '@/lib/slug'
 import * as printful from '@/lib/printful'
 import { normalizePrintfulProduct, normalizePrintfulDetail } from '@/lib/printful-normalize'
 import * as printify from '@/lib/printify'
+import { isUnreleasedProductName } from '@/lib/unreleased'
 
 /**
  * Combine two providers' results. Each is a settled promise so one provider
@@ -43,13 +44,17 @@ export function findBySlug(products: NormalizedProduct[], slug: string): Normali
   return matches[0]
 }
 
-/** All products across both providers (list-level; Printful has no variants here). */
+/**
+ * All products across both providers (list-level; Printful has no variants here).
+ * Products of a drop that is not out yet (OLYMPN Sport) are left out, so they
+ * can already sit in the Printful store without production showing them.
+ */
 export async function getCatalogProducts(): Promise<NormalizedProduct[]> {
   const [pf, pi] = await Promise.allSettled([
     printful.getProducts().then((ps) => ps.map(normalizePrintfulProduct)),
     printify.getProducts(),
   ])
-  return mergeCatalogs(pf, pi)
+  return mergeCatalogs(pf, pi).filter((p) => !isUnreleasedProductName(p.name))
 }
 
 /** A single product with full variants, fetched from the right provider. */
