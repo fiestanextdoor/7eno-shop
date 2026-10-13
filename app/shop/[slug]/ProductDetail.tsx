@@ -6,12 +6,11 @@ import Link from 'next/link'
 import type { NormalizedVariant, Provider } from '@/types/catalog'
 import type { SizeGuide } from '@/lib/printful'
 import { useCartStore } from '@/store/cart'
+import { useVariantPicker } from '@/hooks/useVariantPicker'
 import DonationBanner from '@/components/DonationBanner/DonationBanner'
 import { resolveSwatchBackground, resolveHex, applyBrandOverride, brandColorName, isNearWhite } from '@/lib/color-utils'
 import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_RATE } from '@/lib/shipping'
 import styles from './detail.module.css'
-
-const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
 
 // Standard care for 7ENO's printed apparel. Printful exposes no care field, so
 // this is the recommended care for DTF / all-over prints; the fabric specifics
@@ -105,9 +104,16 @@ export default function ProductDetail({
   const frontFor = (color: string) => frontOverride ?? colorImages[color] ?? baseImageUrl
   const backFor = (color: string) => backOverride ?? colorBackImages[color] ?? null
 
-  const [selectedColor, setSelectedColor] = useState<string>(defaultColor)
+  const {
+    selectedColor,
+    selectedVariantId,
+    selectedVariant,
+    sizes: uniqueSizes,
+    isAvailable,
+    selectColor,
+    selectVariant,
+  } = useVariantPicker({ variants, colors: uniqueColors.map((v) => v.color) })
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(frontFor(defaultColor))
-  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
 
@@ -127,22 +133,8 @@ export default function ProductDetail({
     ),
   ]
 
-  const colorVariants = hasColors && selectedColor
-    ? variants.filter((v) => v.color === selectedColor)
-    : variants
-
-  const allOutOfStock = colorVariants.every((v) => v.inStock === false)
-  const isAvailable = (v: NormalizedVariant) => (allOutOfStock ? true : v.inStock !== false)
-
-  const uniqueSizes = Array.from(
-    new Map(colorVariants.map((v) => [v.size || v.name, v])).values()
-  ).filter((v) => !EXCLUDED_SIZES.has(v.size))
-
-  const selectedVariant = variants.find((v) => v.id === selectedVariantId) ?? null
-
   const handleColorChange = (color: string) => {
-    setSelectedColor(color)
-    setSelectedVariantId(null)
+    selectColor(color)
     setActiveImageUrl(frontFor(color))
   }
 
@@ -166,18 +158,16 @@ export default function ProductDetail({
   useEffect(() => {
     const colorParam = new URLSearchParams(window.location.search).get('color')
     if (!colorParam || !uniqueColors.some((v) => v.color === colorParam)) return
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setSelectedColor(colorParam)
+    selectColor(colorParam)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveImageUrl(frontFor(colorParam))
-    /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Auto-select the only variant for one-size products (e.g. caps, accessories)
   useEffect(() => {
     if (uniqueSizes.length === 1 && isAvailable(uniqueSizes[0])) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedVariantId(uniqueSizes[0].id)
+      selectVariant(uniqueSizes[0].id)
     }
   }, [selectedColor]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -359,7 +349,7 @@ export default function ProductDetail({
                     selectedVariantId === v.id ? styles.selected : '',
                     !isAvailable(v) ? styles.outOfStock : '',
                   ].join(' ')}
-                  onClick={() => isAvailable(v) && setSelectedVariantId(v.id)}
+                  onClick={() => isAvailable(v) && selectVariant(v.id)}
                   aria-pressed={selectedVariantId === v.id}
                   disabled={!isAvailable(v)}
                 >
