@@ -5,9 +5,8 @@ import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
 import { cartItemKey } from '@/lib/cart-key'
 import { productSlug } from '@/lib/slug'
-import { getBundle } from '@/lib/bundles'
-import { resolveBundleDiscountCents } from '@/lib/bundle-discount'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping'
+import { useCartTotals } from '@/hooks/useCartTotals'
 import type { CartItem } from '@/types/cart'
 import styles from './CartDrawer.module.css'
 
@@ -17,18 +16,11 @@ export default function CartDrawer() {
   const items = useCartStore((s) => s.items)
   const removeItem = useCartStore((s) => s.removeItem)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
-  const total = useCartStore((s) => s.total())
 
   // Client-side display of the bundle discount. The checkout API re-validates
   // this authoritatively; here it only keeps the shown total honest.
-  const subtotalCents = Math.round(total * 100)
-  const discountCents = resolveBundleDiscountCents(
-    items.filter((i) => i.bundleId).map((i) => ({ bundleId: i.bundleId!, productId: i.productId, resolved: true })),
-    subtotalCents,
-    getBundle,
-  )
+  const { bundleDiscountCents: discountCents, discountedTotal } = useCartTotals()
   const currency = items[0]?.currency ?? 'EUR'
-  const discountedTotal = (subtotalCents - discountCents) / 100
 
   // Group set items together; standalone items keep their order after the sets.
   const bundleGroups = new Map<string, CartItem[]>()
