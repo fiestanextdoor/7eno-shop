@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Space_Mono, Cormorant_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import CartProvider from '@/components/CartProvider/CartProvider'
+import AppShell from '@/components/AppShell/AppShell'
 import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
 import PageTransition from '@/components/PageTransition/PageTransition'
 import { BASE_URL, BRAND_KEYWORDS, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
@@ -124,11 +124,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <CartProvider>
+        <AppShell>
           <SmoothScroll />
           <PageTransition />
           {children}
-        </CartProvider>
+        </AppShell>
         <Analytics />
       </body>
     </html>

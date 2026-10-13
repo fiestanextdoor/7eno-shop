@@ -9,36 +9,34 @@ import { cartItemKey } from '@/lib/cart-key'
 import {
   ALLOWED_COUNTRIES,
   COUNTRY_NAMES,
-  computeShippingCents,
   FREE_SHIPPING_THRESHOLD,
   FLAT_SHIPPING_RATE,
 } from '@/lib/shipping'
+import { useCheckout } from '@/hooks/useCheckout'
+import { useCartTotals } from '@/hooks/useCartTotals'
 import styles from './checkout.module.css'
 
-interface AddressForm {
-  name: string
-  line1: string
-  line2: string
-  city: string
-  postalCode: string
-  country: string
-}
-
-const EMPTY_FORM: AddressForm = {
-  name: '',
-  line1: '',
-  city: '',
-  line2: '',
-  postalCode: '',
-  country: 'NL',
-}
-
 export default function CheckoutPage() {
-  const { items, total } = useCartStore()
-  const [form, setForm] = useState<AddressForm>(EMPTY_FORM)
-  const [agreed, setAgreed] = useState(false)
-  const [payLoading, setPayLoading] = useState(false)
-  const [payError, setPayError] = useState<string | null>(null)
+  const { items } = useCartStore()
+  const {
+    form,
+    updateField,
+    addressComplete,
+    agreed,
+    changeAgreed,
+    canPay,
+    promoInput,
+    changePromoInput,
+    promo,
+    promoMsg,
+    promoNeedsLogin,
+    promoLoading,
+    applyPromo,
+    removePromo,
+    payLoading,
+    payError,
+    pay,
+  } = useCheckout(items)
 
   // Detect auth so we only nudge guests to create an account. null = not yet
   // resolved, so we never flash the notice for logged-in customers. Mirrors the
@@ -53,112 +51,22 @@ export default function CheckoutPage() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Discount code state. The code is single-use per account and not combinable
-  // with bundle deals, so it is hidden when the cart contains a bundle; the
-  // server re-validates everything before applying it (app/api/checkout).
-  const [promoInput, setPromoInput] = useState('')
-  const [appliedCode, setAppliedCode] = useState<string | null>(null)
-  const [promoPercent, setPromoPercent] = useState(0)
-  const [promoFreeShipping, setPromoFreeShipping] = useState(false)
-  const [promoMsg, setPromoMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
-  const [promoNeedsLogin, setPromoNeedsLogin] = useState(false)
-  const [promoLoading, setPromoLoading] = useState(false)
-
-  const addressComplete =
-    form.name.trim() !== '' &&
-    form.line1.trim() !== '' &&
-    form.city.trim() !== '' &&
-    form.postalCode.trim() !== ''
-
-  const canPay = addressComplete && agreed
+  const appliedCode = promo?.code ?? null
+  const promoPercent = promo?.percentOff ?? 0
+  const promoFreeShipping = promo?.freeShipping ?? false
 
   const hasBundle = items.some((item) => Boolean(item.bundleId))
 
-  // Shipping is a flat fee, free above the threshold. It depends only on the
-  // subtotal, so it is known immediately, without an extra "calculate" step or
-  // a round-trip for the destination.
-  const subtotal = total()
-  // A discount code can waive the fee outright; otherwise it follows the
-  // subtotal threshold. The server recomputes this, the page only displays it.
-  const shippingCost = promoFreeShipping ? 0 : computeShippingCents(Math.round(subtotal * 100)) / 100
-  const freeShipping = shippingCost === 0
-  const remainingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
-  // Display only: the discount applies to the product subtotal (not shipping).
-  // The authoritative amount is recomputed server-side from trusted prices.
-  const discount = appliedCode ? (subtotal * promoPercent) / 100 : 0
-  const grandTotal = Math.max(0, subtotal + shippingCost - discount)
-
-  const updateField = (key: keyof AddressForm, value: string) => {
-    setForm((f) => ({ ...f, [key]: value }))
-    setPayError(null)
-  }
-
-  const applyPromo = async () => {
-    const code = promoInput.trim()
-    if (code === '') return
-    setPromoLoading(true)
-    setPromoMsg(null)
-    setPromoNeedsLogin(false)
-    try {
-      const res = await fetch('/api/promo/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      })
-      const data = await res.json()
-      if (res.ok && data.valid) {
-        setAppliedCode(data.code)
-        setPromoPercent(data.percentOff)
-        setPromoFreeShipping(Boolean(data.freeShipping))
-        setPromoMsg({
-          type: 'success',
-          text: `Code ${data.code} applied: ${data.percentOff}% off${data.freeShipping ? ' and free shipping' : ''}.`,
-        })
-      } else {
-        setAppliedCode(null)
-        setPromoPercent(0)
-        setPromoFreeShipping(false)
-        setPromoNeedsLogin(res.status === 401)
-        setPromoMsg({ type: 'error', text: data.error ?? 'Could not apply this code.' })
-      }
-    } catch {
-      setPromoMsg({ type: 'error', text: 'Network error. Please try again.' })
-    } finally {
-      setPromoLoading(false)
-    }
-  }
-
-  const removePromo = () => {
-    setAppliedCode(null)
-    setPromoPercent(0)
-    setPromoFreeShipping(false)
-    setPromoInput('')
-    setPromoMsg(null)
-    setPromoNeedsLogin(false)
-  }
-
-  const handleCheckout = async () => {
-    if (!canPay) return
-    setPayLoading(true)
-    setPayError(null)
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, address: form, ...(appliedCode ? { promoCode: appliedCode } : {}) }),
-      })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        setPayError(data.error ?? 'Could not start checkout. Please try again.')
-      }
-    } catch {
-      setPayError('Network error. Please try again.')
-    } finally {
-      setPayLoading(false)
-    }
-  }
+  // Shipping is a flat fee, free above the threshold, or waived by a discount
+  // code. The server recomputes all of this; the page only displays it.
+  const {
+    subtotal,
+    shippingCost,
+    freeShipping,
+    remainingForFree,
+    promoDiscount: discount,
+    grandTotal,
+  } = useCartTotals(promo)
 
   if (items.length === 0) {
     return (
@@ -322,10 +230,7 @@ export default function CheckoutPage() {
                 type="text"
                 placeholder="Discount code"
                 value={promoInput}
-                onChange={(e) => {
-                  setPromoInput(e.target.value)
-                  setPromoMsg(null)
-                }}
+                onChange={(e) => changePromoInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -427,10 +332,7 @@ export default function CheckoutPage() {
             type="checkbox"
             className={styles.agreeCheckbox}
             checked={agreed}
-            onChange={(e) => {
-              setAgreed(e.target.checked)
-              setPayError(null)
-            }}
+            onChange={(e) => changeAgreed(e.target.checked)}
           />
           <span className={styles.agreeText}>
             I agree to the{' '}
@@ -447,7 +349,7 @@ export default function CheckoutPage() {
 
         <button
           className={styles.payBtn}
-          onClick={handleCheckout}
+          onClick={pay}
           disabled={payLoading || !canPay}
         >
           {payLoading ? 'Redirecting...' : 'Pay with Stripe'}

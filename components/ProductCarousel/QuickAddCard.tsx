@@ -4,12 +4,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
+import { useVariantPicker } from '@/hooks/useVariantPicker'
 import type { CarouselItem, CarouselVariant } from './ProductCarousel'
 import styles from './QuickAddCard.module.css'
-
-// Mirror the size filter used on the product detail page so the carousel never
-// offers sizes the rest of the shop hides.
-const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
 
 // Same money formatting as ProductCard / the product page, so the carousel
 // price reads identically to the rest of the shop (e.g. "€29.95").
@@ -48,22 +45,17 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
   const openCart = useCartStore((s) => s.openCart)
 
   const colors = item.colors.filter((c) => c.color)
-  const hasColors = colors.length > 1
-  const [activeColor, setActiveColor] = useState<string>(colors[0]?.color ?? '')
+  // Same size rules as the product page (shared hook), but quick-add only
+  // offers sizes that can actually be bought.
+  const {
+    hasColors,
+    selectedColor: activeColor,
+    selectColor,
+    colorVariants,
+    availableSizes: sizes,
+  } = useVariantPicker({ variants: item.variants, colors: colors.map((c) => c.color) })
   const [open, setOpen] = useState(false)
   const [justAdded, setJustAdded] = useState(false)
-
-  // Variants for the active colour (or all, when the product has no colours).
-  const colorVariants = hasColors
-    ? item.variants.filter((v) => v.color === activeColor)
-    : item.variants
-
-  const allOutOfStock = colorVariants.length > 0 && colorVariants.every((v) => v.inStock === false)
-  const isAvailable = (v: CarouselVariant) => (allOutOfStock ? true : v.inStock !== false)
-
-  // Unique, in-stock sizes for the active colour, excluding the hidden sizes.
-  const sizes = Array.from(new Map(colorVariants.map((v) => [v.size || v.name, v])).values())
-    .filter((v) => !EXCLUDED_SIZES.has(v.size) && isAvailable(v))
 
   const canQuickAdd = sizes.length > 0
   const label = (v: CarouselVariant) => (v.size || v.name || 'One size')
@@ -129,7 +121,7 @@ export default function QuickAddCard({ item }: QuickAddCardProps) {
                 aria-pressed={activeColor === c.color}
                 title={c.displayName || c.color}
                 onClick={() => {
-                  setActiveColor(c.color)
+                  selectColor(c.color)
                   setJustAdded(false)
                 }}
               />

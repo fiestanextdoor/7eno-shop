@@ -9,6 +9,7 @@ import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
 import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd, merchantPolicyJsonLd } from '@/lib/seo'
 import { FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES } from '@/lib/shipping'
 import { productSlug } from '@/lib/slug'
+import { HIDDEN_SIZES } from '@/lib/product-classify'
 import { removeBackground } from '@/lib/remove-bg'
 import ProductDetail from './ProductDetail'
 import styles from './detail.module.css'
@@ -118,9 +119,8 @@ export default async function ProductPage({ params }: Props) {
       ? await getCatalogProductId(syncVariants[0].variant_id)
       : null
     const isFootwear = Object.keys(euSizeMap).length > 0
-    const EXCLUDED_SIZES = new Set(['4XL', '5XL', '6XL', '7XL', '8XL', '4X-Large', '5X-Large'])
     const offeredSizes = [...new Set(syncVariants.map((v) => v.size).filter(Boolean))].filter(
-      (s) => !EXCLUDED_SIZES.has(s)
+      (s) => !HIDDEN_SIZES.has(s)
     )
     const [mats, guide] = await Promise.all([
       catalogProductId ? getProductMaterials(catalogProductId) : Promise.resolve([]),
