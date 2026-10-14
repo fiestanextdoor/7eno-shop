@@ -5,7 +5,7 @@
  */
 
 /**
- * Sizes the storefront hides (see ProductDetail / QuickAddCard). The Merchant
+ * Sizes the storefront hides (see hooks/useVariantPicker.ts). The Merchant
  * Center feed skips them too: advertising a size a shopper can't then pick on
  * the product page is both a bad landing and a Merchant Center policy risk.
  */

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { HIDDEN_SIZES } from '@/lib/product-classify'
 
-/** Sizes the shop never offers, on the product page and in quick-add alike; one list for client and server. */
+/** Sizes the shop never offers; one list for client and server. */
 export { HIDDEN_SIZES }
 
-/** The variant fields the picker needs; NormalizedVariant and CarouselVariant both fit. */
+/** The variant fields the picker needs; NormalizedVariant fits. */
 export interface PickableVariant {
   id: string
   color: string
