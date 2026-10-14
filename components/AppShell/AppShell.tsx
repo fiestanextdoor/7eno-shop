@@ -47,11 +47,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const openCart = useCartStore((s) => s.openCart)
   const showFooter = !HIDE_FOOTER.some((p) => pathname.startsWith(p))
 
-  // The coming-soon teaser is a sealed full-screen page (removed in Task 9).
-  if (pathname === '/coming-soon') {
-    return <>{children}</>
-  }
-
   // Checkout is a sealed step: no nav, cart drawer or footer, only the centred
   // logo, so the customer stays in the flow until the order is placed.
   // StoreHydration stays so the cart the checkout reads is still loaded.

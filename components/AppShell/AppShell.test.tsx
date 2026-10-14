@@ -101,14 +101,6 @@ describe('AppShell route chrome', () => {
     expect(screen.getByText('page content')).toBeInTheDocument()
   })
 
-  it('renders /coming-soon bare, without any chrome or hydration', () => {
-    renderAt('/coming-soon')
-    for (const id of ['store-hydration', 'cookie-banner', 'announcement-bar', 'site-header', 'mobile-nav', 'cart-drawer', 'checkout-header', 'footer']) {
-      expect(present(id)).toBe(false)
-    }
-    expect(screen.getByText('page content')).toBeInTheDocument()
-  })
-
   it('passes the cart item count to the header', () => {
     useCartStore.setState({
       items: [

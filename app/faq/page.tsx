@@ -114,7 +114,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
       {
         q: 'What is the difference between the OG and Olympian collections?',
         a: 'OG is the original, darker range built around the 7ENO mark in ink, blood red and butter. Olympian is the newer capsule with a rounded early-2000s wordmark in four dusty colourways: Coconut, Ocean, Sand and Flamingo.',
-        link: { href: '/olympian', label: "See Olympian '26" },
+        link: { href: '/collections/olympian', label: 'See Olympian' },
       },
       {
         q: 'Are the Olympian colours separate products?',
