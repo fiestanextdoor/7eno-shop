@@ -22,14 +22,14 @@ beforeEach(() => {
 
 describe('POST /api/waitlist', () => {
   it('adds a valid signup', async () => {
-    const res = await POST(request({ email: 'A@B.nl', dropId: 'olympn-sport', company: '' }, '10.0.0.1'))
+    const res = await POST(request({ email: 'A@B.nl', dropId: 'olympn-sport', hp_note: '' }, '10.0.0.1'))
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ ok: true })
     expect(mockAdd).toHaveBeenCalledWith({ email: 'a@b.nl', dropId: 'olympn-sport', productSlug: null })
   })
 
   it('answers a bot that filled the honeypot like a person, without storing it', async () => {
-    const res = await POST(request({ email: 'bot@spam.io', company: 'ACME' }, '10.0.0.2'))
+    const res = await POST(request({ email: 'bot@spam.io', hp_note: 'ACME' }, '10.0.0.2'))
     expect(res.status).toBe(200)
     expect(mockAdd).not.toHaveBeenCalled()
   })

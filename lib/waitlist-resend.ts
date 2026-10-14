@@ -31,8 +31,11 @@ export async function addWaitlistContact(signup: WaitlistSignup): Promise<Waitli
     })
     if (!error) return 'added'
     // Signing up twice is not an error for the visitor: they are on the list.
-    if (/already exist/i.test(error.message)) return 'added'
-    console.error('[Waitlist] Resend rejected the contact:', error.name, error.message)
+    // Resend answers a duplicate with a 409 or an "already exists" message.
+    const status = (error as { statusCode?: number }).statusCode
+    if (status === 409 || /already exist/i.test(error.message)) return 'added'
+    // Log the kind of failure only: the message can carry the address.
+    console.error('[Waitlist] Resend rejected the contact:', error.name, status ?? '')
     return 'failed'
   } catch (err) {
     console.error('[Waitlist] Resend request failed:', err)

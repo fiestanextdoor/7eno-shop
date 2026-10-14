@@ -12,7 +12,9 @@ export type WaitlistParse =
   | { ok: false; reason: 'invalid'; error: string }
 
 /** A field people never see or fill; bots that fill every input do. */
-export const HONEYPOT_FIELD = 'company'
+// Not a name browsers autofill (organization, url, name), so a real visitor
+// never trips it by accepting an autofill suggestion.
+export const HONEYPOT_FIELD = 'hp_note'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/

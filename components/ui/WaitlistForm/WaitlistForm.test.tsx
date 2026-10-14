@@ -27,7 +27,7 @@ describe('WaitlistForm', () => {
     fillAndSubmit()
     expect(await screen.findByText("You're on the list. We'll email you when it drops.")).toBeInTheDocument()
     expect(mockFetch).toHaveBeenCalledWith('/api/waitlist', expect.objectContaining({ method: 'POST' }))
-    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ email: 'a@b.nl', dropId: 'olympn-sport', company: '' })
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ email: 'a@b.nl', dropId: 'olympn-sport', hp_note: '' })
     expect(screen.getByLabelText('Get notified when it drops')).toBeDisabled()
   })
 
