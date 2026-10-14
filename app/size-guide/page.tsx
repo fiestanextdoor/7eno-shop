@@ -227,7 +227,7 @@ export default async function SizeGuidePage() {
           </p>
           <p className={styles.body}>
             The OLYMPN Sport hoodies come in two cuts, oversized and relaxed, each with its own
-            table above. Compare your chest measurement with the table of the cut you want.
+            table on its product page. Compare your chest measurement with the table of the cut you want.
           </p>
           <p className={styles.body}>
             Unisex sizing is cut to the men&rsquo;s measurements. If you usually wear a women&rsquo;s
