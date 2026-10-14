@@ -37,6 +37,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
   },
+  // The collection OG image reads its font and logos from disk at request time
+  // when a slug was not prerendered; make sure they ship with that function.
+  outputFileTracingIncludes: {
+    '/collections/**': ['./app/_fonts/**/*', './public/brand/*.png'],
+  },
   // Retired v1 routes (spec section 3). The request query is passed through
   // to the destination, so UTM tags survive and the canonical absorbs them.
   // `/shop?line=og` is handled in proxy.ts (lib/legacy-redirects.ts): a
