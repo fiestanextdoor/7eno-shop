@@ -22,7 +22,7 @@ export default function CheckoutHeader() {
         <span>Back to cart</span>
       </Link>
       <div className={styles.logo}>
-        <LogoWordmark variant="ink" height={28} align="center" priority />
+        <LogoWordmark variant="navy" height={28} align="center" priority />
       </div>
       <p className={styles.secure}>Secure checkout</p>
     </header>

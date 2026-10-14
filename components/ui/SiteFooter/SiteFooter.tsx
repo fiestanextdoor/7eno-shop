@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LogoWordmark } from '@/components/Logo/Logo'
 import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
 import { HELP_NAV, LEGAL_NAV, type NavItem } from '@/lib/nav'
 import styles from './SiteFooter.module.css'
@@ -19,7 +20,9 @@ export default function SiteFooter({ nav }: SiteFooterProps) {
     <footer className={styles.footer}>
       <div className={styles.grid}>
         <div className={styles.brand}>
-          <p className={styles.wordmark}>7ENO</p>
+          <div className={styles.wordmark}>
+            <LogoWordmark variant="cream" height={48} />
+          </div>
           <p className={styles.tagline}>Numbered editions by Abra Entertainment. Made to order.</p>
         </div>
         <nav className={styles.col} aria-label="Footer shop">

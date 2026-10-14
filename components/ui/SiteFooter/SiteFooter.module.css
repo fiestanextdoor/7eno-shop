@@ -14,13 +14,8 @@
 }
 
 .wordmark {
+  display: block;
   margin: 0;
-  font-family: var(--f-display);
-  font-size: var(--fs-h2);
-  font-weight: 900;
-  font-variation-settings: 'wdth' 125;
-  line-height: 0.95;
-  text-transform: uppercase;
 }
 
 .tagline {

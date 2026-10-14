@@ -37,7 +37,7 @@
 .logo {
   justify-self: center;
   display: block;
-  width: 98px;
+  width: auto;
 }
 
 .nav {

@@ -35,7 +35,7 @@ export default function SiteHeader({ nav, cartCount, currentPath, menuOpen, onMe
         </button>
 
         <Link href="/" className={styles.logo} aria-label="7ENO home">
-          <LogoWordmark variant="ink" height={28} />
+          <LogoWordmark variant="navy" height={32} priority />
         </Link>
 
         <nav className={styles.nav} aria-label="Main">

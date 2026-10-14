@@ -68,4 +68,10 @@ describe('SiteHeader', () => {
     renderHeader()
     expect(screen.getByRole('link', { name: 'Account' })).toHaveAttribute('href', '/account/login')
   })
+
+  it('shows the navy v2 wordmark as the home link', () => {
+    renderHeader()
+    const img = screen.getByRole('link', { name: '7ENO home' }).querySelector('img') as HTMLImageElement
+    expect(decodeURIComponent(img.getAttribute('src') ?? '')).toContain('/brand/7eno-wordmark-navy.png')
+  })
 })

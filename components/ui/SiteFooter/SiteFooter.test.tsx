@@ -28,4 +28,10 @@ describe('SiteFooter', () => {
     render(<SiteFooter nav={MAIN_NAV} />)
     expect(screen.getByLabelText('Email for drop alerts')).toBeInTheDocument()
   })
+
+  it('carries the cream v2 wordmark on the navy footer', () => {
+    render(<SiteFooter nav={MAIN_NAV} />)
+    const img = screen.getByRole('img', { name: '7ENO' })
+    expect(decodeURIComponent(img.getAttribute('src') ?? '')).toContain('/brand/7eno-wordmark-cream.png')
+  })
 })
