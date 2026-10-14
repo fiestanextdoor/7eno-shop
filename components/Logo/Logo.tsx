@@ -53,7 +53,11 @@ export function LogoWordmark({ variant = 'navy', height = 36, priority = false, 
   return (
     <div
       className={styles.wrap}
-      style={{ maxWidth: '100%', marginInline: align === 'center' ? 'auto' : undefined }}
+      style={{
+        maxWidth: '100%',
+        width: align === 'center' ? 'fit-content' : undefined,
+        marginInline: align === 'center' ? 'auto' : undefined,
+      }}
     >
       <Image
         src={mark.src}
