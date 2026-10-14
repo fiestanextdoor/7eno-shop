@@ -13,6 +13,8 @@ export interface DrawerProps {
   /** Sticky area under the body, e.g. "Show 12 results" or the checkout button. */
   footer?: ReactNode
   id?: string
+  /** Accessible name of the close button; defaults to `Close <title>`. */
+  closeLabel?: string
 }
 
 /**
@@ -20,7 +22,7 @@ export interface DrawerProps {
  * (phase 3). Stays mounted so it can slide; while closed it is inert, so it
  * is neither focusable nor read out.
  */
-export default function Drawer({ open, onClose, side, title, children, footer, id }: DrawerProps) {
+export default function Drawer({ open, onClose, side, title, children, footer, id, closeLabel }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
   useFocusTrap(panelRef, open, onClose)
@@ -40,7 +42,7 @@ export default function Drawer({ open, onClose, side, title, children, footer, i
       >
         <div className={styles.header}>
           <h2 id={titleId} className={styles.title}>{title}</h2>
-          <button type="button" className={styles.close} onClick={onClose} aria-label={`Close ${title.toLowerCase()}`}>
+          <button type="button" className={styles.close} onClick={onClose} aria-label={closeLabel ?? `Close ${title.toLowerCase()}`}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
               <path d="M2 2l14 14M16 2L2 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
             </svg>

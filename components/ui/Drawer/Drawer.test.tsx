@@ -30,6 +30,22 @@ describe('Drawer', () => {
     expect(onClose).toHaveBeenCalledTimes(3)
   })
 
+  it('does not close on a click inside the panel', () => {
+    const onClose = renderDrawer(true)
+    fireEvent.click(screen.getByRole('dialog', { name: 'Filters' }))
+    fireEvent.click(screen.getByRole('link', { name: 'Tees' }))
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('uses closeLabel for the close button when given', () => {
+    render(
+      <Drawer open onClose={jest.fn()} side="right" title="Cart" closeLabel="Sluit winkelmand">
+        <p>Empty</p>
+      </Drawer>
+    )
+    expect(screen.getByRole('button', { name: 'Sluit winkelmand' })).toBeInTheDocument()
+  })
+
   it('keeps Tab inside the panel', () => {
     renderDrawer(true)
     screen.getByRole('button', { name: 'Show 4 results' }).focus()

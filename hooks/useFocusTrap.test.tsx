@@ -52,6 +52,23 @@ describe('useFocusTrap', () => {
     expect(screen.getByRole('button', { name: 'Last' })).toHaveFocus()
   })
 
+  it('wraps Shift+Tab to the last element when focus is on the container itself', () => {
+    openPanel()
+    const container = screen.getByRole('button', { name: 'First' }).parentElement as HTMLElement
+    container.focus()
+    expect(container).toHaveFocus()
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+    expect(screen.getByRole('button', { name: 'Last' })).toHaveFocus()
+  })
+
+  it('wraps Tab to the first element when focus is on the container itself', () => {
+    openPanel()
+    const container = screen.getByRole('button', { name: 'First' }).parentElement as HTMLElement
+    container.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(screen.getByRole('button', { name: 'First' })).toHaveFocus()
+  })
+
   it('calls onEscape on Escape and returns focus to the opener', () => {
     const { opener, onEscape } = openPanel()
     fireEvent.keyDown(document, { key: 'Escape' })
@@ -67,5 +84,22 @@ describe('useScrollLock', () => {
     expect(document.body.style.overflow).toBe('hidden')
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(document.body.style.overflow).toBe('auto')
+  })
+
+  it('pads the body by the scrollbar width while locked and restores the old padding', () => {
+    const innerWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1024 })
+    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: 1009 })
+    document.body.style.paddingRight = '3px'
+    try {
+      openPanel()
+      expect(document.body.style.paddingRight).toBe('15px')
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(document.body.style.paddingRight).toBe('3px')
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: innerWidth })
+      delete (document.documentElement as { clientWidth?: number }).clientWidth
+      document.body.style.paddingRight = ''
+    }
   })
 })

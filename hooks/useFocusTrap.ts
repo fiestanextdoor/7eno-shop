@@ -53,10 +53,14 @@ export function useFocusTrap<T extends HTMLElement>(
       }
       const first = items[0]
       const last = items[items.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
+      const current = document.activeElement
+      // Focus on the container itself (the fallback target) or outside it
+      // counts as being at the edge, so Tab never leaves the panel.
+      const offItems = current === node || !(current instanceof Node) || !node.contains(current)
+      if (event.shiftKey && (current === first || offItems)) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && (current === last || offItems)) {
         event.preventDefault()
         first.focus()
       }
@@ -74,10 +78,16 @@ export function useFocusTrap<T extends HTMLElement>(
 export function useScrollLock(active: boolean): void {
   useEffect(() => {
     if (!active) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const { body, documentElement } = document
+    const previousOverflow = body.style.overflow
+    const previousPaddingRight = body.style.paddingRight
+    // Measure before hiding: the scrollbar width only shows while it exists.
+    const gap = window.innerWidth - documentElement.clientWidth
+    body.style.overflow = 'hidden'
+    if (gap > 0) body.style.paddingRight = `${gap}px`
     return () => {
-      document.body.style.overflow = previous
+      body.style.overflow = previousOverflow
+      body.style.paddingRight = previousPaddingRight
     }
   }, [active])
 }
