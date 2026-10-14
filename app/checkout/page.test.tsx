@@ -132,3 +132,21 @@ describe('checkout page (characterisation)', () => {
     expect(await screen.findByText(/Checking out as a guest/)).toBeInTheDocument()
   })
 })
+
+describe('checkout shell', () => {
+  it('has the form and a labelled order summary', async () => {
+    await renderPage()
+    expect(screen.getByRole('heading', { level: 1, name: 'Checkout' })).toBeInTheDocument()
+    const summary = screen.getByRole('complementary', { name: 'Order summary' })
+    expect(summary).toHaveTextContent('Olympian Tee Ocean Unisex')
+  })
+
+  it('folds the summary away on mobile behind a toggle with the total', async () => {
+    await renderPage()
+    const toggle = screen.getByRole('button', { name: /Show order summary/ })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveTextContent('€49.95')
+    fireEvent.click(toggle)
+    expect(screen.getByRole('button', { name: /Hide order summary/ })).toHaveAttribute('aria-expanded', 'true')
+  })
+})
