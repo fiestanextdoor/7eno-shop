@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, type ReactNode } from 'react'
 import Button from '@/components/ui/Button/Button'
 import Drawer from '@/components/ui/Drawer/Drawer'
-import type { FilterGroup } from '@/components/ShopFilters/ShopFilters'
+import type { FilterGroup } from '@/lib/filter-types'
 import type { SortOption } from '@/lib/shop-query'
 import styles from './FilterBar.module.css'
 

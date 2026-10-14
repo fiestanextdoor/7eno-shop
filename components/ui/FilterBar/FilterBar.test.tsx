@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
 import FilterBar from './FilterBar'
-import type { FilterGroup } from '@/components/ShopFilters/ShopFilters'
+import type { FilterGroup } from '@/lib/filter-types'
 import type { SortOption } from '@/lib/shop-query'
 
 jest.mock('next/navigation', () => ({ useRouter: jest.fn() }))

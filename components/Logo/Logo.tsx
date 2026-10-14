@@ -2,14 +2,8 @@ import Image from 'next/image'
 import { BEELDMERK, WORDMARK, widthAt, type BrandTone } from '@/lib/brand'
 import styles from './Logo.module.css'
 
-/** v1 colour names, accepted until the last v1 caller is gone (phase 5). */
-type LegacyVariant = 'wit' | 'zwart' | 'butter' | 'ink' | 'blood' | 'stone'
-export type LogoVariant = BrandTone | LegacyVariant
-
-/** Light variants sit on navy surfaces, everything else on cream. */
-export function toneFor(variant: LogoVariant): BrandTone {
-  return variant === 'cream' || variant === 'wit' || variant === 'butter' ? 'cream' : 'navy'
-}
+/** Navy on cream surfaces, cream on navy ones. */
+export type LogoVariant = BrandTone
 
 interface BadgeProps {
   variant?: LogoVariant
@@ -29,7 +23,7 @@ function eager(priority: boolean) {
 }
 
 export function LogoBadge({ variant = 'navy', size = 64, priority = false }: BadgeProps) {
-  const mark = BEELDMERK[toneFor(variant)]
+  const mark = BEELDMERK[variant]
   return (
     <div className={styles.wrap} style={{ width: size, height: size }}>
       <Image
@@ -45,7 +39,7 @@ export function LogoBadge({ variant = 'navy', size = 64, priority = false }: Bad
 }
 
 export function LogoWordmark({ variant = 'navy', height = 36, priority = false, align = 'left' }: WordmarkProps) {
-  const mark = WORDMARK[toneFor(variant)]
+  const mark = WORDMARK[variant]
   const width = widthAt(mark, height)
   // Explicit width and height reserve the box before the file loads. The
   // fixed height with an automatic width keeps the natural ratio; on a narrow

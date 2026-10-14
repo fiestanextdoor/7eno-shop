@@ -1,4 +1,4 @@
-import type { FilterGroup } from '@/components/ShopFilters/ShopFilters'
+import type { FilterGroup } from '@/lib/filter-types'
 import type { ShopProduct } from '@/lib/catalog'
 import { DROPS, listDropsNewestFirst, type Drop, type DropId } from '@/lib/drops'
 import { classify } from '@/lib/product-classify'
@@ -95,7 +95,7 @@ export function shopHref(query: ShopQuery): string {
   return search ? `/shop?${search}` : '/shop'
 }
 
-/** Chips for the FilterBar, in the URL-state shape ShopFilters already uses. */
+/** Chips for the FilterBar, in the URL-state shape from lib/filter-types.ts. */
 export function buildFilterGroups(query: ShopQuery, drops: readonly Drop[] = DROPS): FilterGroup[] {
   return [
     {
