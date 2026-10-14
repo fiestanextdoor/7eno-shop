@@ -1,4 +1,4 @@
-// Shared color resolution — used on shop grid and product detail page.
+// Shared color resolution: used on shop grid and product detail page.
 // Printful's color_code field is unreliable (often returns #FFFFFF or #000000
 // regardless of actual garment color), so name lookup is always preferred.
 
@@ -101,10 +101,6 @@ export const COLOR_HEX: Record<string, string> = {
   'violet':             '#8B5CF6',
 }
 
-// Printful color names that are generic fabric defaults (not intentional brand colors).
-// Only these trigger the brand override when near-white.
-const PRINTFUL_GENERIC_COLORS = new Set(['white'])
-
 // Printful color name → 7ENO brand display name.
 // Used when the Printful name differs from how 7ENO labels the color.
 const PRINTFUL_TO_BRAND_NAME: Record<string, string> = {
@@ -116,7 +112,7 @@ const PRINTFUL_TO_BRAND_NAME: Record<string, string> = {
 // 7ENO brand color keywords in priority order.
 // When Printful reports a generic near-white fabric color ("White"), read the product name
 // and use the FIRST matching keyword to determine the actual garment color.
-// "ink" is intentionally excluded — it now resolves to paper on its own.
+// "ink" is intentionally excluded: it now resolves to paper on its own.
 const BRAND_COLOR_KEYS = [
   'butter', 'stone', 'blood', 'bone', 'carrot', 'coin',
 ]
@@ -134,18 +130,6 @@ const LOGO_COLOR_HEX: Record<string, string> = {
   'ink':    '#111111', // "ink" as logo/design = dark ink
 }
 
-// 7ENO brand colour vocabulary used in product names. The detail page labels a
-// variant's colour with the nearest of these (e.g. "Butter", "Blood", "Ink",
-// "Stone") instead of Printful's fabric name like "Vintage White".
-const BRAND_PALETTE: Array<{ name: string; hex: string }> = [
-  { name: 'Ink',    hex: '#111111' },
-  { name: 'Blood',  hex: '#5C1A1B' },
-  { name: 'Stone',  hex: '#8A8275' },
-  { name: 'Butter', hex: '#EDE8DC' },
-  { name: 'Carrot', hex: '#D4622A' },
-  { name: 'Coin',   hex: '#C4A860' },
-]
-
 // Explicit brand swatch colours for products whose provider data doesn't encode
 // the 7ENO colourway in the product name or variant colour (e.g. swimwear, which
 // comes through as plain "Black" / "White drawstring"). Keyed by a lowercased
@@ -158,7 +142,7 @@ const BRAND_SWATCH_OVERRIDES: Array<{ match: string; hex: string; hex2: string }
 /**
  * Olympian '26 colourways. Each colourway is published as its own Printful
  * product (the name carries the colourway word, e.g. "Olympian Tee Ocean
- * Unisex"), so colours can't come from variant data — they map from the name
+ * Unisex"), so colours can't come from variant data: they map from the name
  * to the brand palette instead. Array order is the display order for swatches.
  */
 export const OLYMPIAN_COLORWAYS: Array<{ key: string; name: string; hex: string }> = [
@@ -191,32 +175,11 @@ export function brandSwatchOverride(productName: string): { hex: string; hex2: s
   return null
 }
 
-/** Nearest 7ENO brand colour name for a resolved hex (by RGB distance). */
-export function brandColorName(hex: string): string {
-  const c = hex.startsWith('#') && hex.length >= 7 ? hex : '#888888'
-  const r = parseInt(c.slice(1, 3), 16)
-  const g = parseInt(c.slice(3, 5), 16)
-  const b = parseInt(c.slice(5, 7), 16)
-  let best = BRAND_PALETTE[0]
-  let bestDist = Infinity
-  for (const p of BRAND_PALETTE) {
-    const pr = parseInt(p.hex.slice(1, 3), 16)
-    const pg = parseInt(p.hex.slice(3, 5), 16)
-    const pb = parseInt(p.hex.slice(5, 7), 16)
-    const d = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
-    if (d < bestDist) {
-      bestDist = d
-      best = p
-    }
-  }
-  return best.name
-}
-
 export function resolveHex(colorName: string, colorCode: string): string {
   const key = colorName.toLowerCase().trim()
   if (key && COLOR_HEX[key]) return COLOR_HEX[key]
   if (colorCode && colorCode.startsWith('#') && colorCode !== '#FFFFFF') {
-    // Treat #000000 as ink-dark — Printful uses it for confirmed-black fabrics
+    // Treat #000000 as ink-dark: Printful uses it for confirmed-black fabrics
     if (colorCode === '#000000') return '#111111'
     return colorCode
   }
@@ -232,48 +195,13 @@ export function isNearWhite(hex: string): boolean {
   return r > 200 && g > 200 && b > 200
 }
 
-// Returns true when hex is very dark — black, navy, dark charcoal, etc. (max channel < 80).
+// Returns true when hex is very dark: black, navy, dark charcoal, etc. (max channel < 80).
 function isVeryDark(hex: string): boolean {
   if (!hex.startsWith('#') || hex.length < 7) return false
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)
   return Math.max(r, g, b) < 80
-}
-
-// When Printful returns a generic near-white fabric color, read the FIRST 7ENO brand
-// keyword from the product name and use that color instead.
-// colorName: the raw Printful color_name — intentional near-whites (ink, bone, etc.)
-// are left unchanged; only generic defaults like "White" trigger the override.
-// skipHexes: hexes already shown by other swatches on this product.
-// When the override target is already covered, return rawHex (paper) instead.
-export function applyBrandOverride(
-  productName: string,
-  resolvedHex: string,
-  colorName = '',
-  skipHexes?: Set<string>
-): string {
-  const key = colorName.toLowerCase().trim()
-  const nameLower = productName.toLowerCase()
-
-  // Ink Sport Tee: these products come in multiple genuine garment colors (black, blood,
-  // stone, paper). Never override any variant — each color is an intentional garment color.
-  // Specifically: near-white variants ARE the paper shirt (not a generic placeholder).
-  if (nameLower.includes('ink') && nameLower.includes('sport') && nameLower.includes('tee')) {
-    return resolvedHex
-  }
-
-  if (!isNearWhite(resolvedHex)) return resolvedHex
-  // If the color name is a known intentional near-white, don't override
-  if (key && COLOR_HEX[key] && !PRINTFUL_GENERIC_COLORS.has(key)) return resolvedHex
-  for (const bk of BRAND_COLOR_KEYS) {
-    if (nameLower.includes(bk) && COLOR_HEX[bk]) {
-      const target = COLOR_HEX[bk]
-      if (skipHexes?.has(target)) return resolvedHex
-      return target
-    }
-  }
-  return resolvedHex
 }
 
 // Returns the human-readable display name for a swatch.
@@ -315,51 +243,4 @@ export function resolveLogoColor(productName: string, garmentHex: string): strin
     return COLOR_HEX['paper'] ?? '#EDE8DD'
   }
   return COLOR_HEX['black'] ?? '#111111'
-}
-
-// Returns a CSS background value for a color swatch.
-// Always shows a diagonal two-tone split: garment color + logo/design color.
-export function resolveSwatchBackground(
-  colorName: string,
-  colorCode: string,
-  colorCode2: string | null | undefined,
-  productName = '',
-  skipHexes?: Set<string>
-): string {
-  // Brand colourway override (e.g. swimwear) takes precedence over data-derived colours.
-  const override = productName ? brandSwatchOverride(productName) : null
-  if (override) return `linear-gradient(135deg, ${override.hex} 50%, ${override.hex2} 50%)`
-
-  const rawHex = resolveHex(colorName, colorCode)
-  const hex1 = applyBrandOverride(productName, rawHex, colorName, skipHexes)
-
-  // Determine the second color for the diagonal swatch.
-  // hex1 (garment) is ALWAYS top-left; the second color goes bottom-right.
-  let hex2: string | null = null
-
-  // Physical two-tone garment (color_code2)
-  if (colorCode2 && colorCode2.startsWith('#') && colorCode2 !== '#000000' && colorCode2 !== '#FFFFFF') {
-    if (colorCode2 !== hex1) hex2 = colorCode2
-  }
-
-  // Compound Printful color name (e.g. "Butter Stone", "Ink/Blood").
-  // Always pick the part that differs from hex1 (garment) as the second color.
-  if (!hex2) {
-    const parts = colorName.toLowerCase().split(/[^a-z]+/).filter(Boolean)
-    if (parts.length >= 2) {
-      const ha = COLOR_HEX[parts[0]]
-      const hb = COLOR_HEX[parts[1]]
-      if (ha && hb && ha !== hb) {
-        hex2 = ha !== hex1 ? ha : hb
-      }
-    }
-  }
-
-  // Logo/design color as second half
-  if (!hex2 && productName) {
-    const logoHex = resolveLogoColor(productName, hex1)
-    if (logoHex !== hex1) hex2 = logoHex
-  }
-
-  return hex2 ? `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)` : hex1
 }

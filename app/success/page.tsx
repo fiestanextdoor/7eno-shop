@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
-import { LogoBadge } from '@/components/Logo/Logo'
+import { useSearchParams } from 'next/navigation'
+import { buttonClasses } from '@/components/ui/Button/Button'
 import { useCartStore } from '@/store/cart'
 import styles from './success.module.css'
 
@@ -18,20 +18,25 @@ function SuccessContent() {
 
   return (
     <div className={styles.inner}>
-      <div className={styles.mark}>
-        <LogoBadge variant="wit" size={100} />
-      </div>
-      <h1 className={styles.title}>Order Confirmed</h1>
+      <p className={styles.label}>Order confirmed</p>
+      <h1 className={styles.title}>Thank you</h1>
       <p className={styles.body}>
-        Your order has been placed successfully.
-        You will receive a confirmation email shortly.
+        Your order has been placed and a confirmation email is on its way. Every piece is made to order, so it ships
+        within 5 to 10 business days.
       </p>
       {sessionId && (
-        <p className={styles.id}>Order ref: {sessionId.slice(-12)}</p>
+        <p className={styles.ref}>
+          <span className={styles.refLabel}>Order ref</span> <span>{sessionId.slice(-12)}</span>
+        </p>
       )}
-      <Link href="/shop" className={styles.shopLink}>
-        Continue Shopping
-      </Link>
+      <div className={styles.actions}>
+        <Link href="/shop" className={buttonClasses('primary', 'lg')}>
+          Continue shopping
+        </Link>
+        <Link href="/account/orders" className={styles.textLink}>
+          View your orders
+        </Link>
+      </div>
     </div>
   )
 }

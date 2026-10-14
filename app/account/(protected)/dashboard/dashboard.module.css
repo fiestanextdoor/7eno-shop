@@ -1,137 +1,114 @@
 .page {
-  max-width: 800px;
+  display: grid;
+  gap: var(--s-6);
 }
 
 .pageTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 600;
-  font-size: clamp(2rem, 4vw, 3rem);
-  color: var(--ink);
-  line-height: 1;
-  margin-bottom: 40px;
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: var(--fs-h2);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  margin-bottom: 40px;
-}
-
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  gap: var(--s-5);
 }
 
 .block {
-  background: var(--oxblood);
-  padding: 32px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--c-stone);
 }
 
 .blockLabel {
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  letter-spacing: 4px;
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--stone);
-}
-
-.orderList {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex: 1;
-}
-
-.orderRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(246, 243, 236, 0.06);
-}
-
-.orderDate {
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-  color: var(--bone);
-  margin-bottom: 4px;
-}
-
-.orderStatus {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--stone);
-}
-
-.orderTotal {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 1px;
-  color: var(--bone);
-}
-
-.addressBlock {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  color: var(--bone);
-  line-height: 1.7;
-  font-style: normal;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.empty {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.9rem;
-  color: var(--stone);
-  flex: 1;
+  color: var(--c-text-muted);
 }
 
 .blockLink {
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--stone);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(138, 130, 117, 0.3);
-  padding-bottom: 2px;
-  width: fit-content;
-  transition: color 0.2s, border-color 0.2s;
+  justify-self: start;
+  font-size: var(--fs-small);
+  color: var(--c-accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.blockLink:hover {
-  color: var(--bone);
-  border-color: rgba(246, 243, 236, 0.4);
+.addressBlock {
+  margin: 0;
+  font-style: normal;
+}
+
+.orderList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orderRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--c-stone);
+}
+
+.orderDate {
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.orderStatus {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.orderTotal {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.empty {
+  margin: 0;
+  color: var(--c-text-muted);
 }
 
 .cta {
-  margin-top: 20px;
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
 }
 
 .ctaBtn {
   display: inline-flex;
-  padding: 14px 36px;
-  background: var(--oxblood);
-  color: var(--bone);
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 3px;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--s-5);
+  border-radius: var(--r-0);
+  background: var(--c-text);
+  color: var(--c-inverse-text);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.2s;
 }
 
-.ctaBtn:hover {
-  background: #7a2223;
+.blockLink:focus-visible,
+.ctaBtn:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
 }

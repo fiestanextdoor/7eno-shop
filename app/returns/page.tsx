@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Nav from '@/components/Nav/Nav'
-import styles from './returns.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 export const metadata: Metadata = {
-  title: 'Returns — 7ENO',
+  title: 'Returns',
   description: 'How returns work at 7ENO: a simple 14-day return process for your order.',
 }
 
@@ -32,7 +31,6 @@ const STEPS = [
 export default function ReturnsPage() {
   return (
     <>
-      <Nav />
       <main className={styles.page}>
         <div className={styles.inner}>
           <h1 className={styles.title}>Returns</h1>

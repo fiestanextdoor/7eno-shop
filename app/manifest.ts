@@ -1,22 +1,26 @@
 import type { MetadataRoute } from 'next'
-import { BRAND } from '@/lib/seo'
+import { APP_ICONS } from '@/lib/brand'
+import { BACKGROUND_COLOR, BRAND, SITE_DESCRIPTION, THEME_COLOR } from '@/lib/seo'
 
-// Web app manifest: lets the store be installed/added to a home screen and
-// gives Android and Chrome an explicit, correct brand name. `name` carries the
-// spoken spelling so on-device search for "Zeno" finds it too.
+// Web app manifest: lets the store be installed to a home screen and gives
+// Android and Chrome the brand name. `name` carries the spoken spelling so
+// on-device search for "Zeno" finds it too. Icons declare their real pixel
+// size: Chrome rejects a PNG whose declared size does not match.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${BRAND.name} (Zeno) — Premium Streetwear`,
+    name: `${BRAND.name} (Zeno) · Numbered streetwear editions`,
     short_name: BRAND.name,
-    description:
-      '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections.',
+    description: SITE_DESCRIPTION,
     start_url: '/',
     display: 'standalone',
-    background_color: '#F7EED6',
-    theme_color: '#297d95',
+    background_color: BACKGROUND_COLOR,
+    theme_color: THEME_COLOR,
     categories: ['shopping', 'lifestyle'],
-    icons: [
-      { src: '/logos/beeldmerk-zwart.png', sizes: 'any', type: 'image/png' },
-    ],
+    icons: APP_ICONS.map((icon) => ({
+      src: icon.src,
+      sizes: `${icon.width}x${icon.height}`,
+      type: 'image/png',
+      purpose: icon.purpose,
+    })),
   }
 }

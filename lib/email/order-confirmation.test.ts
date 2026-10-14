@@ -1,4 +1,5 @@
 import { renderOrderConfirmation, type OrderEmailData } from './order-confirmation'
+import { EMAIL_WORDMARK } from './brand'
 
 const baseOrder: OrderEmailData = {
   orderRef: 'PF-12345',
@@ -111,5 +112,43 @@ describe('renderOrderConfirmation', () => {
   it('formats unknown currencies with a code suffix', () => {
     const out = renderOrderConfirmation({ ...baseOrder, currency: 'gbp' })
     expect(out.html).toContain('80.00 GBP')
+  })
+})
+
+describe('v2 brand', () => {
+  it('renders in the official palette with the new wordmark', () => {
+    const { html } = renderOrderConfirmation(baseOrder)
+    for (const hex of ['#2D3A4F', '#F7F1DA', '#FFFFFF', '#C4C4B5']) expect(html).toContain(hex)
+    expect(html).toContain(`${EMAIL_WORDMARK.src}" width="120" height="${EMAIL_WORDMARK.height}"`)
+    expect(html).not.toMatch(/#111111|#5C1A1B|#F6F3EC|#EDE8DD|#8A8275|Georgia|\/logos\//)
+  })
+
+  it('sets the heading in Arial Black and drops the italics', () => {
+    const { html } = renderOrderConfirmation(baseOrder)
+    expect(html).toContain("font-family:'Arial Black', Arial, sans-serif;font-weight:900")
+    expect(html).not.toContain('font-style:italic')
+  })
+
+  it('never uses periwinkle as a text colour', () => {
+    const { html } = renderOrderConfirmation(baseOrder)
+    expect(html).toContain('#3E5A8F')
+    expect(html).not.toMatch(/color:#7995C7/i)
+  })
+
+  it('drops the v1 tagline and the long dashes', () => {
+    const out = renderOrderConfirmation(baseOrder)
+    expect(out.html + out.text).not.toContain('Divine Authority')
+    expect(out.html + out.text).not.toMatch(/[\u2013\u2014]/)
+    expect(out.text.split('\n')[0]).toBe('7ENO · ORDER CONFIRMATION')
+  })
+
+  it('escapes an ampersand product name exactly once and keeps the text version plain', () => {
+    const out = renderOrderConfirmation({
+      ...baseOrder,
+      items: [{ name: 'Tee & Towel "Set"', variant: 'Rose Red / L', quantity: 1, amountCents: 4500 }],
+    })
+    expect(out.html).toContain('Tee &amp; Towel &quot;Set&quot;')
+    expect(out.html).not.toContain('&amp;amp;')
+    expect(out.text).toContain('Tee & Towel "Set"')
   })
 })

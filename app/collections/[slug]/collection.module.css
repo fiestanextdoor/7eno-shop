@@ -1,0 +1,42 @@
+.page {
+  min-height: 100vh;
+  padding-top: var(--l-chrome);
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.page[data-tone='dark'] {
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}
+
+.lineup {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding-bottom: var(--s-9);
+}
+
+.lineupGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--l-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineupItem {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--c-surface);
+}
+
+.lineupImage {
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .lineupGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

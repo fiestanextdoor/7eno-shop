@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Accordion from '@/components/ui/Accordion/Accordion'
 import { absoluteUrl, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
   'Answers about ordering at 7ENO (Zeno): payment with iDEAL, delivery times for made-to-order pieces, shipping costs, 14-day returns and sizing.'
 
 export const metadata: Metadata = {
-  title: 'FAQ — ordering, delivery and returns',
+  title: 'FAQ: ordering, delivery and returns',
   description: DESCRIPTION,
   keywords: [
     '7ENO FAQ', 'Zeno FAQ', 'verzendkosten', 'levertijd', 'retourneren', 'iDEAL betalen',
@@ -46,7 +47,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
       },
       {
         q: 'Can I change or cancel my order after placing it?',
-        a: 'Get in touch as soon as possible at info@7eno.shop. Because every piece is made to order, production can start quickly — once it has, the order can no longer be changed, but you can still return it after delivery.',
+        a: 'Get in touch as soon as possible at info@7eno.shop. Because every piece is made to order, production can start quickly. Once it has, the order can no longer be changed, but you can still return it after delivery.',
       },
     ],
   },
@@ -112,9 +113,9 @@ const GROUPS: { title: string; items: Faq[] }[] = [
         link: { href: '/size-guide', label: 'Open the size guide' },
       },
       {
-        q: 'What is the difference between the OG and Olympian collections?',
-        a: 'OG is the original, darker range built around the 7ENO mark in ink, blood red and butter. Olympian is the newer capsule with a rounded early-2000s wordmark in four dusty colourways: Coconut, Ocean, Sand and Flamingo.',
-        link: { href: '/olympian', label: "See Olympian '26" },
+        q: 'What is the difference between Olympian and OLYMPN Sport?',
+        a: 'They are two numbered editions. Olympian (edition 01) is ringer tees, knitted tees and backpacks in four colourways: Coconut, Ocean, Sand and Flamingo. OLYMPN Sport (edition 02) is oversized and relaxed hoodies with the OLYMPN SPORT print, released as a timed drop.',
+        link: { href: '/archive', label: 'See every edition' },
       },
       {
         q: 'Are the Olympian colours separate products?',
@@ -133,7 +134,7 @@ export default function FaqPage() {
   ])
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -147,7 +148,7 @@ export default function FaqPage() {
           <p className={styles.eyebrow}>Help</p>
           <h1 className={styles.title}>Questions, answered</h1>
           <p className={styles.lead}>
-            Delivery times, shipping costs, returns and sizing — the things worth knowing before
+            Delivery times, shipping costs, returns and sizing: the things worth knowing before
             you order. Anything missing? Mail{' '}
             <a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a> and a person
             will answer.
@@ -158,19 +159,21 @@ export default function FaqPage() {
           <section key={group.title} className={styles.section}>
             <h2 className={styles.h2}>{group.title}</h2>
             <div className={styles.faqGroup}>
-              {group.items.map((item) => (
-                <details key={item.q} className={styles.faqItem}>
-                  <summary className={styles.faqQuestion}>{item.q}</summary>
-                  <div className={styles.faqAnswer}>
-                    <p>{item.a}</p>
-                    {item.link && (
-                      <p style={{ marginTop: 10 }}>
-                        <Link href={item.link.href} className={styles.link}>{item.link.label} →</Link>
-                      </p>
-                    )}
-                  </div>
-                </details>
-              ))}
+              <Accordion
+                items={group.items.map((item) => ({
+                  title: item.q,
+                  content: (
+                    <>
+                      <p>{item.a}</p>
+                      {item.link && (
+                        <p>
+                          <Link href={item.link.href} className={styles.link}>{item.link.label}</Link>
+                        </p>
+                      )}
+                    </>
+                  ),
+                }))}
+              />
             </div>
           </section>
         ))}

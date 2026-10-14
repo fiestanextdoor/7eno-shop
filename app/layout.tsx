@@ -1,35 +1,53 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Mono, Cormorant_Garamond } from 'next/font/google'
+import { Archivo, Instrument_Sans, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import CartProvider from '@/components/CartProvider/CartProvider'
-import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
-import PageTransition from '@/components/PageTransition/PageTransition'
-import { BASE_URL, BRAND_KEYWORDS, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
+import AppShell from '@/components/AppShell/AppShell'
+import { BASE_URL, BRAND_KEYWORDS, SITE_DESCRIPTION, THEME_COLOR, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
+import '@/styles/tokens.css'
 
-// Cormorant Garamond is the site-wide typeface for headings and body: a soft,
-// high-contrast renaissance serif that gives the "Divine Authority" brand an
-// ethereal, scriptural feel. Wired to --font-sans in globals.css. Space Mono
-// stays for the small uppercase label accents (a distinct, functional element).
-// Both are self-hosted by next/font at build time, so no external font CDN is
-// hit (keeps the `font-src 'self'` CSP intact).
-const cormorant = Cormorant_Garamond({
+// Rebrand v2 type (spec section 2). Archivo is loaded as a variable font with
+// the width axis, so the display face can run at wdth 125 / wght 900.
+// adjustFontFallback keeps the swap from shifting the layout (CLS).
+// Self-hosted by next/font, so the CSP stays `font-src 'self'`.
+const archivo = Archivo({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+  style: ['normal'],
+  axes: ['wdth'],
+  variable: '--font-archivo',
   display: 'swap',
+  preload: true,
+  adjustFontFallback: true,
 })
 
-const spaceMono = Space_Mono({
+// The italic cut is only used for drop and edition titles (DropBlock,
+// EditionCard, home band, 404, success), so it is not preloaded on every page;
+// the browser fetches it when an italic title renders. Used via
+// --f-display-italic in styles/tokens.css.
+const archivoItalic = Archivo({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-mono',
+  style: ['italic'],
+  axes: ['wdth'],
+  variable: '--font-archivo-italic',
   display: 'swap',
+  preload: false,
+  adjustFontFallback: true,
 })
 
-const SITE_DESCRIPTION =
-  '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections, with free shipping over €75.'
+const instrumentSans = Instrument_Sans({
+  subsets: ['latin'],
+  variable: '--font-instrument',
+  display: 'swap',
+  adjustFontFallback: true,
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-plex-mono',
+  display: 'swap',
+  adjustFontFallback: true,
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -53,7 +71,7 @@ export const metadata: Metadata = {
   category: 'shopping',
   // Let Google show full-size image previews and untruncated snippets. Without
   // max-image-preview:large, product photos are shown as thumbnails (or not at
-  // all) in Search and Discover — the single highest-impact robots directive
+  // all) in Search and Discover: the single highest-impact robots directive
   // for a webshop.
   robots: {
     index: true,
@@ -88,7 +106,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#111111',
+  themeColor: THEME_COLOR,
 }
 
 export default function RootLayout({
@@ -98,14 +116,16 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
+    <html
+      lang="en"
+      className={`${archivo.variable} ${archivoItalic.variable} ${instrumentSans.variable} ${plexMono.variable}`}
+    >
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
-        {/* Product photos are served from the print providers' CDNs; warming the
-            connections early shaves a round trip off the largest image (LCP). */}
+        {/* Product photos are served from the Printful CDN; warming the
+            connection early shaves a round trip off the largest image (LCP). */}
         <link rel="preconnect" href="https://files.cdn.printful.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://files.cdn.printful.com" />
-        <link rel="dns-prefetch" href="https://images-api.printify.com" />
         {/* Site-wide entity graph: who the brand is and what the site is. The
             "Zeno" spellings let search engines link the spoken brand name to the
             store (people hear "Zeno", not "7ENO").
@@ -124,11 +144,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <CartProvider>
-          <SmoothScroll />
-          <PageTransition />
-          {children}
-        </CartProvider>
+        <AppShell>{children}</AppShell>
         <Analytics />
       </body>
     </html>

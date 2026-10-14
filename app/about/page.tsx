@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { absoluteUrl, BASE_URL, BRAND, breadcrumbJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
-  '7ENO is pronounced "Zeno". The streetwear label by Abra Entertainment from Eindhoven, made to order in two collections: OG and Olympian.'
+  '7ENO is pronounced "Zeno". The streetwear label by Abra Entertainment from Eindhoven, made to order in numbered editions: Olympian and OLYMPN Sport.'
 
 export const metadata: Metadata = {
-  title: 'About 7ENO — pronounced "Zeno"',
+  title: 'About 7ENO, pronounced "Zeno"',
   description: DESCRIPTION,
   keywords: [
     'Zeno', 'Zeno merk', 'Zeno streetwear', 'Zeno kleding', '7ENO uitspraak',
@@ -43,7 +43,7 @@ export default function AboutPage() {
   }
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
@@ -58,7 +58,7 @@ export default function AboutPage() {
           </p>
           <div className={styles.ctaRow}>
             <Link href="/shop" className={styles.cta}>Browse the shop</Link>
-            <Link href="/olympian" className={styles.ctaGhost}>See Olympian &rsquo;26</Link>
+            <Link href="/archive" className={styles.ctaGhost}>See every edition</Link>
           </div>
         </header>
 
@@ -78,17 +78,18 @@ export default function AboutPage() {
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.h2}>Two collections, two moods</h2>
+          <h2 className={styles.h2}>Numbered editions</h2>
           <p className={styles.body}>
-            <strong>OG</strong> is the original range and the darker one: ink, blood red and butter,
-            with the 7ENO beeldmerk used as a mark rather than a slogan. It covers tees, sport tees
-            and shorts, caps and accessories.
+            7ENO releases in editions. Each one has a number, a release window and its own look,
+            and stays in the archive once it closes.
           </p>
           <p className={styles.body}>
-            <strong>Olympian &rsquo;26</strong> is the newer capsule and the warmer one, built
-            around four dusty colourways and a rounded early-2000s wordmark. Read more on the{' '}
-            <Link href="/olympian" className={styles.link}>Olympian collection page</Link>, or shop{' '}
-            <Link href="/shop?line=og" className={styles.link}>OG</Link> directly.
+            <strong>Olympian</strong> is edition 01: ringer tees, knitted tees and backpacks in four
+            dusty colourways. <strong>OLYMPN Sport</strong> is edition 02: oversized and relaxed
+            hoodies, released as a timed drop. See{' '}
+            <Link href="/collections/olympian" className={styles.link}>Olympian</Link>,{' '}
+            <Link href="/collections/olympn-sport" className={styles.link}>OLYMPN Sport</Link> or the{' '}
+            <Link href="/archive" className={styles.link}>archive</Link>.
           </p>
         </section>
 
@@ -101,18 +102,8 @@ export default function AboutPage() {
           </p>
           <p className={styles.body}>
             The honest trade-off is time. Your order is made after you place it, so production
-            takes two to five working days before the parcel is handed over — instead of shipping
+            takes two to five working days before the parcel is handed over, instead of shipping
             the same afternoon from a shelf.
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.h2}>A tee that gives something back</h2>
-          <p className={styles.body}>
-            One piece in the range is a collaboration:{' '}
-            <Link href="/shop/x-life4hsp-sport-tee" className={styles.link}>the 7ENO × Life4HSP sport tee</Link>,
-            made together with the Life4HSP foundation. It carries both marks and is the one
-            product in the shop that exists for a reason beyond the clothing.
           </p>
         </section>
 
@@ -142,9 +133,9 @@ export default function AboutPage() {
         <section className={styles.section}>
           <h2 className={styles.h2}>Keep reading</h2>
           <div className={styles.related}>
-            <Link href="/olympian" className={styles.relatedCard}>
-              <span className={styles.relatedTitle}>Olympian &rsquo;26</span>
-              <span className={styles.relatedNote}>The four-colourway capsule and where it came from.</span>
+            <Link href="/archive" className={styles.relatedCard}>
+              <span className={styles.relatedTitle}>Archive</span>
+              <span className={styles.relatedNote}>Every edition, its release window and its status.</span>
             </Link>
             <Link href="/size-guide" className={styles.relatedCard}>
               <span className={styles.relatedTitle}>Size guide</span>

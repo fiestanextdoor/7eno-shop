@@ -1,0 +1,559 @@
+{
+ "code": 200,
+ "result": {
+  "items": [
+   {
+    "id": 108435971,
+    "product_id": 892,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Oversized Hoodie Rose Red",
+    "available_variant_ids": [
+     22981,
+     22982,
+     22983,
+     22984,
+     22985,
+     22986
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Maroon",
+      "color_codes": [
+       "#621926"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/0c/0c2b7c72a128abef3a42bd7b51d996aa_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791281521,
+    "updated_at": 1791317801,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436007,
+    "product_id": 892,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Oversized Hoodie Pistachio",
+    "available_variant_ids": [
+     53803,
+     53806,
+     53809,
+     53812,
+     53815,
+     53818
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Sage",
+      "color_codes": [
+       "#9caf92"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/9f/9fb814163c9fbbda66f81402db5e0c63_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791281631,
+    "updated_at": 1791285238,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436035,
+    "product_id": 892,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Oversized Hoodie Mocha",
+    "available_variant_ids": [
+     22999,
+     23000,
+     23001,
+     23002,
+     23003,
+     23004
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Vintage Brown",
+      "color_codes": [
+       "#9e7551"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/1e/1ef6f05b91ff3cfc0e5326d9eb3f8cc5_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791281725,
+    "updated_at": 1791282484,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108206482,
+    "product_id": 892,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Oversized Hoodie Obsidian",
+    "available_variant_ids": [
+     22958,
+     22960,
+     22962,
+     22964,
+     22966,
+     22968
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Black",
+      "color_codes": [
+       "#0e0b0b"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/23/232da2cf521a59d70dcbcbab85266b5c_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1790849565,
+    "updated_at": 1791282465,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436240,
+    "product_id": 1577,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Relaxed Hoodie Dune",
+    "available_variant_ids": [
+     49649,
+     49657,
+     49665,
+     49673,
+     49681,
+     49689
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Stone",
+      "color_codes": [
+       "#c3b99c"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/9d/9dc0cb94e6759824537089df92cafb3d_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791282334,
+    "updated_at": 1791282396,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436201,
+    "product_id": 1577,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Relaxed Hoodie Olive",
+    "available_variant_ids": [
+     49647,
+     49655,
+     49663,
+     49671,
+     49679,
+     49687
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Khaki Green",
+      "color_codes": [
+       "#3c3d2e"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/0d/0d84f8131c17f8c385276e5c9a441155_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791282238,
+    "updated_at": 1791282324,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436119,
+    "product_id": 1577,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Relaxed Hoodie Obsidian",
+    "available_variant_ids": [
+     49643,
+     49651,
+     49659,
+     49667,
+     49675,
+     49683
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Black",
+      "color_codes": [
+       "#0b0b0b"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/6a/6a8ef60d389751653484ee6496e28606_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791281972,
+    "updated_at": 1791282225,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 108436135,
+    "product_id": 1577,
+    "external_product_id": null,
+    "title": "OLYMPN Sport Relaxed Hoodie Maritime",
+    "available_variant_ids": [
+     49645,
+     49653,
+     49661,
+     49669,
+     49677,
+     49685
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "French Navy",
+      "color_codes": [
+       "#071429"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/f3/f31c78ec14b15d1cc8e6e5f02acfd9d0_l",
+    "placements": [
+     {
+      "placement": "front",
+      "display_name": "Front print",
+      "technique_key": "DTG",
+      "technique_display_name": "DTG printing",
+      "options": []
+     }
+    ],
+    "created_at": 1791282030,
+    "updated_at": 1791282149,
+    "placement_option_data": [
+     {
+      "type": "front",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 105940274,
+    "product_id": 586,
+    "external_product_id": null,
+    "title": "7ENO x Speeco Tee",
+    "available_variant_ids": [
+     17700,
+     17701,
+     17702,
+     17703,
+     17704,
+     17705,
+     17706
+    ],
+    "option_data": [],
+    "colors": [
+     {
+      "color_name": "Moss",
+      "color_codes": [
+       "#6b7053"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL",
+     "3XL",
+     "4XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/62/62c48e1f4e2ac546210bd629b95ec6fe_l",
+    "placements": [
+     {
+      "placement": "front_dtf",
+      "display_name": "Front print",
+      "technique_key": "DTFILM",
+      "technique_display_name": "DTF printing",
+      "options": []
+     },
+     {
+      "placement": "back_dtf",
+      "display_name": "Back print",
+      "technique_key": "DTFILM",
+      "technique_display_name": "DTF printing",
+      "options": []
+     },
+     {
+      "placement": "short_sleeve_right_dtf",
+      "display_name": "Short right sleeve",
+      "technique_key": "DTFILM",
+      "technique_display_name": "DTF printing",
+      "options": []
+     }
+    ],
+    "created_at": 1786112446,
+    "updated_at": 1786116271,
+    "placement_option_data": [
+     {
+      "type": "front_dtf",
+      "options": []
+     },
+     {
+      "type": "back_dtf",
+      "options": []
+     },
+     {
+      "type": "short_sleeve_right_dtf",
+      "options": []
+     }
+    ],
+    "design_id": null
+   },
+   {
+    "id": 102794803,
+    "product_id": 661,
+    "external_product_id": null,
+    "title": "Unisex windbreaker",
+    "available_variant_ids": [
+     16424,
+     16425,
+     16426,
+     16427,
+     16428
+    ],
+    "option_data": [
+     {
+      "id": "thread_colors_chest_left",
+      "value": [
+       "#FFCC00"
+      ]
+     },
+     {
+      "id": "thread_colors_large_center",
+      "value": [
+       "#FFCC00"
+      ]
+     }
+    ],
+    "colors": [
+     {
+      "color_name": "Black",
+      "color_codes": [
+       "#1c1b1b"
+      ]
+     }
+    ],
+    "sizes": [
+     "S",
+     "M",
+     "L",
+     "XL",
+     "2XL"
+    ],
+    "mockup_file_url": "https://files.cdn.printful.com/upload/product-templates/24/242cb4ff2e2e0c7125ec18611c8b8c35_l",
+    "placements": [
+     {
+      "placement": "embroidery_chest_left",
+      "display_name": "Left chest",
+      "technique_key": "EMBROIDERY",
+      "technique_display_name": "Embroidery",
+      "options": []
+     },
+     {
+      "placement": "embroidery_large_center",
+      "display_name": "Large center",
+      "technique_key": "EMBROIDERY",
+      "technique_display_name": "Embroidery",
+      "options": []
+     }
+    ],
+    "created_at": 1779213118,
+    "updated_at": 1779213118,
+    "placement_option_data": [
+     {
+      "type": "embroidery_chest_left",
+      "options": []
+     },
+     {
+      "type": "embroidery_large_center",
+      "options": []
+     }
+    ],
+    "design_id": null
+   }
+  ]
+ },
+ "extra": [],
+ "paging": {
+  "total": 10,
+  "limit": 100,
+  "offset": 0
+ }
+}

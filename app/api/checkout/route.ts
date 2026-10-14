@@ -7,6 +7,8 @@ import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
 import { getBundle } from '@/lib/bundles'
 import { resolveBundleDiscountCents, type BundleMemberItem } from '@/lib/bundle-discount'
 import { findPromoCode, type PromoCode } from '@/lib/promo'
+import { currentTimeMs, isPurchasable, matchDrop } from '@/lib/drops'
+import { PREVIEW_COOKIE, isPreviewCookieValue } from '@/lib/preview'
 import { createClient } from '@/lib/supabase/server'
 import type { NormalizedVariant } from '@/types/catalog'
 import type { CartItem } from '@/types/cart'
@@ -84,6 +86,9 @@ export async function POST(req: NextRequest) {
   const bundleMembers: BundleMemberItem[] = []
   let subtotalCents = 0
   let currency = 'eur'
+  // One clock for the whole cart, so every line is judged at the same moment.
+  const now = currentTimeMs()
+  const preview = isPreviewCookieValue(req.cookies.get(PREVIEW_COOKIE)?.value)
 
   for (const item of items) {
     // The variant is only present if it genuinely belongs to one of the products
@@ -94,6 +99,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'One or more products are no longer available' },
         { status: 400 }
+      )
+    }
+
+    // Only products of a live drop are for sale (spec section 4): OG, Printify,
+    // unplanned products and teasers before release are refused. Judged on the
+    // server-resolved name and id, so a stale cart or a crafted request cannot
+    // buy early. The id is the variant's own product, never the body's
+    // productId: a sync-id match outranks the name.
+    const drop = matchDrop({ id: found.variant.productId, provider: found.variant.provider, name: found.productName })
+    if (!isPurchasable(drop, now, { preview })) {
+      return NextResponse.json(
+        { error: 'One or more products are not available' },
+        { status: 409 }
       )
     }
 
@@ -183,7 +201,7 @@ export async function POST(req: NextRequest) {
 
   // Discount code. Single-use per account and not combinable with bundle deals,
   // so it requires a signed-in account (that is how "one use per account" is
-  // enforced — see coupon_redemptions). Every check is repeated here, never
+  // enforced, see coupon_redemptions). Every check is repeated here, never
   // trusting the client or the /api/promo/validate pre-check.
   let appliedPromo: PromoCode | null = null
   if (typeof promoCode === 'string' && promoCode.trim() !== '') {

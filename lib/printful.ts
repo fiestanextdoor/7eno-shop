@@ -186,7 +186,7 @@ export interface SizeGuide {
 /**
  * A size guide for apparel, built from Printful's "measure yourself" body
  * measurements. Printful reports inches; we convert to cm for the EU audience.
- * Ranges (e.g. chest 34–37") become "86–94". Optionally filtered to the sizes a
+ * Ranges (e.g. chest 34-37") become "86-94". Optionally filtered to the sizes a
  * product actually offers so the guide matches the buyable options.
  */
 export async function getSizeGuide(
@@ -223,7 +223,7 @@ export async function getSizeGuide(
   const toCm = (inch: string | number) => Math.round(Number(inch) * 2.54)
   const cell = (v: { value?: string | number; min_value?: string | number; max_value?: string | number }) => {
     if (v.value !== undefined && v.value !== null && v.value !== '') return `${toCm(v.value)}`
-    if (v.min_value !== undefined && v.max_value !== undefined) return `${toCm(v.min_value)}–${toCm(v.max_value)}`
+    if (v.min_value !== undefined && v.max_value !== undefined) return `${toCm(v.min_value)}-${toCm(v.max_value)}`
     return ''
   }
 

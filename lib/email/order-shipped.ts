@@ -1,6 +1,7 @@
 import { sendEmail, type SendEmailResult } from './send'
 import {
-  INK, BONE, PAPER, OXBLOOD, STONE, RULE, SERIF, MONO,
+  INK, BONE, SURFACE, ACCENT_INK, MUTED, RULE, DISPLAY, BODY, MONO,
+  EMAIL_WORDMARK, EMAIL_MARK,
   escapeHtml, firstName, emailBaseUrl, type RenderedEmail,
 } from './brand'
 
@@ -31,7 +32,7 @@ export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
     .join('<br />')
 
   const carrierLine = data.carrier
-    ? `<span style="color:${STONE};">${escapeHtml(data.carrier)}</span> &middot; `
+    ? `<span style="color:${MUTED};">${escapeHtml(data.carrier)}</span> &middot; `
     : ''
 
   const html = `<!DOCTYPE html>
@@ -42,34 +43,34 @@ export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
   <meta name="color-scheme" content="light only" />
   <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background:${PAPER};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAPER};">
+<body style="margin:0;padding:0;background:${BONE};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BONE};">
     <tr>
       <td align="center" style="padding:32px 16px;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:${BONE};border:1px solid ${RULE};">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:${SURFACE};border:1px solid ${RULE};">
           <!-- Header -->
           <tr>
             <td align="center" style="padding:40px 40px 8px;">
-              <img src="${baseUrl}/logos/woordmerk-ink.png" width="180" height="138" alt="7ENO" style="display:block;border:0;margin:0 auto;max-width:100%;" />
-              <div style="font-family:${MONO};font-size:10px;letter-spacing:4px;text-transform:uppercase;color:${OXBLOOD};margin-top:12px;">Shipped</div>
+              <img src="${baseUrl}${EMAIL_WORDMARK.src}" width="${EMAIL_WORDMARK.width}" height="${EMAIL_WORDMARK.height}" alt="7ENO" style="display:block;border:0;margin:0 auto;max-width:100%;" />
+              <div style="font-family:${MONO};font-size:10px;letter-spacing:4px;text-transform:uppercase;color:${ACCENT_INK};margin-top:12px;">Shipped</div>
             </td>
           </tr>
           <!-- Greeting -->
           <tr>
             <td style="padding:24px 40px 0;">
-              <h1 style="margin:0 0 12px;font-family:${SERIF};font-style:italic;font-weight:600;font-size:26px;color:${INK};">On its way, ${escapeHtml(firstName(data.customerName))}.</h1>
-              <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.6;color:${INK};">
+              <h1 style="margin:0 0 12px;font-family:${DISPLAY};font-weight:900;font-size:24px;line-height:1.1;text-transform:uppercase;color:${INK};">On its way, ${escapeHtml(firstName(data.customerName))}.</h1>
+              <p style="margin:0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK};">
                 Your order has shipped. Reference
-                <span style="font-family:${MONO};font-size:13px;color:${OXBLOOD};">${escapeHtml(data.orderRef)}</span>.
+                <span style="font-family:${MONO};font-size:13px;color:${ACCENT_INK};">${escapeHtml(data.orderRef)}</span>.
               </p>
             </td>
           </tr>
           <!-- Tracking -->
           <tr>
             <td style="padding:24px 40px 0;">
-              <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${STONE};margin-bottom:8px;">Tracking</div>
+              <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:8px;">Tracking</div>
               <p style="margin:0 0 16px;font-family:${MONO};font-size:14px;color:${INK};">
-                ${carrierLine}<span style="color:${OXBLOOD};">${escapeHtml(data.trackingNumber)}</span>
+                ${carrierLine}<span style="color:${ACCENT_INK};">${escapeHtml(data.trackingNumber)}</span>
               </p>
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
@@ -83,17 +84,17 @@ export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
           <!-- Shipping address -->
           <tr>
             <td style="padding:24px 40px 0;">
-              <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${STONE};margin-bottom:8px;">Shipping to</div>
-              <p style="margin:0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK};">${addressHtml}</p>
+              <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${MUTED};margin-bottom:8px;">Shipping to</div>
+              <p style="margin:0;font-family:${BODY};font-size:15px;line-height:1.6;color:${INK};">${addressHtml}</p>
             </td>
           </tr>
           <!-- Footer -->
           <tr>
             <td align="center" style="padding:28px 40px 40px;">
               <hr style="border:none;border-top:1px solid ${RULE};margin:0 0 20px;" />
-              <img src="${baseUrl}/logos/beeldmerk-zwart.png" width="34" height="35" alt="" style="display:block;border:0;margin:0 auto 12px;" />
-              <p style="margin:0;font-family:${MONO};font-size:11px;line-height:1.7;color:${STONE};text-align:center;">
-                7ENO &middot; Divine Authority<br />
+              <img src="${baseUrl}${EMAIL_MARK.src}" width="${EMAIL_MARK.width}" height="${EMAIL_MARK.height}" alt="" style="display:block;border:0;margin:0 auto 12px;" />
+              <p style="margin:0;font-family:${MONO};font-size:11px;line-height:1.7;color:${MUTED};text-align:center;">
+                7ENO &middot; Numbered editions by Abra Entertainment<br />
                 Questions about your order? Just reply to this email.
               </p>
             </td>
@@ -106,7 +107,7 @@ export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
 </html>`
 
   const text = [
-    '7ENO — SHIPPED',
+    '7ENO · SHIPPED',
     '',
     `On its way, ${firstName(data.customerName)}.`,
     `Your order has shipped. Reference ${data.orderRef}.`,
@@ -122,7 +123,7 @@ export function renderOrderShipped(data: ShippedEmailData): RenderedEmail {
     `${addr.country}`,
     '',
     'Questions about your order? Just reply to this email.',
-    '7ENO · Divine Authority',
+    '7ENO · Numbered editions by Abra Entertainment',
   ].join('\n')
 
   return { subject, html, text }

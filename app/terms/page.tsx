@@ -1,15 +1,13 @@
 import type { Metadata } from 'next'
-import Nav from '@/components/Nav/Nav'
-import styles from './terms.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions — 7ENO',
+  title: 'Terms & Conditions',
 }
 
 export default function TermsPage() {
   return (
     <>
-      <Nav />
       <main className={styles.page}>
         <div className={styles.inner}>
           <h1 className={styles.title}>Terms &amp; Conditions</h1>
@@ -42,14 +40,14 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2 className={styles.heading}>6. Delivery</h2>
-            <p>Orders are produced and shipped by Printful. Estimated delivery times are 5–10 business days for standard shipping within the EU. Delivery times are indicative and not guaranteed. 7ENO is not liable for delays caused by carriers or customs.</p>
+            <p>Orders are produced and shipped by Printful. Estimated delivery times are 5 to 10 business days for standard shipping within the EU. Delivery times are indicative and not guaranteed. 7ENO is not liable for delays caused by carriers or customs.</p>
           </section>
 
           <section className={styles.section}>
             <h2 className={styles.heading}>7. Right of withdrawal (cooling-off period)</h2>
             <p>As a consumer, you have the right to withdraw from your purchase within 14 days of receiving your order, without giving any reason. To exercise this right, contact us at <a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a> before the 14-day period expires.</p>
             <p>The right of withdrawal does not apply to custom-made or personalised products. Standard print-on-demand items without personalisation do qualify.</p>
-            <p>Return shipping costs are at the customer's expense unless the product is defective or incorrect.</p>
+            <p>Return shipping costs are at the customer&apos;s expense unless the product is defective or incorrect.</p>
           </section>
 
           <section className={styles.section}>
@@ -65,7 +63,7 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2 className={styles.heading}>10. Liability</h2>
-            <p>7ENO's liability is limited to the amount paid for the order in question. We are not liable for indirect damages, loss of profit, or consequential loss.</p>
+            <p>7ENO&apos;s liability is limited to the amount paid for the order in question. We are not liable for indirect damages, loss of profit, or consequential loss.</p>
           </section>
 
           <section className={styles.section}>

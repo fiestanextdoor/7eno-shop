@@ -1,29 +1,20 @@
 import type { MetadataRoute } from 'next'
-import { getCatalogProducts } from '@/lib/catalog'
-import { getBundles } from '@/lib/bundles'
-import { productSlug } from '@/lib/slug'
+import { getShopProducts, type ShopProduct } from '@/lib/catalog'
+import { DROPS, currentTimeMs, getDropStatus, isDropListed } from '@/lib/drops'
 import { BASE_URL } from '@/lib/seo'
 
-// Refresh hourly so products added in Printful/Printify appear without a redeploy.
+// Refresh hourly so products added in Printful appear without a redeploy, and
+// a teaser product joins the sitemap within the hour after its release.
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date()
+  const nowMs = currentTimeMs()
+  const now = new Date(nowMs)
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE_URL}/shop`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    // Collection landing pages. These are the pages that should rank for
-    // "Olympian" and for the original range, so they belong in the sitemap
-    // even though they are filter URLs.
-    { url: `${BASE_URL}/shop?line=olympian`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-    { url: `${BASE_URL}/shop?line=og`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${BASE_URL}/shop?gender=men`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/shop?gender=women`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/deals`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    // Content landing pages: these target search demand the product pages
-    // can't answer (the collection story, the brand name, sizing, FAQs).
-    { url: `${BASE_URL}/olympian`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/archive`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/size-guide`, lastModified: now, changeFrequency: 'monthly', priority: 0.65 },
     { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: 'monthly', priority: 0.65 },
@@ -32,29 +23,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
-  let products: Awaited<ReturnType<typeof getCatalogProducts>> = []
-  try {
-    products = await getCatalogProducts()
-  } catch {
-    // Catalog unavailable (e.g. provider API down): still serve the static pages.
-  }
-
-  // `images` emits image:image entries, so product photos get discovered for
-  // Google Images — a real traffic source for clothing.
-  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${BASE_URL}/shop/${productSlug(p.name)}`,
-    lastModified: p.createdAt ? new Date(p.createdAt.replace(' ', 'T')) : now,
-    changeFrequency: 'weekly',
-    priority: 0.8,
-    ...(p.thumbnailUrl ? { images: [p.thumbnailUrl] } : {}),
-  }))
-
-  const bundlePages: MetadataRoute.Sitemap = getBundles().map((b) => ({
-    url: `${BASE_URL}/deals/${b.id}`,
+  // Collection landings rank for "Olympian" and "OLYMPN Sport", also before
+  // a teaser drop is out (the landing carries the countdown and waitlist).
+  const collectionPages: MetadataRoute.Sitemap = DROPS.filter((d) => isDropListed(d, nowMs)).map((d) => ({
+    url: `${BASE_URL}/collections/${d.slug}`,
     lastModified: now,
     changeFrequency: 'weekly',
-    priority: 0.6,
+    priority: getDropStatus(d, nowMs) === 'live' ? 0.9 : 0.85,
   }))
 
-  return [...staticPages, ...productPages, ...bundlePages]
+  let products: ShopProduct[] = []
+  try {
+    products = await getShopProducts(nowMs)
+  } catch {
+    // Catalogue unavailable: still serve the static pages.
+  }
+
+  // Product pages of live drops only. A teaser page is noindex and stays out.
+  const productPages: MetadataRoute.Sitemap = products
+    .filter((p) => p.status === 'live')
+    .map((p) => ({
+      url: `${BASE_URL}/shop/${p.slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      ...(p.thumbnailUrl ? { images: [p.thumbnailUrl] } : {}),
+    }))
+
+  return [...staticPages, ...collectionPages, ...productPages]
 }

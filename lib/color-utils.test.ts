@@ -1,4 +1,4 @@
-import { brandSwatchOverride, resolveSwatchBackground } from './color-utils'
+import { brandSwatchOverride } from './color-utils'
 
 describe('brandSwatchOverride', () => {
   it('forces Blood (top-left) over Butter (bottom-right) for the bikini', () => {
@@ -9,14 +9,5 @@ describe('brandSwatchOverride', () => {
   })
   it('returns null for products without an override', () => {
     expect(brandSwatchOverride('Ink Sport Tee')).toBeNull()
-  })
-})
-
-describe('resolveSwatchBackground with override', () => {
-  it('renders the blood→butter gradient for swimwear regardless of variant colour', () => {
-    // Bikini variant is plain "Black" in the data; override must still win.
-    expect(resolveSwatchBackground('Black', '#000000', null, '7ENO Bikini')).toBe(
-      'linear-gradient(135deg, #5C1A1B 50%, #EDE8DC 50%)'
-    )
   })
 })
