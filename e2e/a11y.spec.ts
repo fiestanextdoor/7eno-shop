@@ -26,6 +26,17 @@ const CART_ITEM = {
 const plain = (text: string) => text.replace(/[\u2013\u2014]/g, '-').replace(/\|/g, '/')
 
 async function scan(page: Page, name: string) {
+  // Let open transitions (menu labels and drawers fade in) settle first; axe
+  // measures contrast on the colour of the moment, mid-fade it reads too light.
+  // Endless loops (the ticker) never finish, so only finite ones are awaited.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+        .map((a) => a.finished.catch(() => null)),
+    ),
+  )
   const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze()
   results.push({
     page: name,
@@ -107,11 +118,25 @@ test('PDP', async ({ page }) => {
   await scan(page, `PDP ${href}`)
 })
 
-test('cart drawer open', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: /^Open cart/ }).click()
-  await expect(page.getByRole('dialog', { name: 'Cart' })).toBeVisible()
-  await scan(page, 'Cart drawer open')
+test('cart drawer open with a line in it', async ({ page }) => {
+  // A live product page from the sitemap (only purchasable products are listed
+  // there), one real add to cart, then the drawer. This test never goes to /checkout.
+  const sitemap = await (await page.request.get('/sitemap.xml')).text()
+  const pdp = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((m) => new URL(m[1].trim()).pathname)
+    .find((p) => /^\/shop\/[^/]+$/.test(p))
+  expect(pdp).toBeTruthy()
+  await page.goto(pdp as string)
+  const sizes = page.getByRole('radiogroup', { name: 'Size' })
+  if (await sizes.count()) {
+    await sizes.getByRole('radio').filter({ hasNotText: 'sold out' }).first().click()
+  }
+  await page.getByRole('button', { name: 'Add to cart', exact: true }).first().click()
+  const drawer = page.getByRole('dialog', { name: 'Cart' })
+  if (!(await drawer.isVisible())) await page.getByRole('button', { name: /^Open cart/ }).click()
+  await expect(drawer).toBeVisible()
+  await expect(drawer.getByRole('listitem').first()).toBeVisible()
+  await scan(page, `Cart drawer open, one line from ${pdp}`)
 })
 
 test('checkout with one line in the cart, nothing filled in', async ({ page }) => {
