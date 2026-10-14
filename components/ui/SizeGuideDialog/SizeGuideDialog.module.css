@@ -1,0 +1,139 @@
+.trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-accent-ink);
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.dialog {
+  width: min(640px, calc(100vw - 2 * var(--l-gutter)));
+  max-height: calc(100vh - 2 * var(--s-6));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-0);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.dialog::backdrop {
+  background: var(--c-text);
+  opacity: 0.4;
+}
+
+/* Entry only animates opacity and transform; --m-* collapse under reduced motion. */
+.dialog[open] {
+  animation: dialog-in var(--m-base) var(--m-ease);
+}
+
+.dialog[open]::backdrop {
+  animation: backdrop-in var(--m-base) var(--m-ease);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.inner {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--l-gutter) var(--s-6);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: var(--fs-h3);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: calc(var(--s-3) * -1);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.caption {
+  caption-side: bottom;
+  padding-top: var(--s-3);
+  text-align: left;
+  font-family: var(--f-body);
+  color: var(--c-text-muted);
+}
+
+.table th,
+.table td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--c-stone);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table thead th {
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.table th[scope='row'] {
+  text-align: left;
+  font-weight: 500;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--c-text-muted);
+}
