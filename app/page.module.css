@@ -58,7 +58,7 @@
 .rowTitle,
 .bandTitle {
   margin: 0;
-  font-family: var(--f-display);
+  font-family: var(--f-display-italic);
   font-size: var(--fs-h2);
   font-style: italic;
   font-weight: 900;

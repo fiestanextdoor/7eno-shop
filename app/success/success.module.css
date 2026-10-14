@@ -28,7 +28,7 @@
 
 .title {
   margin: 0;
-  font-family: var(--f-display);
+  font-family: var(--f-display-italic);
   font-size: var(--fs-h1);
   font-style: italic;
   font-weight: 900;

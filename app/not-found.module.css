@@ -14,7 +14,7 @@
 
 .code {
   margin: 0;
-  font-family: var(--f-display);
+  font-family: var(--f-display-italic);
   font-size: clamp(6rem, 28vw, 20rem);
   font-style: italic;
   font-weight: 900;

@@ -7,15 +7,30 @@ import '@/styles/globals.css'
 import '@/styles/tokens.css'
 
 // Rebrand v2 type (spec section 2). Archivo is loaded as a variable font with
-// the width axis, so the display face can run at wdth 125 / wght 900 and in
-// italic for drop titles. adjustFontFallback keeps the swap from shifting the
-// layout (CLS). Self-hosted by next/font, so the CSP stays `font-src 'self'`.
+// the width axis, so the display face can run at wdth 125 / wght 900.
+// adjustFontFallback keeps the swap from shifting the layout (CLS).
+// Self-hosted by next/font, so the CSP stays `font-src 'self'`.
 const archivo = Archivo({
   subsets: ['latin'],
-  style: ['normal', 'italic'],
+  style: ['normal'],
   axes: ['wdth'],
   variable: '--font-archivo',
   display: 'swap',
+  preload: true,
+  adjustFontFallback: true,
+})
+
+// The italic cut is only used for drop and edition titles (DropBlock,
+// EditionCard, home band, 404, success), so it is not preloaded on every page;
+// the browser fetches it when an italic title renders. Used via
+// --f-display-italic in styles/tokens.css.
+const archivoItalic = Archivo({
+  subsets: ['latin'],
+  style: ['italic'],
+  axes: ['wdth'],
+  variable: '--font-archivo-italic',
+  display: 'swap',
+  preload: false,
   adjustFontFallback: true,
 })
 
@@ -103,7 +118,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${instrumentSans.variable} ${plexMono.variable}`}
+      className={`${archivo.variable} ${archivoItalic.variable} ${instrumentSans.variable} ${plexMono.variable}`}
     >
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}

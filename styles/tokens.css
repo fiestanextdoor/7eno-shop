@@ -32,6 +32,7 @@
 
   /* Type */
   --f-display: var(--font-archivo), 'Archivo Black', 'Arial Black', sans-serif;
+  --f-display-italic: var(--font-archivo-italic), var(--f-display);
   --f-body: var(--font-instrument), system-ui, sans-serif;
   --f-mono: var(--font-plex-mono), ui-monospace, monospace;
   --fs-display: clamp(2.75rem, 8vw, 7.5rem);

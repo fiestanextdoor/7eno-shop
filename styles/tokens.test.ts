@@ -47,6 +47,7 @@ const TOKENS: [string, string][] = [
   ['--c-swatch-olive', '#3C3D2E'],
   ['--c-swatch-maritime', '#071429'],
   ['--f-display', "var(--font-archivo), 'Archivo Black', 'Arial Black', sans-serif"],
+  ['--f-display-italic', 'var(--font-archivo-italic), var(--f-display)'],
   ['--f-body', 'var(--font-instrument), system-ui, sans-serif'],
   ['--f-mono', 'var(--font-plex-mono), ui-monospace, monospace'],
   ['--fs-display', 'clamp(2.75rem, 8vw, 7.5rem)'],
@@ -106,6 +107,26 @@ describe('styles/tokens.css', () => {
     const declared = [...css.matchAll(/(--[a-z0-9-]+):/g)].map((m) => m[1])
     expect(declared.length).toBeGreaterThan(50)
     for (const name of declared) expect(name).toMatch(/^--(c|f|fs|s|r|l|m)-/)
+  })
+
+  it('loads Archivo italic as its own font without a preload', () => {
+    const italic = layout.slice(layout.indexOf('const archivoItalic = Archivo('))
+    const options = italic.slice(0, italic.indexOf('})'))
+    expect(options).toContain("style: ['italic']")
+    expect(options).toContain('preload: false')
+    expect(options).toContain("variable: '--font-archivo-italic'")
+    expect(layout).toMatch(/const archivo = Archivo\(\{[^}]*style: \['normal'\][^}]*preload: true/)
+    expect(layout).toContain('${archivoItalic.variable}')
+  })
+
+  it.each([
+    'app/not-found.module.css', 'app/page.module.css', 'app/success/success.module.css',
+    'components/ui/DropBlock/DropBlock.module.css', 'components/ui/EditionCard/EditionCard.module.css',
+  ])('%s sets italic display text in --f-display-italic', (file) => {
+    const source = readFileSync(path.join(process.cwd(), file), 'utf8')
+    const rules = source.match(/\{[^{}]*font-style: italic[^{}]*\}/g) ?? []
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) expect(rule).toContain('font-family: var(--f-display-italic)')
   })
 
   it('is imported after globals.css in the root layout', () => {

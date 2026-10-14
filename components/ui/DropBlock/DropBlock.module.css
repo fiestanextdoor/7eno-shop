@@ -33,7 +33,7 @@
 
 .title {
   margin: 0;
-  font-family: var(--f-display);
+  font-family: var(--f-display-italic);
   font-size: var(--fs-display);
   font-style: italic;
   font-weight: 900;
