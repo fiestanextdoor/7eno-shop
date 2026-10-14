@@ -10,9 +10,19 @@ describe('Logo', () => {
     expect(src(screen.getByRole('img', { name: '7ENO' }))).toContain('/brand/7eno-wordmark-navy.png')
   })
 
-  it('sizes the box from the natural ratio of the file', () => {
-    const { container } = render(<LogoWordmark height={40} />)
-    expect((container.firstChild as HTMLElement).style.width).toBe(`${widthAt(WORDMARK.navy, 40)}px`)
+  it('gives the image explicit dimensions from the natural ratio of the file', () => {
+    render(<LogoWordmark height={40} />)
+    const img = screen.getByRole('img', { name: '7ENO' })
+    expect(img).toHaveAttribute('width', String(widthAt(WORDMARK.navy, 40)))
+    expect(img).toHaveAttribute('height', '40')
+    expect(src(img)).toContain(WORDMARK.navy.src)
+  })
+
+  it('reserves the cream box with the same explicit dimensions', () => {
+    render(<LogoWordmark variant="cream" height={48} />)
+    const img = screen.getByRole('img', { name: '7ENO' })
+    expect(img).toHaveAttribute('width', String(widthAt(WORDMARK.cream, 48)))
+    expect(img).toHaveAttribute('height', '48')
   })
 
   it('uses the cream wordmark on dark surfaces', () => {

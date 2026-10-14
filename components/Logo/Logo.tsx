@@ -47,24 +47,27 @@ export function LogoBadge({ variant = 'navy', size = 64, priority = false }: Bad
 export function LogoWordmark({ variant = 'navy', height = 36, priority = false, align = 'left' }: WordmarkProps) {
   const mark = WORDMARK[toneFor(variant)]
   const width = widthAt(mark, height)
-  // Width plus aspect-ratio with max-width 100%: on a narrow cell the mark
-  // shrinks with its ratio instead of spilling over the layout.
+  // Explicit width and height reserve the box before the file loads. The
+  // fixed height with an automatic width keeps the natural ratio; on a narrow
+  // cell max-width caps the box and object-fit keeps the mark undistorted.
   return (
     <div
       className={styles.wrap}
-      style={{
-        width,
-        maxWidth: '100%',
-        aspectRatio: `${mark.width} / ${mark.height}`,
-        marginInline: align === 'center' ? 'auto' : undefined,
-      }}
+      style={{ maxWidth: '100%', marginInline: align === 'center' ? 'auto' : undefined }}
     >
       <Image
         src={mark.src}
         alt="7ENO"
-        fill
-        sizes={`${width}px`}
-        style={{ objectFit: 'contain', objectPosition: align === 'center' ? 'center' : 'left center' }}
+        width={width}
+        height={height}
+        style={{
+          display: 'block',
+          width: 'auto',
+          height,
+          maxWidth: '100%',
+          objectFit: 'contain',
+          objectPosition: align === 'center' ? 'center' : 'left center',
+        }}
         {...eager(priority)}
       />
     </div>

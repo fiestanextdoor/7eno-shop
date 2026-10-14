@@ -36,8 +36,10 @@
 
 .logo {
   justify-self: center;
-  display: block;
+  display: inline-flex;
+  align-items: center;
   width: auto;
+  height: 32px;
 }
 
 .nav {
