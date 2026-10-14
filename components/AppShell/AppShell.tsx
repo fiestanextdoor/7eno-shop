@@ -33,10 +33,14 @@ function useMounted(): boolean {
  */
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  // The menu belongs to the path it was opened on, so any route change (link,
-  // back or forward) closes it without a state update in an effect.
+  // The menu remembers the path it was opened on. Any route change (link,
+  // back or forward) resets it during render, so returning to that path later
+  // does not reopen it, and no effect is needed.
   const [menuOpenAt, setMenuOpenAt] = useState<string | null>(null)
-  const menuOpen = menuOpenAt === pathname
+  if (menuOpenAt !== null && menuOpenAt !== pathname) {
+    setMenuOpenAt(null)
+  }
+  const menuOpen = menuOpenAt !== null
   const mounted = useMounted()
   const storeCount = useCartStore((s) => s.itemCount())
   const cartCount = mounted ? storeCount : 0

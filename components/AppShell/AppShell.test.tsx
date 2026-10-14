@@ -103,7 +103,7 @@ describe('AppShell route chrome', () => {
 
   it('renders /coming-soon bare, without any chrome or hydration', () => {
     renderAt('/coming-soon')
-    for (const id of ['store-hydration', 'site-header', 'cart-drawer', 'footer']) {
+    for (const id of ['store-hydration', 'cookie-banner', 'announcement-bar', 'site-header', 'mobile-nav', 'cart-drawer', 'checkout-header', 'footer']) {
       expect(present(id)).toBe(false)
     }
     expect(screen.getByText('page content')).toBeInTheDocument()
@@ -141,6 +141,9 @@ describe('AppShell route chrome', () => {
     fireEvent.click(screen.getByRole('button', { name: 'menu' }))
     expect(screen.getByTestId('mobile-nav')).toHaveAttribute('data-open', 'true')
     jest.mocked(usePathname).mockReturnValue('/about')
+    rerender(<AppShell><p>page content</p></AppShell>)
+    expect(screen.getByTestId('mobile-nav')).toHaveAttribute('data-open', 'false')
+    jest.mocked(usePathname).mockReturnValue('/shop')
     rerender(<AppShell><p>page content</p></AppShell>)
     expect(screen.getByTestId('mobile-nav')).toHaveAttribute('data-open', 'false')
   })

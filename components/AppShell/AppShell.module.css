@@ -1,3 +1,7 @@
+/*
+ * Stacking order: chrome 300 < cart drawer 350/351 < mobile nav and Drawer
+ * 400 < skip link 500 < cookie banner 999. Overlays must cover the chrome.
+ */
 .chrome {
   position: fixed;
   top: 0;

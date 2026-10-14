@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Nav from '@/components/Nav/Nav'
 import styles from './terms.module.css'
 
 export const metadata: Metadata = {
@@ -9,7 +8,6 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <>
-      <Nav />
       <main className={styles.page}>
         <div className={styles.inner}>
           <h1 className={styles.title}>Terms &amp; Conditions</h1>
