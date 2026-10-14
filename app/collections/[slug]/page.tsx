@@ -19,8 +19,11 @@ interface Props {
 // the page itself when it reaches zero.
 export const revalidate = 60
 
+// Build time has no preview session: an upcoming drop without a teaser is
+// not pre-rendered (and stays a 404 until it is listed).
 export function generateStaticParams() {
-  return DROPS.map((d) => ({ slug: d.slug }))
+  const now = currentTimeMs()
+  return DROPS.filter((d) => isDropListed(d, now)).map((d) => ({ slug: d.slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -34,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: drop.intro,
     alternates: { canonical: url },
     openGraph: { title: `${title} · 7ENO (Zeno)`, description: drop.intro, url: absoluteUrl(url), type: 'website' },
-    twitter: { card: 'summary_large_image', title: `${title} · 7ENO (Zeno)`, description: drop.intro },
+    twitter: { card: 'summary', title: `${title} · 7ENO (Zeno)`, description: drop.intro },
   }
 }
 

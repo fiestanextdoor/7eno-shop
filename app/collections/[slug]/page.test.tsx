@@ -1,13 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
 import type { ShopProduct } from '@/lib/catalog'
-import { DROPS } from '@/lib/drops'
+import { DROPS, type Drop } from '@/lib/drops'
 import type { TileProduct } from '@/lib/tiles'
 import CollectionPage, { generateMetadata, generateStaticParams } from './page'
 
 const mockGetShopProducts = jest.fn()
 const mockToTiles = jest.fn()
 const mockIsPreviewSession = jest.fn()
+const mockGetDropBySlug = jest.fn()
+const mockDrops = jest.fn()
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -17,10 +19,30 @@ jest.mock('next/navigation', () => ({
 }))
 jest.mock('../../../lib/catalog', () => ({ getShopProducts: (...args: unknown[]) => mockGetShopProducts(...args) }))
 jest.mock('../../../lib/tiles', () => ({ toTiles: (...args: unknown[]) => mockToTiles(...args) }))
+jest.mock('../../../lib/drops', () => {
+  const actual = jest.requireActual('../../../lib/drops')
+  return {
+    ...actual,
+    get DROPS() {
+      return mockDrops() ?? actual.DROPS
+    },
+    getDropBySlug: (slug: string) => mockGetDropBySlug(slug) ?? actual.getDropBySlug(slug),
+  }
+})
 jest.mock('../../../lib/preview-session', () => ({ isPreviewSession: () => mockIsPreviewSession() }))
 
 const [olympian, sport] = DROPS
 const BEFORE = Date.parse('2026-10-14T10:00:00Z')
+
+// An upcoming drop without a teaser: hidden until its release.
+const SECRET: Drop = {
+  ...sport,
+  id: 'olympn-sport',
+  slug: 'secret',
+  title: 'Secret',
+  teaser: false,
+  window: { startsAt: '2027-01-01T12:00:00+01:00', endsAt: null },
+}
 
 const params = (slug: string) => ({ params: Promise.resolve({ slug }) })
 
@@ -39,6 +61,8 @@ const TILE: TileProduct = {
 beforeEach(() => {
   jest.spyOn(Date, 'now').mockReturnValue(BEFORE)
   jest.mocked(useRouter).mockReturnValue({ refresh: jest.fn(), push: jest.fn() } as unknown as ReturnType<typeof useRouter>)
+  mockGetDropBySlug.mockReset().mockReturnValue(null)
+  mockDrops.mockReset().mockReturnValue(undefined)
   mockIsPreviewSession.mockReset().mockResolvedValue(false)
   mockGetShopProducts.mockReset().mockResolvedValue([])
   mockToTiles.mockReset().mockResolvedValue([])
@@ -51,6 +75,11 @@ describe('/collections/[slug]', () => {
     expect(generateStaticParams()).toEqual([{ slug: 'olympian' }, { slug: 'olympn-sport' }])
   })
 
+  it('does not pre-render an upcoming drop without a teaser', () => {
+    mockDrops.mockReturnValue([olympian, SECRET])
+    expect(generateStaticParams()).toEqual([{ slug: 'olympian' }])
+  })
+
   it('gives every collection its own title and canonical', async () => {
     const meta = await generateMetadata(params('olympn-sport'))
     expect(meta.title).toBe('OLYMPN Sport · Edition 02')
@@ -60,6 +89,12 @@ describe('/collections/[slug]', () => {
 
   it('is a 404 for a slug that is not a drop', async () => {
     await expect(CollectionPage(params('og'))).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('is a 404 for an upcoming drop without a teaser', async () => {
+    mockGetDropBySlug.mockImplementation((slug: string) => (slug === 'secret' ? SECRET : null))
+    await expect(CollectionPage(params('secret'))).rejects.toThrow('NEXT_NOT_FOUND')
+    expect(mockGetShopProducts).not.toHaveBeenCalled()
   })
 
   it('shows the countdown, the waitlist and the line-up of a teaser drop without products', async () => {

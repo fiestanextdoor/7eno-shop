@@ -22,6 +22,14 @@ describe('EditionCard', () => {
     expect(screen.getByText('Live now')).toBeInTheDocument()
   })
 
+  it('shows a closed edition with its closed label', () => {
+    const closed = { ...toDropView(olympian, BEFORE), status: 'closed' as const }
+    render(<EditionCard drop={closed} />)
+    expect(screen.getByText('Released 19 June 2026, now closed')).toBeInTheDocument()
+    expect(screen.getByText('Closed')).toBeInTheDocument()
+    expect(screen.queryByText('Live now')).toBeNull()
+  })
+
   it('shows a strip of four images from the line-up', () => {
     const { container } = render(<EditionCard drop={toDropView(sport, BEFORE)} />)
     expect(container.querySelectorAll('img')).toHaveLength(4)
