@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Space_Mono, Cormorant_Garamond, Archivo, Instrument_Sans, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import AppShell from '@/components/AppShell/AppShell'
-import { BASE_URL, BRAND_KEYWORDS, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
+import { BASE_URL, BRAND_KEYWORDS, SITE_DESCRIPTION, THEME_COLOR, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
 import '@/styles/tokens.css'
 
@@ -55,9 +55,6 @@ const plexMono = IBM_Plex_Mono({
   adjustFontFallback: true,
 })
 
-const SITE_DESCRIPTION =
-  '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections, with free shipping over €75.'
-
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
@@ -80,7 +77,7 @@ export const metadata: Metadata = {
   category: 'shopping',
   // Let Google show full-size image previews and untruncated snippets. Without
   // max-image-preview:large, product photos are shown as thumbnails (or not at
-  // all) in Search and Discover — the single highest-impact robots directive
+  // all) in Search and Discover: the single highest-impact robots directive
   // for a webshop.
   robots: {
     index: true,
@@ -115,7 +112,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#111111',
+  themeColor: THEME_COLOR,
 }
 
 export default function RootLayout({

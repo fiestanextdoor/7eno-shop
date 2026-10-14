@@ -1,3 +1,6 @@
+import { SEVENO_TILE } from './brand'
+import { formatEdition, type Drop } from './drops'
+
 /**
  * Shared SEO constants and structured-data builders.
  *
@@ -24,7 +27,7 @@ export const BRAND = {
   /**
    * Public brand profiles. Google uses sameAs to connect the site to the
    * brand's other identities (knowledge panel). Add the real profile URLs
-   * here — an empty list is simply omitted from the schema.
+   * here; an empty list is simply omitted from the schema.
    */
   sameAs: [] as string[],
 } as const
@@ -33,8 +36,21 @@ export const BRAND = {
 export const BRAND_KEYWORDS = [
   '7ENO', 'Zeno', 'Zeno streetwear', 'Zeno shop', 'Zeno kleding', 'Zeno merk',
   '7eno shop', '7ENO streetwear', 'streetwear', 'streetwear Nederland',
-  'Abra Entertainment', 'Olympian collection', 'OG collection', 'premium streetwear',
+  'Abra Entertainment', 'Olympian collection', 'OLYMPN Sport', 'OLYMPN Sport hoodie', 'premium streetwear',
 ]
+
+/** Site-wide description: root layout, WebSite node and manifest. */
+export const SITE_DESCRIPTION =
+  '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the Olympian and OLYMPN Sport editions, with free shipping over €75.'
+
+/** Official navy (browser chrome) and cream (splash screen), spec section 2. */
+export const THEME_COLOR = '#2D3A4F'
+export const BACKGROUND_COLOR = '#F7F1DA'
+
+/** Meta description for a collection page: edition, brand, intro, shipping. */
+export function collectionDescription(drop: Pick<Drop, 'title' | 'edition' | 'intro'>): string {
+  return `${drop.title} (${formatEdition(drop.edition)}) by 7ENO (Zeno): ${drop.intro} Free shipping over €75.`
+}
 
 /** Absolute URL for a site-relative path (schema.org and OG need absolute). */
 export function absoluteUrl(path = '/'): string {
@@ -55,9 +71,9 @@ export function organizationJsonLd() {
     email: BRAND.email,
     logo: {
       '@type': 'ImageObject',
-      url: absoluteUrl('/logos/beeldmerk-zwart.png'),
+      url: absoluteUrl(SEVENO_TILE.src),
     },
-    image: absoluteUrl('/logos/beeldmerk-zwart.png'),
+    image: absoluteUrl(SEVENO_TILE.src),
     description:
       '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment.',
     parentOrganization: { '@type': 'Organization', name: BRAND.parent },
@@ -87,8 +103,7 @@ export function webSiteJsonLd() {
     name: BRAND.name,
     alternateName: [...BRAND.alternateNames],
     url: BASE_URL,
-    description:
-      '7ENO (pronounced "Zeno") is the official online streetwear store by Abra Entertainment. Shop the OG and Olympian collections.',
+    description: SITE_DESCRIPTION,
     publisher: { '@id': `${BASE_URL}/#organization` },
     inLanguage: 'en',
   }
@@ -110,7 +125,7 @@ export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
 
 /**
  * FAQPage node. Google can expand these straight into the search result, which
- * takes up more of the page and answers the question before the click — so the
+ * takes up more of the page and answers the question before the click, so the
  * answers here must match the visible text on the page exactly.
  */
 export function faqJsonLd(entries: { question: string; answer: string }[]) {

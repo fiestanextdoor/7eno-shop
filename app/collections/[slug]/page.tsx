@@ -7,7 +7,7 @@ import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import { DROPS, currentTimeMs, formatEdition, getDropBySlug, isDropListed, toDropView } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
 import { toTiles } from '@/lib/tiles'
-import { absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
+import { absoluteUrl, breadcrumbJsonLd, collectionDescription } from '@/lib/seo'
 import styles from './collection.module.css'
 
 interface Props {
@@ -32,12 +32,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!drop) return { title: 'Collection not found' }
   const title = `${drop.title} · ${formatEdition(drop.edition)}`
   const url = `/collections/${drop.slug}`
+  const description = collectionDescription(drop)
   return {
     title,
-    description: drop.intro,
+    description,
     alternates: { canonical: url },
-    openGraph: { title: `${title} · 7ENO (Zeno)`, description: drop.intro, url: absoluteUrl(url), type: 'website' },
-    twitter: { card: 'summary', title: `${title} · 7ENO (Zeno)`, description: drop.intro },
+    openGraph: { title: `${title} · 7ENO (Zeno)`, description, url: absoluteUrl(url), type: 'website' },
+    twitter: { card: 'summary', title: `${title} · 7ENO (Zeno)`, description },
   }
 }
 

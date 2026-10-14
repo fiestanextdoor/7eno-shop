@@ -1,3 +1,4 @@
+import { collectionDescription } from '@/lib/seo'
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
 import type { ShopProduct } from '@/lib/catalog'
@@ -83,7 +84,7 @@ describe('/collections/[slug]', () => {
   it('gives every collection its own title and canonical', async () => {
     const meta = await generateMetadata(params('olympn-sport'))
     expect(meta.title).toBe('OLYMPN Sport · Edition 02')
-    expect(meta.description).toBe(sport.intro)
+    expect(meta.description).toBe(collectionDescription(sport))
     expect(meta.alternates?.canonical).toBe('/collections/olympn-sport')
   })
 
