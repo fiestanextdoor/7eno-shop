@@ -24,6 +24,10 @@ export interface Classification {
   isClothing: boolean
   isSport: boolean
   isOlympian: boolean
+  /** v2 kinds (spec section 4): the shop categories tees, knits, hoodies, bags. */
+  isKnit: boolean
+  isHoodie: boolean
+  isBag: boolean
 }
 
 const ACCESSORY_KEYWORDS = [
@@ -83,5 +87,11 @@ export function classify(name: string): Classification {
   // Collection split: anything named "Olympian" is the Olympian capsule; the
   // rest is the original ("OG") 7ENO range.
   const isOlympian = n.includes('olympian')
-  return { isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport, isOlympian }
+  const isKnit = /\bknit(ted)?\b/.test(n)
+  const isHoodie = /\bhood(ie|y)\b/.test(n)
+  const isBag = /\b(backpack|bag|tote)\b/.test(n)
+  return {
+    isWomen, isMen, isUnisex, isTee, isShorts, isSwim, isTowel, isAccessory, isClothing, isSport, isOlympian,
+    isKnit, isHoodie, isBag,
+  }
 }

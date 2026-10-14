@@ -1,5 +1,5 @@
 import {
-  buildTitle, escapeXml, genderFor, googleCategoryFor, isWearable, productTypeFor, renderFeedXml, type FeedItem,
+  buildTitle, escapeXml, googleCategoryFor, isWearable, productTypeFor, renderFeedXml, type FeedItem,
 } from './merchant-feed'
 import { classify } from './product-classify'
 
@@ -48,53 +48,27 @@ describe('buildTitle', () => {
   })
 })
 
-describe('category and gender mapping', () => {
-  it('maps a unisex tee', () => {
-    const c = classify('Olympian Tee Ocean Unisex')
-    expect(googleCategoryFor(c)).toBe('Apparel & Accessories > Clothing > Shirts & Tops')
-    expect(genderFor(c)).toBe('unisex')
-    expect(productTypeFor(c)).toBe('7ENO > Olympian > Tees')
-  })
-  it("maps a women's OG tee", () => {
-    const c = classify('7ENO Ink/Butter Tee Women')
-    expect(genderFor(c)).toBe('female')
-    expect(productTypeFor(c)).toBe('7ENO > OG > Tees')
-  })
-  it("maps a men's tee", () => {
-    expect(genderFor(classify('7ENO Ink/Blood Tee Men'))).toBe('male')
-  })
-  it('maps shorts and swimwear', () => {
-    expect(googleCategoryFor(classify('7ENO Ink/Blood Sport Shorts Unisex'), '7ENO Ink/Blood Sport Shorts Unisex'))
-      .toBe('Apparel & Accessories > Clothing > Shorts')
-    expect(googleCategoryFor(classify('7ENO Swim Shorts'), '7ENO Swim Shorts'))
-      .toBe('Apparel & Accessories > Clothing > Swimwear')
-  })
-
-  it('files non-apparel outside the clothing taxonomy', () => {
-    const cases: [string, string][] = [
-      ['Olympian Ocean Backpack 20 L', 'Luggage & Bags > Backpacks'],
-      ['7ENO Ink/Butter iPhone MagSafe Tough Case', 'Electronics > Electronics Accessories > Mobile Phone Accessories > Mobile Phone Cases'],
-      ['7ENO Blood/Butter Mouse Pad', 'Office Supplies > Desk Pads & Blotters'],
-      ['7ENO Blood Vintage Cap', 'Apparel & Accessories > Clothing Accessories > Hats'],
-      ['7ENO Blood/Butter Loafers Men', 'Apparel & Accessories > Shoes'],
-    ]
-    for (const [name, expected] of cases) {
-      expect(googleCategoryFor(classify(name), name)).toBe(expected)
-    }
+describe('category and type mapping', () => {
+  it.each([
+    ['Olympian Tee Sand Unisex', 'Olympian', 'Apparel & Accessories > Clothing > Shirts & Tops', '7ENO > Olympian > Tees'],
+    ['Olympian Knitted Tee Ocean Unisex', 'Olympian', 'Apparel & Accessories > Clothing > Shirts & Tops', '7ENO > Olympian > Knits'],
+    ['OLYMPN Sport Oversized Hoodie Rose Red', 'OLYMPN Sport', 'Apparel & Accessories > Clothing > Shirts & Tops', '7ENO > OLYMPN Sport > Hoodies'],
+    ['Olympian Ocean Backpack 20 L', 'Olympian', 'Luggage & Bags > Backpacks', '7ENO > Olympian > Bags'],
+  ])('maps %s', (name, collection, category, type) => {
+    const c = classify(name)
+    expect(googleCategoryFor(c)).toBe(category)
+    expect(productTypeFor(c, collection)).toBe(type)
   })
 })
 
 describe('isWearable', () => {
-  it('is true for clothing and worn accessories', () => {
-    for (const n of ['Olympian Tee Ocean Unisex', '7ENO Blood Vintage Cap', '7ENO Blood/Butter Loafers Men']) {
-      expect(isWearable(classify(n), n)).toBe(true)
+  it('is true for hoodies, tees and knits', () => {
+    for (const n of ['OLYMPN Sport Relaxed Hoodie Dune', 'Olympian Tee Sand Unisex', 'Olympian Knitted Tee Ocean Unisex']) {
+      expect(isWearable(classify(n))).toBe(true)
     }
   })
-  it('is false for objects that have no gender', () => {
-    for (const n of ['7ENO Blood/Butter Mouse Pad', 'Olympian Ocean Backpack 20 L',
-      '7ENO Ink/Butter iPhone MagSafe Tough Case', '7ENO Blood/ Paper White Beach Towel']) {
-      expect(isWearable(classify(n), n)).toBe(false)
-    }
+  it('is false for a backpack, which has no gender', () => {
+    expect(isWearable(classify('Olympian Ocean Backpack 20 L'))).toBe(false)
   })
 })
 

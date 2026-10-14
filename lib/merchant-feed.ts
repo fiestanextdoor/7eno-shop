@@ -36,57 +36,23 @@ export interface FeedItem {
 
 /**
  * Google's product taxonomy, as text paths (accepted alongside numeric ids).
- * The catalogue mixes apparel with phone cases, desk mats and posters, and a
- * phone case filed under "Clothing Accessories" performs badly and risks a
- * Merchant Center disapproval — so non-apparel is mapped by name first.
+ * Every v2 piece is a hoodie, a tee, a knitted tee or a backpack.
  */
-export function googleCategoryFor(c: Classification, productName = ''): string {
-  const n = productName.toLowerCase()
-  if (/phone|case/.test(n)) {
-    return 'Electronics > Electronics Accessories > Mobile Phone Accessories > Mobile Phone Cases'
-  }
-  if (/backpack|tote|bag/.test(n)) return 'Luggage & Bags > Backpacks'
-  if (/mouse pad|desk mat/.test(n)) return 'Office Supplies > Desk Pads & Blotters'
-  if (/poster/.test(n)) return 'Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork'
-  if (/sticker/.test(n)) return 'Office Supplies > General Office Supplies > Labels, Indexes & Stamps'
-  if (/loafer|sandal|shoe|sneaker/.test(n)) return 'Apparel & Accessories > Shoes'
-  if (/cap|hat|beanie/.test(n)) return 'Apparel & Accessories > Clothing Accessories > Hats'
-  if (/sock/.test(n)) return 'Apparel & Accessories > Clothing > Underwear & Socks > Socks'
-  if (c.isTee) return 'Apparel & Accessories > Clothing > Shirts & Tops'
-  if (c.isSwim) return 'Apparel & Accessories > Clothing > Swimwear'
-  if (c.isShorts) return 'Apparel & Accessories > Clothing > Shorts'
-  if (c.isTowel) return 'Home & Garden > Linens & Bedding > Towels'
-  if (c.isAccessory) return 'Apparel & Accessories > Clothing Accessories'
+export function googleCategoryFor(c: Classification): string {
+  if (c.isBag) return 'Luggage & Bags > Backpacks'
+  if (c.isHoodie || c.isKnit || c.isTee) return 'Apparel & Accessories > Clothing > Shirts & Tops'
   return 'Apparel & Accessories'
 }
 
-/**
- * Whether the item is worn. Only these carry gender/age_group in the feed;
- * a mouse pad has no gender and Google flags one that claims to.
- */
-export function isWearable(c: Classification, productName = ''): boolean {
-  const n = productName.toLowerCase()
-  if (/phone|case|mouse pad|desk mat|poster|sticker|mug|towel/.test(n)) return false
-  if (/backpack|tote|bag/.test(n)) return false
-  return c.isClothing || /cap|hat|beanie|sock|loafer|sandal|shoe|sneaker/.test(n)
+/** Whether the item is worn. Only these carry gender and age group in the feed. */
+export function isWearable(c: Classification): boolean {
+  return !c.isBag
 }
 
-/** Our own breadcrumb-style taxonomy; shown in Merchant Center reporting. */
-export function productTypeFor(c: Classification): string {
-  const collection = c.isOlympian ? 'Olympian' : 'OG'
-  const kind = c.isTee ? 'Tees'
-    : c.isShorts ? 'Shorts'
-    : c.isSwim ? 'Swimwear'
-    : c.isAccessory || c.isTowel ? 'Accessories'
-    : 'Apparel'
+/** Our own breadcrumb taxonomy, e.g. "7ENO > OLYMPN Sport > Hoodies", shown in Merchant Center reporting. */
+export function productTypeFor(c: Classification, collection: string): string {
+  const kind = c.isHoodie ? 'Hoodies' : c.isKnit ? 'Knits' : c.isTee ? 'Tees' : c.isBag ? 'Bags' : 'Apparel'
   return `7ENO > ${collection} > ${kind}`
-}
-
-export function genderFor(c: Classification): FeedItem['gender'] {
-  if (c.isUnisex) return 'unisex'
-  if (c.isWomen) return 'female'
-  if (c.isMen) return 'male'
-  return 'unisex'
 }
 
 /** Merchant Center caps titles at 150 characters. */

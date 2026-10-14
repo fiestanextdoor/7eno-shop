@@ -74,3 +74,15 @@ describe('classify', () => {
     expect(HIDDEN_SIZES.has('XL')).toBe(false)
   })
 })
+
+describe('product kinds', () => {
+  it.each([
+    ['Olympian Knitted Tee Ocean Unisex', { isKnit: true, isHoodie: false, isBag: false }],
+    ['OLYMPN Sport Oversized Hoodie Rose Red', { isKnit: false, isHoodie: true, isBag: false }],
+    ['OLYMPN Sport Relaxed Hoodie Dune', { isKnit: false, isHoodie: true, isBag: false }],
+    ['Olympian Ocean Backpack 20 L', { isKnit: false, isHoodie: false, isBag: true }],
+    ['Olympian Tee Sand Unisex', { isTee: true, isKnit: false, isHoodie: false, isBag: false }],
+  ])('classifies %s', (name, expected) => {
+    expect(classify(name)).toMatchObject(expected)
+  })
+})
