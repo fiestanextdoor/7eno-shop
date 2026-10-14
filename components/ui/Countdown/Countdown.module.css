@@ -1,0 +1,52 @@
+.countdown {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.date {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.clock {
+  display: flex;
+  gap: var(--s-4);
+}
+
+.unit {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-1);
+  min-width: 3ch;
+}
+
+.value {
+  font-family: var(--f-mono);
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.unitLabel {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Orange digits only on navy (spec section 2: never orange text on cream). */
+:global([data-tone='dark']) .value {
+  color: var(--c-live);
+}
+
+.live {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

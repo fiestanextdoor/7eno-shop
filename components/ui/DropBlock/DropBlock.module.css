@@ -1,0 +1,88 @@
+.block {
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.block[data-tone='dark'] {
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}
+
+.block[data-tone='dark'] :focus-visible {
+  outline-color: var(--c-inverse-text);
+}
+
+.inner {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-4);
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding: var(--s-8) var(--l-gutter);
+}
+
+.edition,
+.teaser,
+.live {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: var(--fs-display);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* Large periwinkle headings on navy (spec section 2). */
+.block[data-tone='dark'] .title {
+  color: var(--c-accent);
+}
+
+.intro {
+  max-width: var(--l-text-max);
+  margin: 0;
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+.state {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-5);
+  width: 100%;
+  max-width: 560px;
+  margin-top: var(--s-4);
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* Orange text only on navy; on cream the dot carries the colour. */
+.block[data-tone='dark'] .live {
+  color: var(--c-live);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-live);
+}
+
+.closed {
+  margin: 0;
+  font-family: var(--f-body);
+}
