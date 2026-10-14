@@ -2,6 +2,7 @@ import type { BadgeKind } from '@/components/ui/Badge/Badge'
 import type { ShopProduct } from '@/lib/catalog'
 import { resolveCardImage } from '@/lib/card-image'
 import { NEW_IN_MS, formatDropDate } from '@/lib/drops'
+import { formatPrice } from '@/lib/money'
 
 /** Everything a product tile shows, resolved on the server. */
 export interface TileProduct {
@@ -23,12 +24,8 @@ export function tileBadges(p: Pick<ShopProduct, 'status' | 'soldOut' | 'drop'>, 
   return now - Date.parse(p.drop.window.startsAt) < NEW_IN_MS ? ['new'] : []
 }
 
-const SYMBOLS: Record<string, string> = { EUR: '€', USD: '$', GBP: '£' }
-
-export function formatPrice(cents: number | undefined, currency: string): string | null {
-  if (cents === undefined || !Number.isFinite(cents) || cents <= 0) return null
-  return `${SYMBOLS[currency] ?? `${currency} `}${(cents / 100).toFixed(2)}`
-}
+/** Lives in lib/money.ts so client components can format prices without the server image helpers. */
+export { formatPrice }
 
 export function toTile(p: ShopProduct, image: string | null, now: number): TileProduct {
   return {
