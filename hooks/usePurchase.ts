@@ -17,7 +17,11 @@ export interface UsePurchaseOptions {
   soldOut: boolean
   /** EU labels for footwear sizes, from Printful. */
   euSizeMap?: Record<string, string>
-  /** Cart thumbnail for a colour: the first gallery image. */
+  /**
+   * Cart thumbnail for a colour. Must equal the old ProductDetail `frontFor(colour)`
+   * (`frontOverride ?? colorImages[colour] ?? baseImageUrl`), so the cart shows the
+   * same thumbnail as before the redesign; ProductView builds it that way.
+   */
   imageFor(colour: string): string | null
 }
 
@@ -35,7 +39,7 @@ export interface Purchase {
   needsSize: boolean
   /** The chosen size (or the whole product) cannot be bought: offer "Notify me". */
   selectionSoldOut: boolean
-  /** Price of the chosen size, else the first variant; null when unknown. */
+  /** Price of the chosen size, else the first offered size, else the first variant; null when unknown. */
   price: string | null
   added: boolean
   addToCart(): void
@@ -65,6 +69,7 @@ export function usePurchase({
   const pickerSizes = picker.sizes
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
+  const isSoldOut = (v: NormalizedVariant) => soldOut || !isAvailable(v)
 
   // Preselect a colour when arriving via a swatch deep link (/shop/{slug}?color=...).
   useEffect(() => {
@@ -73,9 +78,10 @@ export function usePurchase({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Auto-select the only variant of a one-size product (bags, caps).
+  // Auto-select the only variant of a one-size product (bags, caps), unless it
+  // is sold out: then the shopper sees "Notify me" without a chosen size.
   useEffect(() => {
-    if (pickerSizes.length === 1 && isAvailable(pickerSizes[0])) selectVariant(pickerSizes[0].id)
+    if (pickerSizes.length === 1 && !isSoldOut(pickerSizes[0])) selectVariant(pickerSizes[0].id)
   }, [selectedColor]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -84,10 +90,10 @@ export function usePurchase({
     return () => clearTimeout(t)
   }, [added])
 
-  const isSoldOut = (v: NormalizedVariant) => soldOut || !isAvailable(v)
   const chosen = selectedVariant ?? (pickerSizes.length === 1 ? pickerSizes[0] : null)
   const selectionSoldOut = soldOut || pickerSizes.length === 0 || (chosen !== null && isSoldOut(chosen))
-  const priced = chosen ?? variants[0] ?? null
+  // Hidden sizes never supply the price; variants[0] only when no size is offered.
+  const priced = chosen ?? pickerSizes[0] ?? variants[0] ?? null
 
   function addToCart() {
     if (!chosen || selectionSoldOut) return

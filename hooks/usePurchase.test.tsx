@@ -97,6 +97,14 @@ describe('usePurchase', () => {
     expect(cartIds()).toEqual(['cap'])
   })
 
+  it('does not auto-select the only size when it is sold out', () => {
+    const { result } = setup({ variants: [variant('cap', '', 'One size', false)], soldOut: true })
+    expect(result.current.selectedSize).toBeNull()
+    expect(result.current.selectionSoldOut).toBe(true)
+    act(() => result.current.addToCart())
+    expect(cartIds()).toEqual([])
+  })
+
   it('can only be waitlisted without variants or with hidden sizes only', () => {
     for (const variants of [[], [variant('x', 'Black', '4XL')]]) {
       const { result } = setup({ variants })
@@ -123,6 +131,13 @@ describe('usePurchase', () => {
     expect(result.current.price).toBe('€45.00')
     act(() => result.current.selectSize('xl'))
     expect(result.current.price).toBe('€50.00')
+  })
+
+  it('never takes the displayed price from a hidden size', () => {
+    const { result } = setup({
+      variants: [variant('b-4xl', 'Black', '4XL', true, 9900), variant('b-m', 'Black', 'M', true, 4500), variant('b-l', 'Black', 'L')],
+    })
+    expect(result.current.price).toBe('€45.00')
   })
 
   it('says Added to cart for a moment', () => {
