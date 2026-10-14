@@ -18,7 +18,7 @@ export default function Accordion({ items, defaultOpen }: AccordionProps) {
   return (
     <div className={styles.accordion}>
       {items.map((item, i) => (
-        <details key={item.title} className={styles.item} open={i === defaultOpen ? true : undefined}>
+        <details key={`${item.title}-${i}`} className={styles.item} open={i === defaultOpen ? true : undefined}>
           <summary className={styles.summary}>
             <span>{item.title}</span>
             <span className={styles.icon} aria-hidden="true" />

@@ -1,6 +1,7 @@
 'use client'
 
-import { useId, useRef, type KeyboardEvent, type MouseEvent, type SyntheticEvent } from 'react'
+import { useId, useRef, useState, type KeyboardEvent, type MouseEvent, type SyntheticEvent } from 'react'
+import { useScrollLock } from '@/hooks/useFocusTrap'
 import type { SizeGuide } from '@/lib/printful'
 import styles from './SizeGuideDialog.module.css'
 
@@ -23,17 +24,22 @@ export default function SizeGuideDialog({ category, guide, modelNote, sizeLabels
   const dialogRef = useRef<HTMLDialogElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const titleId = useId()
+  const [isOpen, setIsOpen] = useState(false)
+  useScrollLock(isOpen)
+  const isEmpty = guide.rows.length === 0 || guide.sizes.length === 0
 
   function open() {
     const dialog = dialogRef.current
     if (!dialog || dialog.hasAttribute('open')) return
     if (typeof dialog.showModal === 'function') dialog.showModal()
     else dialog.setAttribute('open', '')
+    setIsOpen(true)
   }
 
   function close() {
     const dialog = dialogRef.current
     if (!dialog || !dialog.hasAttribute('open')) return
+    setIsOpen(false)
     if (typeof dialog.close === 'function') {
       dialog.close()
     } else {
@@ -51,6 +57,11 @@ export default function SizeGuideDialog({ category, guide, modelNote, sizeLabels
     if (event.key !== 'Escape') return
     event.preventDefault()
     close()
+  }
+
+  // Keeps the scroll lock in sync when the native dialog closes by other means.
+  function onClose() {
+    setIsOpen(false)
   }
 
   function onBackdropClick(event: MouseEvent<HTMLDialogElement>) {
@@ -71,6 +82,7 @@ export default function SizeGuideDialog({ category, guide, modelNote, sizeLabels
         onCancel={onCancel}
         onKeyDown={onKeyDown}
         onClick={onBackdropClick}
+        onClose={onClose}
       >
         <div className={styles.inner}>
           <div className={styles.head}>
@@ -81,29 +93,33 @@ export default function SizeGuideDialog({ category, guide, modelNote, sizeLabels
               </svg>
             </button>
           </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <caption className={styles.caption}>Body measurements in {guide.unit}</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Size</th>
-                  {guide.sizes.map((size) => (
-                    <th key={size} scope="col">{sizeLabels[size] ?? size}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {guide.rows.map((row) => (
-                  <tr key={row.label}>
-                    <th scope="row">{row.label}</th>
+          {isEmpty ? (
+            <p className={styles.empty}>No size guide available for this product.</p>
+          ) : (
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <caption className={styles.caption}>Body measurements in {guide.unit}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Size</th>
                     {guide.sizes.map((size) => (
-                      <td key={size}>{row.values[size] || '-'}</td>
+                      <th key={size} scope="col">{sizeLabels[size] ?? size}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {guide.rows.map((row, i) => (
+                    <tr key={`${row.label}-${i}`}>
+                      <th scope="row">{row.label}</th>
+                      {guide.sizes.map((size) => (
+                        <td key={size}>{row.values[size] || '-'}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           {modelNote && <p className={styles.note}>{modelNote}</p>}
         </div>
       </dialog>

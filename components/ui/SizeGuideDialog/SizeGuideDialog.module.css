@@ -132,6 +132,12 @@
   font-weight: 500;
 }
 
+.empty {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--c-text-muted);
+}
+
 .note {
   margin: 0;
   font-size: var(--fs-small);

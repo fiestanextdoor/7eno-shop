@@ -89,4 +89,35 @@ describe('SizeGuideDialog', () => {
     expect(within(d).getByRole('columnheader', { name: 'EU 40' })).toBeInTheDocument()
     expect(within(d).getByText('Model is 1,85 m and wears L')).toBeInTheDocument()
   })
+  it('shows a sentence instead of a header-only table for an empty guide', () => {
+    const { trigger } = setup({ guide: { unit: 'cm', sizes: [], rows: [] } })
+    fireEvent.click(trigger)
+    const d = screen.getByRole('dialog', { name: 'Hoodies size guide' })
+    expect(within(d).queryByRole('table')).toBeNull()
+    expect(within(d).getByText('No size guide available for this product.')).toBeInTheDocument()
+  })
+
+  it('treats a guide with sizes but no rows as empty', () => {
+    const { trigger } = setup({ guide: { unit: 'cm', sizes: ['S'], rows: [] } })
+    fireEvent.click(trigger)
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(screen.getByText('No size guide available for this product.')).toBeInTheDocument()
+  })
+
+  it('locks body scroll while open and restores it on close', () => {
+    document.body.style.overflow = 'scroll'
+    try {
+      const { trigger } = setup()
+      fireEvent.click(trigger)
+      expect(document.body.style.overflow).toBe('hidden')
+      fireEvent.click(screen.getByRole('button', { name: 'Close size guide' }))
+      expect(document.body.style.overflow).toBe('scroll')
+      fireEvent.click(trigger)
+      expect(document.body.style.overflow).toBe('hidden')
+      fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }))
+      expect(document.body.style.overflow).toBe('scroll')
+    } finally {
+      document.body.style.overflow = ''
+    }
+  })
 })
