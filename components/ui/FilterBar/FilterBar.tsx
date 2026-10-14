@@ -64,28 +64,33 @@ export default function FilterBar({ filters, sort, sortOptions = [], controls, r
       </div>
     ))
 
+  // The Drawer is a sibling of the bar, not a child: the sticky bar is a
+  // stacking context at z-index 100, which would trap the Drawer (400) under
+  // the fixed chrome (300).
   return (
-    <div className={styles.bar}>
-      <div className={styles.inner}>
-        {filters.length > 0 && (
-          <button
-            type="button"
-            className={styles.filtersButton}
-            onClick={() => setOpen(true)}
-            aria-expanded={open}
-            aria-controls="filter-drawer"
-          >
-            {`Filters${activeCount > 0 ? ` (${activeCount})` : ''}`}
-          </button>
-        )}
-        {filters.length > 0 && (
-          <nav className={styles.groups} aria-label="Filters">
-            {chipGroups()}
-          </nav>
-        )}
-        <div className={styles.tools}>
-          <div className={styles.desktopSort}>{sortControl('sort-desktop')}</div>
-          {controls}
+    <>
+      <div className={styles.bar}>
+        <div className={styles.inner}>
+          {filters.length > 0 && (
+            <button
+              type="button"
+              className={styles.filtersButton}
+              onClick={() => setOpen(true)}
+              aria-expanded={open}
+              aria-controls="filter-drawer"
+            >
+              {`Filters${activeCount > 0 ? ` (${activeCount})` : ''}`}
+            </button>
+          )}
+          {filters.length > 0 && (
+            <nav className={styles.groups} aria-label="Filters">
+              {chipGroups()}
+            </nav>
+          )}
+          <div className={styles.tools}>
+            <div className={styles.desktopSort}>{sortControl('sort-desktop')}</div>
+            {controls}
+          </div>
         </div>
       </div>
 
@@ -108,6 +113,6 @@ export default function FilterBar({ filters, sort, sortOptions = [], controls, r
           {sortControl('sort-mobile')}
         </Drawer>
       )}
-    </div>
+    </>
   )
 }

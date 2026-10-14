@@ -88,6 +88,14 @@ describe('FilterBar', () => {
     expect(dialog.closest('[data-open]')).toHaveAttribute('data-open', 'false')
   })
 
+  it('renders the drawer outside the sticky bar, so the chrome cannot cover it', () => {
+    render(<FilterBar filters={FILTERS} sort="featured" sortOptions={SORT_OPTIONS} />)
+    const bar = screen.getByRole('button', { name: 'Filters (2)' }).parentElement?.parentElement
+    const drawer = screen.getByRole('dialog', { hidden: true }).closest('[data-open]')
+    expect(bar).toBeTruthy()
+    expect(bar?.contains(drawer)).toBe(false)
+  })
+
   it('renders only the extra controls when there are no filters or sorts', () => {
     render(<FilterBar filters={[]} sort="featured" controls={<button type="button">density</button>} />)
     expect(screen.getByRole('button', { name: 'density' })).toBeInTheDocument()
