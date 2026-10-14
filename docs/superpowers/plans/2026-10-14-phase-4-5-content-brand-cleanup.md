@@ -77,7 +77,7 @@ git status --short
 test -f components/ui/DropBlock/DropBlock.tsx && test -f components/ui/WaitlistForm/WaitlistForm.tsx \
   && test -f app/collections/\[slug\]/page.tsx && test -f components/ui/Accordion/Accordion.tsx \
   && test -f app/shop/\[slug\]/ProductView.tsx && echo "phases 1-3 present"
-ls -l /private/tmp/claude-501/-Users-joep/4a51778d-eb14-44cb-9ef9-07e9a9aa329a/scratchpad/media/
+ls -l /Users/joep/Documents/Persoonlijk/7eno-shop-media-prepared/
 npm ci
 npm test
 ```
@@ -120,7 +120,7 @@ Het 7ENO-woordmerk bestaat alleen als vierkante tegel (periwinkle op navy, 750x7
 
 ```bash
 cd /Users/joep/Documents/Persoonlijk/7eno-shop-master
-MEDIA=/private/tmp/claude-501/-Users-joep/4a51778d-eb14-44cb-9ef9-07e9a9aa329a/scratchpad/media
+MEDIA=/Users/joep/Documents/Persoonlijk/7eno-shop-media-prepared
 mkdir -p public/brand docs/brand/source
 for f in model-dune.webp instagram-logo-nieuw.webp something-is-coming.webp \
   olympn-sport-wordmark-orange.png olympn-badge-orange.png \
