@@ -20,6 +20,14 @@ describe('ProductTile', () => {
     expect(screen.getByRole('heading', { name: 'OLYMPN Sport Oversized Hoodie Mocha' })).toBeInTheDocument()
   })
 
+  it('renders the name as h3 by default and as h2 under a page heading', () => {
+    const { rerender } = render(<ProductTile product={tile} density={4} />)
+    expect(screen.getByRole('heading', { level: 3, name: tile.name })).toBeInTheDocument()
+    rerender(<ProductTile product={tile} density={4} headingLevel="h2" />)
+    expect(screen.getByRole('heading', { level: 2, name: tile.name })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 3 })).toBeNull()
+  })
+
   it('lazy-loads the image by default and eagerly in the first row', () => {
     const { rerender } = render(<ProductTile product={tile} density={4} />)
     expect(screen.getByRole('img', { name: tile.imageAlt })).toHaveAttribute('loading', 'lazy')

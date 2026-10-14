@@ -28,6 +28,12 @@ describe('ShopView', () => {
     expect(images[4]).toHaveAttribute('loading', 'lazy')
   })
 
+  it('titles each tile with an h2, straight under the page h1', () => {
+    render(<ShopView filters={[]} sort="featured" sortOptions={[]} tiles={TILES} />)
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(TILES.map((t) => t.name))
+    expect(screen.queryByRole('heading', { level: 3 })).toBeNull()
+  })
+
   it('switches the desktop grid to two per row', () => {
     const { container } = render(<ShopView filters={[]} sort="featured" sortOptions={[]} tiles={TILES} />)
     const grid = container.querySelector('ul[data-desktop]')

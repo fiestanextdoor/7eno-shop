@@ -60,7 +60,7 @@ export default function ShopView({ filters, sort, sortOptions, tiles, emptyMessa
         <ul className={styles.grid} data-mobile={density.mobile} data-desktop={density.desktop}>
           {tiles.map((tile, i) => (
             <li key={tile.slug} className={styles.cell}>
-              <ProductTile product={tile} density={density.desktop} eager={i < density.desktop} />
+              <ProductTile product={tile} density={density.desktop} eager={i < density.desktop} headingLevel="h2" />
             </li>
           ))}
         </ul>
