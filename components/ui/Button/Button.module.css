@@ -1,0 +1,88 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-0);
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--m-fast) var(--m-ease);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.md {
+  min-height: 44px;
+  padding: 0 var(--s-5);
+}
+
+.lg {
+  min-height: 52px;
+  padding: 0 var(--s-6);
+  font-size: var(--fs-body);
+}
+
+.primary {
+  background: var(--c-text);
+  color: var(--c-inverse-text);
+}
+
+.accent {
+  background: var(--c-accent);
+  color: var(--c-text);
+  /* Navy on periwinkle is 3.8:1: enough only for large text (WCAG 1.4.3),
+     so the accent button always sets its label at 20px bold. */
+  font-size: var(--fs-h3);
+  font-weight: 700;
+}
+
+.ghost {
+  background: transparent;
+  color: currentColor;
+  border-color: currentColor;
+}
+
+.primary:hover:not(:disabled),
+.accent:hover:not(:disabled),
+.ghost:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.label {
+  display: inline-block;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
