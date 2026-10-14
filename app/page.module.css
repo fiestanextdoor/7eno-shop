@@ -1,11 +1,37 @@
 .page {
   min-height: 100vh;
   padding-top: var(--l-chrome);
-  padding-bottom: var(--s-9);
   background: var(--c-bg);
   color: var(--c-text);
 }
 
+/* Hero: the next drop's block beside its photo, on the drop's own tone. */
+.hero {
+  display: grid;
+  background: var(--c-bg);
+}
+
+.hero[data-tone='dark'] {
+  background: var(--c-inverse-bg);
+}
+
+.heroCopy {
+  display: grid;
+  align-content: center;
+}
+
+.heroMedia {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--c-accent);
+}
+
+.heroImage {
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* Drop rows */
 .row {
   max-width: var(--l-max);
   margin: 0 auto;
@@ -29,7 +55,8 @@
   color: var(--c-text-muted);
 }
 
-.rowTitle {
+.rowTitle,
+.bandTitle {
   margin: 0;
   font-family: var(--f-display);
   font-size: var(--fs-h2);
@@ -49,12 +76,17 @@
   text-underline-offset: 3px;
 }
 
+.olyText .rowLink {
+  margin-left: 0;
+}
+
 .rowLink:focus-visible {
   outline: 2px solid var(--c-focus);
   outline-offset: 2px;
 }
 
-.rowGrid {
+.rowGrid,
+.olyModels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--l-grid-gap);
@@ -70,12 +102,171 @@
   background: var(--c-surface);
 }
 
-.lineupImage {
+.lineupImage,
+.contain {
   object-fit: contain;
 }
 
+.cover {
+  object-fit: cover;
+}
+
+/* Olympian photo band */
+.olyBand {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding-top: var(--s-9);
+}
+
+.olyLead {
+  display: grid;
+  gap: var(--s-6);
+  padding: 0 var(--l-gutter) var(--s-6);
+}
+
+.olyPoster {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--c-stone);
+}
+
+.olyText {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--s-3);
+}
+
+.bandText {
+  margin: 0;
+  max-width: var(--l-text-max);
+}
+
+.olyModel {
+  position: relative;
+  aspect-ratio: 939 / 1400;
+  background: var(--c-surface);
+}
+
+/* OLYMPN Sport video band */
+.sportBand {
+  margin-top: var(--s-9);
+  padding: var(--s-9) var(--l-gutter);
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}
+
+.sportBand :focus-visible {
+  outline-color: var(--c-inverse-text);
+}
+
+.sportInner {
+  display: grid;
+  gap: var(--s-7);
+  max-width: var(--l-max);
+  margin: 0 auto;
+}
+
+.sportHead {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-4);
+}
+
+.sportTitle {
+  margin: 0;
+  width: min(100%, 560px);
+}
+
+.sportWordmark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sportMeta {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.sportMedia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--l-grid-gap);
+  max-width: 1080px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sportTile {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--c-inverse-bg);
+}
+
+.sportTile[data-teaser='true'] {
+  grid-column: 1 / -1;
+  aspect-ratio: 1 / 1;
+  background: var(--c-sage);
+}
+
+/* Waitlist strip */
+.waitlist {
+  padding: var(--s-9) var(--l-gutter);
+  background: var(--c-sage);
+  color: var(--c-text);
+}
+
+.waitlistInner {
+  display: grid;
+  gap: var(--s-3);
+  max-width: var(--l-text-max);
+  margin: 0 auto;
+}
+
+.waitlistLabel {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+
 @media (min-width: 768px) {
-  .rowGrid {
+  .rowGrid,
+  .olyModels {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sportMedia {
+    grid-template-columns: repeat(var(--tiles, 2), minmax(0, 1fr));
+  }
+
+  .sportTile[data-teaser='true'] {
+    grid-column: auto;
+    aspect-ratio: 9 / 16;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: calc(100vh - var(--l-chrome));
+  }
+
+  .heroMedia {
+    aspect-ratio: auto;
+    min-height: 100%;
+  }
+
+  .olyLead {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
 }

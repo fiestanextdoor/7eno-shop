@@ -33,10 +33,16 @@ describe('drop config', () => {
 
   it('ships all eight OLYMPN Sport mockups as local webp files', () => {
     expect(sport.hero.lineup).toHaveLength(8)
-    for (const src of [...sport.hero.lineup, sport.hero.image]) {
+    for (const src of sport.hero.lineup) {
       expect(src).toMatch(/^\/drops\/olympn-sport\/[a-z-]+\.webp$/)
       expect(publicFile(src)).toBe(true)
     }
+  })
+
+  it('points the OLYMPN Sport hero at the model photo and the ad, with a poster', () => {
+    const assets = [sport.hero.image, sport.hero.video, sport.hero.poster]
+    expect(assets).toEqual(['/brand/model-dune.webp', '/brand/ad-dune.mp4', '/brand/ad-dune-poster.jpg'])
+    for (const src of assets) expect(publicFile(src as string)).toBe(true)
   })
 
   it('points every Olympian hero asset at a file that exists', () => {

@@ -76,8 +76,10 @@ export const DROPS: readonly Drop[] = [
     window: { startsAt: '2026-11-01T12:00:00+01:00', endsAt: null },
     match: { printfulSyncIds: [], namePrefixes: ['OLYMPN Sport '] },
     hero: {
-      image: '/drops/olympn-sport/dune.webp',
-      alt: 'OLYMPN Sport Relaxed Hoodie in Dune',
+      image: '/brand/model-dune.webp',
+      alt: 'Model wearing the OLYMPN Sport Relaxed Hoodie in Dune',
+      video: '/brand/ad-dune.mp4',
+      poster: '/brand/ad-dune-poster.jpg',
       lineup: [
         '/drops/olympn-sport/rose-red.webp',
         '/drops/olympn-sport/pistachio.webp',
