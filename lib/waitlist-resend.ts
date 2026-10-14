@@ -4,7 +4,9 @@ export type WaitlistResult = 'added' | 'unconfigured' | 'failed'
 
 /**
  * Adds the address to the Resend audience in RESEND_WAITLIST_AUDIENCE_ID,
- * with the drop or product as a contact property. No Supabase involved
+ * with the drop or product as a contact property (the properties drop_id and
+ * product_slug must exist in Resend; without them the contact is stored bare).
+ * No Supabase involved
  * (spec section 4). Resend is imported lazily so tests and builds without
  * a key never load the SDK.
  */
@@ -23,12 +25,17 @@ export async function addWaitlistContact(signup: WaitlistSignup): Promise<Waitli
   try {
     const { Resend } = await import('resend')
     const client = new Resend(apiKey)
-    const { error } = await client.contacts.create({
-      audienceId,
-      email: signup.email,
-      unsubscribed: false,
-      ...(Object.keys(properties).length > 0 ? { properties } : {}),
-    })
+    const base = { audienceId, email: signup.email, unsubscribed: false }
+    const hasProperties = Object.keys(properties).length > 0
+    let { error } = await client.contacts.create(hasProperties ? { ...base, properties } : base)
+    if (error && hasProperties && /propert/i.test(error.message)) {
+      // The custom properties are missing in the Resend account: never lose
+      // the signup over that, store the bare contact instead.
+      console.warn(
+        '[Waitlist] Resend rejected the contact properties; create drop_id and product_slug (type string) in Resend. Retrying without them.',
+      )
+      ;({ error } = await client.contacts.create(base))
+    }
     if (!error) return 'added'
     // Signing up twice is not an error for the visitor: they are on the list.
     // Resend answers a duplicate with a 409 or an "already exists" message.

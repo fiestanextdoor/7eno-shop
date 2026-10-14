@@ -55,4 +55,21 @@ describe('addWaitlistContact', () => {
     expect(mockCreate).not.toHaveBeenCalled()
     warnSpy.mockRestore()
   })
+
+  it('retries without properties when Resend does not know them, and warns once without the address', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    mockCreate.mockResolvedValueOnce({
+      data: null,
+      error: { name: 'validation_error', message: 'Property drop_id does not exist for a@b.nl', statusCode: 422 },
+    })
+    await expect(addWaitlistContact(SIGNUP)).resolves.toBe('added')
+    expect(mockCreate).toHaveBeenCalledTimes(2)
+    expect(mockCreate).toHaveBeenLastCalledWith({ audienceId: 'aud_test', email: 'a@b.nl', unsubscribed: false })
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+    const logged = warnSpy.mock.calls[0].join(' ')
+    expect(logged).toMatch(/drop_id/)
+    expect(logged).toMatch(/product_slug/)
+    expect(logged).not.toMatch(/a@b\.nl/)
+    warnSpy.mockRestore()
+  })
 })
