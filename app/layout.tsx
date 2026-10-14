@@ -122,11 +122,10 @@ export default function RootLayout({
     >
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
-        {/* Product photos are served from the print providers' CDNs; warming the
-            connections early shaves a round trip off the largest image (LCP). */}
+        {/* Product photos are served from the Printful CDN; warming the
+            connection early shaves a round trip off the largest image (LCP). */}
         <link rel="preconnect" href="https://files.cdn.printful.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://files.cdn.printful.com" />
-        <link rel="dns-prefetch" href="https://images-api.printify.com" />
         {/* Site-wide entity graph: who the brand is and what the site is. The
             "Zeno" spellings let search engines link the spoken brand name to the
             store (people hear "Zeno", not "7ENO").
