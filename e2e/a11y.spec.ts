@@ -29,13 +29,17 @@ async function scan(page: Page, name: string) {
   // Let open transitions (menu labels and drawers fade in) settle first; axe
   // measures contrast on the colour of the moment, mid-fade it reads too light.
   // Endless loops (the ticker) never finish, so only finite ones are awaited.
+  // Bounded: a paused or very long finite animation must not hang the scan.
   await page.evaluate(() =>
-    Promise.all(
-      document
-        .getAnimations()
-        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
-        .map((a) => a.finished.catch(() => null)),
-    ),
+    Promise.race([
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+          .map((a) => a.finished.catch(() => null)),
+      ),
+      new Promise((resolve) => setTimeout(resolve, 2000)),
+    ]),
   )
   const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze()
   results.push({
