@@ -1,9 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isShopLocked } from '@/lib/release'
-
-// Cookie that lets the owner browse the storefront while the launch seal is up.
-const PREVIEW_COOKIE = 'seal_bypass'
+import { PREVIEW_COOKIE, PREVIEW_COOKIE_MAX_AGE, isPreviewCookieValue, previewParamAction } from '@/lib/preview'
 
 // Paths that must stay reachable even while the seal is active. API routes,
 // Next internals and static files (anything with a dot, e.g. /favicon.ico) are
@@ -67,31 +65,32 @@ async function handleAccountAuth(request: NextRequest, pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const previewKey = process.env.SITE_PREVIEW_KEY
 
-  // ── Preview bypass ──────────────────────────────────────────────────────
-  // `?preview=<SITE_PREVIEW_KEY>` drops a cookie so the owner can browse the
-  // sealed shop, then redirects to the clean URL. `?preview=off` clears it.
+  // ── Preview cookie ──────────────────────────────────────────────────────
+  // `?preview=<SITE_PREVIEW_KEY>` stores the key in an httpOnly cookie so an
+  // upcoming drop shows as live for QA (lib/preview.ts), then redirects to the
+  // clean URL. `?preview=off` clears it. Ignored on Vercel production.
   const previewParam = request.nextUrl.searchParams.get('preview')
   if (previewParam !== null) {
     const cleanUrl = request.nextUrl.clone()
     cleanUrl.searchParams.delete('preview')
     const res = NextResponse.redirect(cleanUrl)
-    if (previewParam === 'off') {
+    const action = previewParamAction(previewParam)
+    if (action === 'clear') {
       res.cookies.delete({ name: PREVIEW_COOKIE, path: '/' })
-    } else if (previewKey && previewParam === previewKey) {
-      res.cookies.set(PREVIEW_COOKIE, '1', {
+    } else if (action === 'set') {
+      res.cookies.set(PREVIEW_COOKIE, process.env.SITE_PREVIEW_KEY ?? '', {
         httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+        maxAge: PREVIEW_COOKIE_MAX_AGE,
       })
     }
     return res
   }
 
-  const hasBypass = request.cookies.get(PREVIEW_COOKIE)?.value === '1'
+  const hasBypass = isPreviewCookieValue(request.cookies.get(PREVIEW_COOKIE)?.value)
 
   // ── Storefront seal ─────────────────────────────────────────────────────
   // Until the launch moment (lib/release.ts), every page redirects to the
