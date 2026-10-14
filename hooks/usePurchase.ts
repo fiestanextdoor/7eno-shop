@@ -93,7 +93,7 @@ export function usePurchase({
   const chosen = selectedVariant ?? (pickerSizes.length === 1 ? pickerSizes[0] : null)
   const selectionSoldOut = soldOut || pickerSizes.length === 0 || (chosen !== null && isSoldOut(chosen))
   // Hidden sizes never supply the price; variants[0] only when no size is offered.
-  const priced = chosen ?? pickerSizes[0] ?? variants[0] ?? null
+  const priced = chosen ?? pickerSizes[0] ?? null
 
   function addToCart() {
     if (!chosen || selectionSoldOut) return

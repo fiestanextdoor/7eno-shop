@@ -111,6 +111,7 @@ describe('usePurchase', () => {
       expect(result.current.sizes).toEqual([])
       expect(result.current.needsSize).toBe(false)
       expect(result.current.selectionSoldOut).toBe(true)
+      expect(result.current.price).toBeNull()
       act(() => result.current.addToCart())
       expect(cartIds()).toEqual([])
     }
