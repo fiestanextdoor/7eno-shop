@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import styles from './terms.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions — 7ENO',
+  title: 'Terms & Conditions',
 }
 
 export default function TermsPage() {
@@ -40,7 +40,7 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2 className={styles.heading}>6. Delivery</h2>
-            <p>Orders are produced and shipped by Printful. Estimated delivery times are 5–10 business days for standard shipping within the EU. Delivery times are indicative and not guaranteed. 7ENO is not liable for delays caused by carriers or customs.</p>
+            <p>Orders are produced and shipped by Printful. Estimated delivery times are 5 to 10 business days for standard shipping within the EU. Delivery times are indicative and not guaranteed. 7ENO is not liable for delays caused by carriers or customs.</p>
           </section>
 
           <section className={styles.section}>

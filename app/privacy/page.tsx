@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import styles from './privacy.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — 7ENO',
+  title: 'Privacy Policy',
 }
 
 export default function PrivacyPage() {

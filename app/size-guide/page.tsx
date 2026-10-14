@@ -7,7 +7,7 @@ import {
 import { HIDDEN_SIZES } from '@/lib/product-classify'
 import { productSlug } from '@/lib/slug'
 import { absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
   'Size guide for 7ENO (Zeno) streetwear: body measurements in centimetres for the tees, how to measure yourself, and how each fit runs.'
@@ -136,7 +136,7 @@ export default async function SizeGuidePage() {
   ])
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { absoluteUrl, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
   'Answers about ordering at 7ENO (Zeno): payment with iDEAL, delivery times for made-to-order pieces, shipping costs, 14-day returns and sizing.'
@@ -133,7 +133,7 @@ export default function FaqPage() {
   ])
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

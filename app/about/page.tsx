@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { absoluteUrl, BASE_URL, BRAND, breadcrumbJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
   '7ENO is pronounced "Zeno". The streetwear label by Abra Entertainment from Eindhoven, made to order in two collections: OG and Olympian.'
@@ -43,7 +43,7 @@ export default function AboutPage() {
   }
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
