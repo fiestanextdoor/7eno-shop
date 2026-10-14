@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getCatalogProducts } from '@/lib/catalog'
+import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import {
   getProduct as getPrintfulProduct, getCatalogProductId, getSizeGuide, type SizeGuide,
 } from '@/lib/printful'
@@ -84,7 +84,7 @@ interface ResolvedGuide {
 /** Pull the real Printful size table for one representative product. */
 async function guideFor(
   target: GuideTarget,
-  products: Awaited<ReturnType<typeof getCatalogProducts>>,
+  products: ShopProduct[],
 ): Promise<ResolvedGuide | null> {
   const product = products.find((p) => p.provider === 'printful' && target.match(p.name.toLowerCase()))
   if (!product) return null
@@ -109,11 +109,11 @@ async function guideFor(
 }
 
 export default async function SizeGuidePage() {
-  let products: Awaited<ReturnType<typeof getCatalogProducts>> = []
+  let products: ShopProduct[] = []
   try {
-    products = await getCatalogProducts()
+    products = await getShopProducts()
   } catch {
-    // fall through — page renders without the tables
+    // fall through: page renders without the tables
   }
 
   const resolved = (await Promise.all(TARGETS.map((t) => guideFor(t, products)))).filter(

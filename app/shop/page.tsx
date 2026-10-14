@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import ProductCard from '@/components/ProductCard/ProductCard'
 import ShopFilters from '@/components/ShopFilters/ShopFilters'
-import { getCatalogProducts, getCatalogProduct, isInStock } from '@/lib/catalog'
+import { getShopProducts, getCatalogProduct, isInStock, type ShopProduct } from '@/lib/catalog'
+import { currentTimeMs } from '@/lib/drops'
+import { isPreviewSession } from '@/lib/preview-session'
 import { getProductCardImages } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
 import { productSlug } from '@/lib/slug'
@@ -136,11 +138,11 @@ interface Props {
 export default async function ShopPage({ searchParams }: Props) {
   const { gender = '', line = '', category = '' } = await searchParams
 
-  let allProducts: NormalizedProduct[] = []
+  let allProducts: ShopProduct[] = []
   try {
-    allProducts = await getCatalogProducts()
+    allProducts = await getShopProducts(currentTimeMs(), { preview: await isPreviewSession() })
   } catch (err) {
-    console.error('[Catalog] getCatalogProducts failed:', err)
+    console.error('[Catalog] getShopProducts failed:', err)
   }
 
   // Filter by keyword classification (gender → line → category).
@@ -229,11 +231,8 @@ export default async function ShopPage({ searchParams }: Props) {
     ).then((entries) => Object.fromEntries(entries.map((e) => [e.id, e]))),
   ])
 
-  // Auto-disable out-of-stock products: drop any with no in-stock variant.
-  // bgRemovedUrls is parallel to `products`, so zip before filtering to stay aligned.
-  const visibleCards = products
-    .map((p, i) => ({ product: p, bgUrl: bgRemovedUrls[i] }))
-    .filter(({ product }) => productInfoMap[product.id]?.inStock !== false)
+  // Sold-out products stay visible (spec section 4); the v2 tile marks them.
+  const visibleCards = products.map((p, i) => ({ product: p, bgUrl: bgRemovedUrls[i] }))
 
   const genderFilters = [
     { label: 'All',   href: buildHref({ line, category }),                   active: !gender },

@@ -1,7 +1,9 @@
 import Hero from '@/components/Hero/Hero'
 import ProductCarousel, { type CarouselItem } from '@/components/ProductCarousel/ProductCarousel'
 import BundleCover from '@/components/BundleCover/BundleCover'
-import { getCatalogProducts, getCatalogProduct, isInStock } from '@/lib/catalog'
+import { getShopProducts, getCatalogProduct, isInStock } from '@/lib/catalog'
+import { currentTimeMs } from '@/lib/drops'
+import { isPreviewSession } from '@/lib/preview-session'
 import { getBundles, computeBundlePricing, lowestVariantPriceCents } from '@/lib/bundles'
 import { resolveCardImage } from '@/lib/card-image'
 import { getProductImageOverride } from '@/lib/product-images'
@@ -118,9 +120,12 @@ async function buildCarouselColors(slug: string, product: NormalizedProduct, fal
 export default async function HomePage() {
   let products: NormalizedProduct[] = []
   try {
-    products = await getCatalogProducts()
+    // Only pieces that can be bought now: a teaser in the quick-add carousel
+    // would offer an add-to-cart that the checkout refuses.
+    const shop = await getShopProducts(currentTimeMs(), { preview: await isPreviewSession() })
+    products = shop.filter((p) => p.purchasable)
   } catch (err) {
-    console.error('[Catalog] getCatalogProducts failed:', err)
+    console.error('[Catalog] getShopProducts failed:', err)
   }
 
   const latest = [...products].sort((a, b) => createdMs(b) - createdMs(a)).slice(0, MAX_CAROUSEL_ITEMS)

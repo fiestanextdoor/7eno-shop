@@ -1,4 +1,5 @@
 import type { NormalizedProduct } from '@/types/catalog'
+import type { PrintfulProductDetail } from '@/types/printful'
 import * as printful from '@/lib/printful'
 import * as printify from '@/lib/printify'
 
@@ -98,5 +99,135 @@ describe('getCatalogProducts', () => {
     const { getCatalogProducts } = await import('./catalog')
     expect((await getCatalogProducts()).map((p) => p.id)).toEqual(['abc'])
     errorSpy.mockRestore()
+  })
+})
+
+describe('getShopProducts', () => {
+  const BEFORE_SPORT = Date.parse('2026-10-14T10:00:00Z')
+  const SPORT_RELEASE = Date.parse('2026-11-01T11:00:00Z')
+
+  const listing = (id: number, name: string) => ({
+    id, name, thumbnail_url: `https://files.cdn.printful.com/${id}.png`, variants: 2, synced: 2,
+  })
+  const detail = (id: number, name: string, stock: boolean[] = [true, true]): PrintfulProductDetail => ({
+    sync_product: listing(id, name),
+    sync_variants: stock.map((inStock, i) => ({
+      id: id * 10 + i, sync_product_id: id, variant_id: 4000 + i, name: `${name} / ${['M', 'L', 'XL'][i]}`,
+      retail_price: '45.00', currency: 'EUR', is_ignored: false, sku: `${id}-${i}`, files: [],
+      size: ['M', 'L', 'XL'][i], color: 'White', color_code: '#ffffff', color_code2: null, in_stock: inStock,
+    })),
+  })
+
+  // Provider order on purpose: OG first, Olympian and OLYMPN Sport mixed.
+  const CATALOGUE: [number, string][] = [
+    [1, 'Ink/Butter Sport Tee Unisex'],
+    [2, 'Olympian Tee Sand Unisex'],
+    [3, 'Olympian Knitted Tee Ocean Unisex'],
+    [4, 'OLYMPN Sport Oversized Hoodie Mocha'],
+    [5, 'OLYMPN Sport Relaxed Hoodie Dune'],
+    [6, 'Olympian Tee Ocean Unisex'],
+  ]
+  let details: Map<string, PrintfulProductDetail>
+
+  beforeEach(() => {
+    details = new Map(CATALOGUE.map(([id, name]) => [String(id), detail(id, name)]))
+    jest.mocked(printful.getProducts).mockReset().mockResolvedValue(CATALOGUE.map(([id, name]) => listing(id, name)))
+    jest.mocked(printful.getProduct).mockReset().mockImplementation(async (id: string) => {
+      const d = details.get(id)
+      if (!d) throw new Error(`no detail for ${id}`)
+      return d
+    })
+    jest.mocked(printify.getProducts).mockReset()
+  })
+
+  it('keeps only drop products, sorted by edition, family and colour', async () => {
+    const { getShopProducts } = await import('./catalog')
+    const names = (await getShopProducts(BEFORE_SPORT)).map((p) => p.name)
+    expect(names).toEqual([
+      'OLYMPN Sport Oversized Hoodie Mocha',
+      'OLYMPN Sport Relaxed Hoodie Dune',
+      'Olympian Knitted Tee Ocean Unisex',
+      'Olympian Tee Ocean Unisex',
+      'Olympian Tee Sand Unisex',
+    ])
+  })
+
+  it('never fetches Printify', async () => {
+    const { getShopProducts } = await import('./catalog')
+    await getShopProducts(BEFORE_SPORT)
+    expect(printify.getProducts).not.toHaveBeenCalled()
+  })
+
+  it('shows teaser products before the release, but not for sale', async () => {
+    const { getShopProducts } = await import('./catalog')
+    const products = await getShopProducts(BEFORE_SPORT)
+    const sport = products.filter((p) => p.drop.id === 'olympn-sport')
+    expect(sport).toHaveLength(2)
+    expect(sport.every((p) => p.status === 'upcoming' && !p.purchasable)).toBe(true)
+    expect(products.filter((p) => p.drop.id === 'olympian').every((p) => p.purchasable)).toBe(true)
+  })
+
+  it('sells teaser products from the release millisecond', async () => {
+    const { getShopProducts } = await import('./catalog')
+    const sport = (await getShopProducts(SPORT_RELEASE)).filter((p) => p.drop.id === 'olympn-sport')
+    expect(sport.every((p) => p.status === 'live' && p.purchasable)).toBe(true)
+  })
+
+  it('sells an upcoming drop in preview', async () => {
+    const { getShopProducts } = await import('./catalog')
+    const sport = (await getShopProducts(BEFORE_SPORT, { preview: true })).filter((p) => p.drop.id === 'olympn-sport')
+    expect(sport.every((p) => p.purchasable)).toBe(true)
+  })
+
+  it('marks a product with every variant out of stock as sold out instead of hiding it', async () => {
+    details.set('2', detail(2, 'Olympian Tee Sand Unisex', [false, false]))
+    const { getShopProducts } = await import('./catalog')
+    const sand = (await getShopProducts(BEFORE_SPORT)).find((p) => p.id === '2')
+    expect(sand?.soldOut).toBe(true)
+    expect(sand?.slug).toBe('olympian-tee-sand-unisex')
+  })
+
+  it('loads variants and price from the product detail', async () => {
+    const { getShopProducts } = await import('./catalog')
+    const ocean = (await getShopProducts(BEFORE_SPORT)).find((p) => p.id === '6')
+    expect(ocean?.variants).toHaveLength(2)
+    expect(ocean?.priceCents).toBe(4500)
+    expect(ocean?.soldOut).toBe(false)
+  })
+
+  it('keeps a product whose detail fails, without claiming it is sold out', async () => {
+    details.delete('3')
+    const { getShopProducts } = await import('./catalog')
+    const knit = (await getShopProducts(BEFORE_SPORT)).find((p) => p.id === '3')
+    expect(knit?.variants).toEqual([])
+    expect(knit?.soldOut).toBe(false)
+  })
+
+  it('returns an empty shop when Printful is down', async () => {
+    jest.mocked(printful.getProducts).mockRejectedValue(new Error('printful down'))
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const { getShopProducts } = await import('./catalog')
+    await expect(getShopProducts(BEFORE_SPORT)).resolves.toEqual([])
+    errorSpy.mockRestore()
+  })
+})
+
+describe('isRetiredProductSlug', () => {
+  beforeEach(() => {
+    jest.mocked(printful.getProducts).mockReset().mockResolvedValue([
+      { id: 433345476, name: 'Ink/Butter Sport Tee Unisex', thumbnail_url: null, variants: 5, synced: 5 },
+    ])
+    jest.mocked(printify.getProducts).mockReset().mockResolvedValue([pi])
+  })
+
+  it('recognises an OG or Printify product that left the shop', async () => {
+    const { isRetiredProductSlug } = await import('./catalog')
+    await expect(isRetiredProductSlug('ink-butter-sport-tee-unisex')).resolves.toBe(true)
+    await expect(isRetiredProductSlug('olympus-tee')).resolves.toBe(true)
+  })
+
+  it('is false for a slug that never existed', async () => {
+    const { isRetiredProductSlug } = await import('./catalog')
+    await expect(isRetiredProductSlug('no-such-product')).resolves.toBe(false)
   })
 })

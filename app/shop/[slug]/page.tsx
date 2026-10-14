@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
-import { getCatalogProducts, getCatalogProduct, findBySlug } from '@/lib/catalog'
+import { getShopProducts, getCatalogProduct, findBySlug, isRetiredProductSlug, type ShopProduct } from '@/lib/catalog'
+import { currentTimeMs } from '@/lib/drops'
+import { isPreviewSession } from '@/lib/preview-session'
 import { variantFrontImage, variantBackImage, variantMockupImages } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
 import { getBundlesForProduct } from '@/lib/bundles'
@@ -20,8 +22,8 @@ interface Props {
 
 export async function generateStaticParams() {
   try {
-    const products = await getCatalogProducts()
-    return products.map((p) => ({ slug: productSlug(p.name) }))
+    const products = await getShopProducts()
+    return products.map((p) => ({ slug: p.slug }))
   } catch {
     return []
   }
@@ -29,7 +31,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const products = await getCatalogProducts().catch(() => [])
+  const products = await getShopProducts(currentTimeMs(), { preview: await isPreviewSession() }).catch(
+    () => [] as ShopProduct[]
+  )
   const match = findBySlug(products, slug)
   if (!match) return { title: 'Product not found' }
   const collection = /olympian/i.test(match.name) ? 'Olympian' : 'OG'
@@ -58,9 +62,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params
 
-  let products: Awaited<ReturnType<typeof getCatalogProducts>> = []
+  let products: ShopProduct[] = []
   try {
-    products = await getCatalogProducts()
+    products = await getShopProducts(currentTimeMs(), { preview: await isPreviewSession() })
   } catch {
     products = []
   }
@@ -68,12 +72,17 @@ export default async function ProductPage({ params }: Props) {
   // Back-compat: old numeric-id Printful URLs (/shop/433351254) redirect to slug.
   if (/^\d+$/.test(slug)) {
     const byId = products.find((p) => p.provider === 'printful' && p.id === slug)
-    if (byId) permanentRedirect(`/shop/${productSlug(byId.name)}`)
+    if (byId) permanentRedirect(`/shop/${byId.slug}`)
     notFound()
   }
 
   const match = findBySlug(products, slug)
-  if (!match) notFound()
+  if (!match) {
+    // A retired product (OG, Printify) keeps its old URL working as a 308 to
+    // the shop (spec section 3), so old links and search results still land.
+    if (await isRetiredProductSlug(slug)) permanentRedirect('/shop')
+    notFound()
+  }
 
   let detail
   try {
