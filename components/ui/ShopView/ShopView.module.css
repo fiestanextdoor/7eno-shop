@@ -1,0 +1,53 @@
+/* The stone background shows through the 2px gaps as hairlines between tiles. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--l-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--c-stone);
+}
+
+.grid[data-mobile='1'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cell {
+  min-width: 0;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--s-9) var(--l-gutter);
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  color: var(--c-text-muted);
+  text-align: center;
+}
+
+.mobileOnly {
+  display: block;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .grid[data-desktop='4'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grid[data-desktop='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+}

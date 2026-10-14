@@ -1,88 +1,30 @@
-import { classify, olympianSortRank, HIDDEN_SIZES } from './product-classify'
+import { classify, HIDDEN_SIZES } from './product-classify'
 
-// The real catalogue names, deliberately in the order the provider returns them
-// (backpacks first) so the test proves the sort actually reorders.
-const CATALOGUE = [
-  'Olympian Ocean Backpack 20 L',
-  'Olympian Coconut Backpack 20 L',
-  'Olympian Sand Backpack 20 L',
-  'Olympian Flamingo Backpack 20 L',
-  'Olympian Tee Coconut Unisex',
-  'Olympian Tee Flamingo Unisex',
-  'Olympian Tee Sand Unisex',
-  'Olympian Tee Ocean Unisex',
-  'Olympian Knitted Tee Coconut Unisex',
-  'Olympian Knitted Tee Flamingo Unisex',
-  'Olympian Knitted Tee Sand Unisex',
-  'Olympian Knitted Tee Ocean Unisex',
-]
-
-const sorted = () => [...CATALOGUE].sort((a, b) => olympianSortRank(a) - olympianSortRank(b))
-
-describe('olympianSortRank', () => {
-  it('groups knitted tees, then tees, then backpacks', () => {
-    const groups = sorted().map((n) =>
-      /knitted/i.test(n) ? 'knitted' : /backpack/i.test(n) ? 'backpack' : 'tee',
-    )
-    expect(groups).toEqual([
-      'knitted', 'knitted', 'knitted', 'knitted',
-      'tee', 'tee', 'tee', 'tee',
-      'backpack', 'backpack', 'backpack', 'backpack',
-    ])
+describe('classify', () => {
+  it.each([
+    ['Olympian Tee Sand Unisex', { isTee: true, isKnit: false, isHoodie: false, isBag: false }],
+    ['Olympian Knitted Tee Ocean Unisex', { isTee: false, isKnit: true, isHoodie: false, isBag: false }],
+    ['OLYMPN Sport Oversized Hoodie Rose Red', { isTee: false, isKnit: false, isHoodie: true, isBag: false }],
+    ['OLYMPN Sport Relaxed Hoodie Dune', { isTee: false, isKnit: false, isHoodie: true, isBag: false }],
+    ['Olympian Ocean Backpack 20 L', { isTee: false, isKnit: false, isHoodie: false, isBag: true }],
+  ])('classifies %s', (name, expected) => {
+    expect(classify(name)).toEqual(expected)
   })
 
-  it('repeats the same colourway sequence in every group', () => {
-    const colour = (n: string) =>
-      ['ocean', 'coconut', 'sand', 'flamingo'].find((c) => n.toLowerCase().includes(c))
-    const rows = [sorted().slice(0, 4), sorted().slice(4, 8), sorted().slice(8, 12)]
-    for (const row of rows) {
-      expect(row.map(colour)).toEqual(['ocean', 'coconut', 'sand', 'flamingo'])
+  it('puts every v2 piece in exactly one kind', () => {
+    const names = [
+      'Olympian Tee Coconut Unisex', 'Olympian Knitted Tee Flamingo Unisex', 'Olympian Sand Backpack 20 L',
+      'OLYMPN Sport Oversized Hoodie Pistachio', 'OLYMPN Sport Relaxed Hoodie Maritime',
+    ]
+    for (const name of names) {
+      expect(Object.values(classify(name)).filter(Boolean)).toHaveLength(1)
     }
-  })
-
-  it('lines the colourways up in columns on the 4-wide grid', () => {
-    // Column n of a 4-column grid is every 4th item starting at n.
-    const list = sorted()
-    for (let col = 0; col < 4; col++) {
-      const column = [list[col], list[col + 4], list[col + 8]]
-      const colours = column.map((n) =>
-        ['ocean', 'coconut', 'sand', 'flamingo'].find((c) => n.toLowerCase().includes(c)),
-      )
-      expect(new Set(colours).size).toBe(1)
-    }
-  })
-
-  it('does not mistake a knitted tee for a plain tee', () => {
-    expect(olympianSortRank('Olympian Knitted Tee Ocean Unisex'))
-      .toBeLessThan(olympianSortRank('Olympian Tee Ocean Unisex'))
-  })
-
-  it('sorts an unknown colourway to the end of its own group, not the front', () => {
-    const unknown = olympianSortRank('Olympian Tee Midnight Unisex')
-    expect(unknown).toBeGreaterThan(olympianSortRank('Olympian Tee Flamingo Unisex'))
-    expect(unknown).toBeLessThan(olympianSortRank('Olympian Ocean Backpack 20 L'))
   })
 })
 
-describe('classify', () => {
-  it('separates the two collections', () => {
-    expect(classify('Olympian Tee Ocean Unisex').isOlympian).toBe(true)
-    expect(classify('7ENO Ink/Blood Tee Men').isOlympian).toBe(false)
-  })
+describe('HIDDEN_SIZES', () => {
   it('hides the sizes the storefront hides', () => {
     expect(HIDDEN_SIZES.has('4XL')).toBe(true)
     expect(HIDDEN_SIZES.has('XL')).toBe(false)
-  })
-})
-
-describe('product kinds', () => {
-  it.each([
-    ['Olympian Knitted Tee Ocean Unisex', { isKnit: true, isHoodie: false, isBag: false }],
-    ['OLYMPN Sport Oversized Hoodie Rose Red', { isKnit: false, isHoodie: true, isBag: false }],
-    ['OLYMPN Sport Relaxed Hoodie Dune', { isKnit: false, isHoodie: true, isBag: false }],
-    ['Olympian Ocean Backpack 20 L', { isKnit: false, isHoodie: false, isBag: true }],
-    ['Olympian Tee Sand Unisex', { isTee: true, isKnit: false, isHoodie: false, isBag: false }],
-  ])('classifies %s', (name, expected) => {
-    expect(classify(name)).toMatchObject(expected)
   })
 })
