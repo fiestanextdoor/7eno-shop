@@ -22,7 +22,7 @@ describe.each(PAGES)('%s', (page) => {
   })
 
   it('no longer carries the v1 theme class', () => {
-    expect(readFileSync(page, 'utf8')).not.toContain('oly-theme')
+    expect(readFileSync(page, 'utf8')).not.toMatch(/oly-(theme|palette)/)
   })
 })
 

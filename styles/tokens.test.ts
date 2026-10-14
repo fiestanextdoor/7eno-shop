@@ -102,7 +102,7 @@ describe('styles/tokens.css', () => {
     expect(reduced).toContain('animation: none')
   })
 
-  it('declares only the new prefixes, so it can never clash with --ink or --gutter', () => {
+  it('declares only the v2 prefixes (c, f, fs, s, r, l, m)', () => {
     const declared = [...css.matchAll(/(--[a-z0-9-]+):/g)].map((m) => m[1])
     expect(declared.length).toBeGreaterThan(50)
     for (const name of declared) expect(name).toMatch(/^--(c|f|fs|s|r|l|m)-/)

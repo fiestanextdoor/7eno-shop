@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       found,
     }
   } catch {
-    // Stripe key missing/invalid, or API error — leave the defaults (not configured).
+    // Stripe key missing/invalid, or API error: leave the defaults (not configured).
   }
 
   // The full automatic flow is "green" only when every link is wired up.

@@ -1,7 +1,7 @@
 /**
  * One-time installer: registers the Printful status webhook at our deployed URL.
  * Printful uses a single webhook config (one URL + a list of event types), so
- * POSTing replaces any previous config — re-running is idempotent by nature.
+ * POSTing replaces any previous config, so re-running is idempotent by nature.
  *
  * Printful does not sign webhook payloads, so the shared secret goes in the URL
  * as `?token=…`; the route (app/api/printful-webhook) verifies it.
@@ -34,7 +34,7 @@ function loadEnvLocal() {
       if (!(key in process.env) || process.env[key] === '') process.env[key] = value
     }
   } catch {
-    // no .env.local — rely on real environment variables
+    // no .env.local: rely on real environment variables
   }
 }
 

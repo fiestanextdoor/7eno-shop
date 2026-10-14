@@ -6,7 +6,7 @@ import { classify } from './product-classify'
 const baseItem: FeedItem = {
   id: 'printful-1',
   itemGroupId: 'printful-100',
-  title: 'Olympian Tee Ocean Unisex — Ocean, M',
+  title: 'Olympian Tee Ocean Unisex - Ocean, M',
   description: 'A tee.',
   link: 'https://www.7eno.shop/shop/olympian-tee-ocean-unisex',
   imageLink: 'https://files.cdn.printful.com/a.png',
@@ -35,11 +35,11 @@ describe('escapeXml', () => {
 
 describe('buildTitle', () => {
   it('joins product, colour and size', () => {
-    expect(buildTitle('Olympian Tee', 'Ocean', 'M')).toBe('Olympian Tee — Ocean, M')
+    expect(buildTitle('Olympian Tee', 'Ocean', 'M')).toBe('Olympian Tee - Ocean, M')
   })
   it('omits empty colour/size instead of leaving separators', () => {
     expect(buildTitle('Blood Vintage Cap', '', '')).toBe('Blood Vintage Cap')
-    expect(buildTitle('Olympian Tee', 'Ocean', '')).toBe('Olympian Tee — Ocean')
+    expect(buildTitle('Olympian Tee', 'Ocean', '')).toBe('Olympian Tee - Ocean')
   })
   it('truncates past the 150-character Merchant Center limit', () => {
     const title = buildTitle('x'.repeat(200), 'Ocean', 'M')

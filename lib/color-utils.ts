@@ -1,4 +1,4 @@
-// Shared color resolution — used on shop grid and product detail page.
+// Shared color resolution: used on shop grid and product detail page.
 // Printful's color_code field is unreliable (often returns #FFFFFF or #000000
 // regardless of actual garment color), so name lookup is always preferred.
 
@@ -112,7 +112,7 @@ const PRINTFUL_TO_BRAND_NAME: Record<string, string> = {
 // 7ENO brand color keywords in priority order.
 // When Printful reports a generic near-white fabric color ("White"), read the product name
 // and use the FIRST matching keyword to determine the actual garment color.
-// "ink" is intentionally excluded — it now resolves to paper on its own.
+// "ink" is intentionally excluded: it now resolves to paper on its own.
 const BRAND_COLOR_KEYS = [
   'butter', 'stone', 'blood', 'bone', 'carrot', 'coin',
 ]
@@ -142,7 +142,7 @@ const BRAND_SWATCH_OVERRIDES: Array<{ match: string; hex: string; hex2: string }
 /**
  * Olympian '26 colourways. Each colourway is published as its own Printful
  * product (the name carries the colourway word, e.g. "Olympian Tee Ocean
- * Unisex"), so colours can't come from variant data — they map from the name
+ * Unisex"), so colours can't come from variant data: they map from the name
  * to the brand palette instead. Array order is the display order for swatches.
  */
 export const OLYMPIAN_COLORWAYS: Array<{ key: string; name: string; hex: string }> = [
@@ -179,7 +179,7 @@ export function resolveHex(colorName: string, colorCode: string): string {
   const key = colorName.toLowerCase().trim()
   if (key && COLOR_HEX[key]) return COLOR_HEX[key]
   if (colorCode && colorCode.startsWith('#') && colorCode !== '#FFFFFF') {
-    // Treat #000000 as ink-dark — Printful uses it for confirmed-black fabrics
+    // Treat #000000 as ink-dark: Printful uses it for confirmed-black fabrics
     if (colorCode === '#000000') return '#111111'
     return colorCode
   }
@@ -195,7 +195,7 @@ export function isNearWhite(hex: string): boolean {
   return r > 200 && g > 200 && b > 200
 }
 
-// Returns true when hex is very dark — black, navy, dark charcoal, etc. (max channel < 80).
+// Returns true when hex is very dark: black, navy, dark charcoal, etc. (max channel < 80).
 function isVeryDark(hex: string): boolean {
   if (!hex.startsWith('#') || hex.length < 7) return false
   const r = parseInt(hex.slice(1, 3), 16)

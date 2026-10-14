@@ -3,7 +3,7 @@ import type { Provider } from '@/types/catalog'
 /** One product slot in a set. The customer chooses the variant (size/colour). */
 export interface BundleProductRef {
   provider: Provider
-  productId: string // live Printful/Printify product id — must be a real id
+  productId: string // live Printful/Printify product id, must be a real id
   slug: string      // product slug, for catalog lookup + linking
 }
 

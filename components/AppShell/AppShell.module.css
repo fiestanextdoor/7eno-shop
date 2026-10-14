@@ -16,14 +16,8 @@
   min-height: 100vh;
 }
 
-/*
- * Old pages pad and stick against --nav-height (styles/globals.css). Inside
- * the shell it equals the new fixed chrome, so they line up under it without
- * changing the old token definition. New pages use var(--l-chrome) directly.
- */
 .content {
   flex: 1;
-  --nav-height: var(--l-chrome);
 }
 
 .skipLink {

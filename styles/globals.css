@@ -1,89 +1,25 @@
-*, *::before, *::after {
+/* Global base for v2. All tokens live in styles/tokens.css (spec section 2);
+   this file only resets and sets the page defaults. */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-:root {
-  --ink:     #111111;
-  --bone:    #F6F3EC;
-  --butter:  #F6F3EC;
-  --paper:   #EDE8DD;
-  --oxblood: #5C1A1B;
-  --stone:   #8A8275;
-  --mid:     #8F8A80;
-  --rule:    #C8C1B2;
-
-  /* Cormorant Garamond is the site-wide typeface: a high-contrast renaissance
-     serif loaded + self-hosted by next/font (exposed as --font-cormorant in
-     layout.tsx). Falls back to classic system serifs before the web font swaps
-     in. The --font-sans name is kept for backwards compatibility across the
-     existing modules; headings and the --font-serif alias resolve to the same
-     family. */
-  --font-sans: var(--font-cormorant), Georgia, 'Times New Roman', 'Iowan Old Style', serif;
-  --font-display: var(--font-sans);
-  --font-serif:   var(--font-sans);
-  --font-mono:    'Space Mono', ui-monospace, monospace;
-
-  --nav-height: 110px;
-  --max-width: 1280px;
-  --gutter: 32px;
-}
-
-@media (max-width: 640px) {
-  :root {
-    --gutter: 20px;
-    --nav-height: 72px;
-  }
-}
-
-/* ── Olympian '26 palette ──────────────────────────────────────────────────
-   The four brand colours plus a warm wheat ground. Applied ONLY through the
-   .oly-theme class, which is set on the homepage and /shop <main>. That class
-   re-defines the shared tokens for its subtree, so the nav, off-canvas cart,
-   footer and the account / checkout / deals pages keep the original look. */
-:root {
-  --oly-clay:  #b57446; /* clay (lookbook colourway) */
-  --oly-teal:  #297d95; /* primary / interactive accent */
-  --oly-wheat: #eddca2; /* tonal fills */
-  --oly-rosa:  #eda5b2; /* highlight / pop */
-  --oly-bg:    #F7EED6; /* page ground: the cream, lightened */
-}
-
-/* Token overrides shared by the page bodies (.oly-theme) and by chrome such as
-   the header and preloader (.oly-palette). Teal is the primary accent; the old
-   clay is dropped from the UI and survives only as one lookbook colourway. */
-.oly-theme,
-.oly-palette {
-  --paper:   #F1E7C6; /* warm wheat section ground */
-  --oxblood: var(--oly-teal); /* teal is the primary accent (was clay) */
-  --ink:     #241A12; /* warm espresso text */
-  --stone:   #8A7B5F; /* warm muted */
-  --rule:    #E4D6AE; /* wheat hairline */
-}
-
-/* Page bodies also carry the wheat ground; .oly-palette stays transparent so
-   the nav/preloader only inherit the recoloured tokens, not a background. */
-.oly-theme {
-  background: var(--oly-bg);
-}
-
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
-  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--butter);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  /* Medium (500) Cormorant gives the body a touch more presence than the airy
-     regular weight, while headings set their own heavier weight. */
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.6;
-  font-variant-numeric: lining-nums;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
 }
 
 a {
@@ -101,26 +37,10 @@ button {
   font-family: inherit;
 }
 
-.container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
-}
-
-.mono {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

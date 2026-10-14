@@ -49,6 +49,6 @@ describe('size guide', () => {
 
   it('contains no long dashes', async () => {
     const { container } = render(await SizeGuidePage())
-    expect(container.textContent).not.toMatch(/[–—]/)
+    expect(container.textContent).not.toMatch(/[\u2013\u2014]/)
   })
 })

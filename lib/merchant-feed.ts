@@ -4,7 +4,7 @@
  * Merchant Center is how products enter free Shopping listings, so the feed is
  * built at variant level: Google wants one item per buyable size/colour, tied
  * together by `item_group_id`. Apparel additionally requires gender, age group,
- * colour and size — without those the whole item is rejected.
+ * colour and size; without those the whole item is rejected.
  *
  * Pure functions only (no fetching), so the mapping is unit-testable.
  */
@@ -58,7 +58,7 @@ export function productTypeFor(c: Classification, collection: string): string {
 /** Merchant Center caps titles at 150 characters. */
 export function buildTitle(productName: string, color: string, size: string): string {
   const parts = [productName, [color, size].filter(Boolean).join(', ')].filter(Boolean)
-  const title = parts.join(' — ')
+  const title = parts.join(' - ')
   return title.length <= 150 ? title : `${title.slice(0, 147)}...`
 }
 

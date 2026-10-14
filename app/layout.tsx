@@ -1,31 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Mono, Cormorant_Garamond, Archivo, Instrument_Sans, IBM_Plex_Mono } from 'next/font/google'
+import { Archivo, Instrument_Sans, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import AppShell from '@/components/AppShell/AppShell'
 import { BASE_URL, BRAND_KEYWORDS, SITE_DESCRIPTION, THEME_COLOR, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
 import '@/styles/tokens.css'
-
-// Cormorant Garamond is the site-wide typeface for headings and body: a soft,
-// high-contrast renaissance serif that gives the "Divine Authority" brand an
-// ethereal, scriptural feel. Wired to --font-sans in globals.css. Space Mono
-// stays for the small uppercase label accents (a distinct, functional element).
-// Both are self-hosted by next/font at build time, so no external font CDN is
-// hit (keeps the `font-src 'self'` CSP intact).
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const spaceMono = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-mono',
-  display: 'swap',
-})
 
 // Rebrand v2 type (spec section 2). Archivo is loaded as a variable font with
 // the width axis, so the display face can run at wdth 125 / wght 900 and in
@@ -124,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${spaceMono.variable} ${archivo.variable} ${instrumentSans.variable} ${plexMono.variable}`}
+      className={`${archivo.variable} ${instrumentSans.variable} ${plexMono.variable}`}
     >
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}

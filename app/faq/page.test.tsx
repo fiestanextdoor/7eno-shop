@@ -23,6 +23,6 @@ describe('FAQ', () => {
     const { container } = render(<FaqPage />)
     expect(screen.getByText('What is the difference between Olympian and OLYMPN Sport?')).toBeInTheDocument()
     expect(container.textContent).not.toMatch(/\bOG\b/)
-    expect(container.textContent).not.toMatch(/[–—]/)
+    expect(container.textContent).not.toMatch(/[\u2013\u2014]/)
   })
 })

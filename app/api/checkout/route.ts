@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
 
   // Discount code. Single-use per account and not combinable with bundle deals,
   // so it requires a signed-in account (that is how "one use per account" is
-  // enforced — see coupon_redemptions). Every check is repeated here, never
+  // enforced, see coupon_redemptions). Every check is repeated here, never
   // trusting the client or the /api/promo/validate pre-check.
   let appliedPromo: PromoCode | null = null
   if (typeof promoCode === 'string' && promoCode.trim() !== '') {
