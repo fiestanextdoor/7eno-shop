@@ -99,6 +99,7 @@ describe('home', () => {
     render(await HomePage())
     // The hero and the tile row are also named "OLYMPN Sport", so select the band by its data attribute.
     const band = document.querySelector('[data-band="sport"]') as HTMLElement
+    expect(band).not.toBeNull()
     const videos = band.querySelectorAll('video')
     expect(videos).toHaveLength(2)
     for (const video of videos) {

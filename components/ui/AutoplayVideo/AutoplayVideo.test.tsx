@@ -33,6 +33,10 @@ afterEach(() => {
 const video = (container: HTMLElement) => container.querySelector('video') as HTMLVideoElement
 
 describe('AutoplayVideo', () => {
+  it('respects reduced motion in its query', () => {
+    expect(AUTOPLAY_QUERY).toContain('prefers-reduced-motion: no-preference')
+  })
+
   it('never preloads and always shows its poster', () => {
     mockMatchMedia(false)
     const { container } = render(<AutoplayVideo {...props} />)
@@ -56,7 +60,8 @@ describe('AutoplayVideo', () => {
     mockMatchMedia(true)
     const { container } = render(<AutoplayVideo {...props} />)
     expect(play).toHaveBeenCalledTimes(1)
-    expect(video(container)).not.toHaveAttribute('controls')
+    // Native controls stay so the looping ad can be paused (WCAG 2.2.2).
+    expect(video(container)).toHaveAttribute('controls')
   })
 
   it('stays still where matchMedia does not exist', () => {

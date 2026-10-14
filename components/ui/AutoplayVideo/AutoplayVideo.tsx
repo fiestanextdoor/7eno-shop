@@ -56,7 +56,7 @@ export default function AutoplayVideo({ src, poster, label, width, height }: Aut
       muted
       loop
       playsInline
-      controls={!autoplay}
+      controls
       aria-label={label}
     >
       <source src={src} type="video/mp4" />
