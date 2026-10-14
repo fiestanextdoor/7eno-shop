@@ -37,7 +37,7 @@ export interface SendEmailResult {
 let cachedClient: Resend | null = null
 
 // Resend is imported lazily (only when a key is present and we actually send)
-// so that pure helpers like renderOrderConfirmation — and their tests — never
+// so that pure helpers like renderOrderConfirmation, and their tests, never
 // pull the SDK into the bundle/runtime.
 async function getClient(): Promise<Resend | null> {
   const apiKey = process.env.RESEND_API_KEY
