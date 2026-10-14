@@ -1,0 +1,76 @@
+.bar {
+  display: flex;
+  align-items: center;
+  height: var(--l-announce);
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}
+
+.viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--c-inverse-text);
+  outline-offset: -2px;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: announce 40s linear infinite;
+}
+
+.track[data-paused='true'] {
+  animation-play-state: paused;
+}
+
+.item {
+  padding: 0 var(--s-7);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  line-height: var(--l-announce);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pause {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--l-announce);
+  height: var(--l-announce);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pause:focus-visible {
+  outline: 2px solid var(--c-inverse-text);
+  outline-offset: -4px;
+}
+
+@keyframes announce {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pause {
+    display: none;
+  }
+}

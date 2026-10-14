@@ -1,0 +1,42 @@
+.chrome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/*
+ * Old pages pad and stick against --nav-height (styles/globals.css). Inside
+ * the shell it equals the new fixed chrome, so they line up under it without
+ * changing the old token definition. New pages use var(--l-chrome) directly.
+ */
+.content {
+  flex: 1;
+  --nav-height: var(--l-chrome);
+}
+
+.skipLink {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-4);
+  z-index: 500;
+  padding: var(--s-2) var(--s-4);
+  background: var(--c-text);
+  color: var(--c-inverse-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+  outline: 2px solid var(--c-live);
+  outline-offset: 2px;
+}
