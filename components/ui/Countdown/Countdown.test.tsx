@@ -74,4 +74,33 @@ describe('Countdown', () => {
     })
     expect(refresh).toHaveBeenCalledTimes(1)
   })
+
+  it('keeps refreshing after the release until it unmounts, then stops', () => {
+    jest.setSystemTime(new Date('2026-11-01T10:59:59Z'))
+    const { unmount } = render(<Countdown target={TARGET} />)
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+    act(() => {
+      jest.advanceTimersByTime(30_000)
+    })
+    const calls = refresh.mock.calls.length
+    expect(calls).toBeGreaterThan(1)
+    unmount()
+    act(() => {
+      jest.advanceTimersByTime(60_000)
+    })
+    expect(refresh).toHaveBeenCalledTimes(calls)
+    expect(jest.getTimerCount()).toBe(0)
+  })
+
+  it('gives up refreshing after 20 attempts', () => {
+    jest.setSystemTime(new Date('2026-11-01T11:00:01Z'))
+    render(<Countdown target={TARGET} />)
+    act(() => {
+      jest.advanceTimersByTime(15 * 60_000)
+    })
+    expect(refresh).toHaveBeenCalledTimes(20)
+    expect(jest.getTimerCount()).toBe(0)
+  })
 })

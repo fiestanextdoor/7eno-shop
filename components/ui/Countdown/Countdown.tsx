@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatDropDate } from '@/lib/drops'
 import styles from './Countdown.module.css'
 
@@ -22,6 +22,10 @@ export function splitRemaining(ms: number): { days: number; hours: number; minut
   }
 }
 
+/** Retry cadence after the release: every 15 s for at most 5 minutes. */
+const REFRESH_INTERVAL_MS = 15_000
+const REFRESH_MAX_ATTEMPTS = 20
+
 const pad = (n: number) => String(n).padStart(2, '0')
 
 export default function Countdown({ target, label }: CountdownProps) {
@@ -30,24 +34,36 @@ export default function Countdown({ target, label }: CountdownProps) {
   // Null on the server and in the first client render: the time is only
   // known in the browser, and the placeholders keep both renders equal.
   const [now, setNow] = useState<number | null>(null)
-  const refreshed = useRef(false)
 
   useEffect(() => {
-    const tick = () => setNow(Date.now())
+    let id: number | undefined
+    const tick = () => {
+      const t = Date.now()
+      setNow(t)
+      // Past the release the digits stay at zero: stop ticking.
+      if (t >= targetMs && id !== undefined) window.clearInterval(id)
+    }
     tick()
-    const id = window.setInterval(tick, 1000)
+    if (Date.now() < targetMs) id = window.setInterval(tick, 1000)
     return () => window.clearInterval(id)
-  }, [])
+  }, [targetMs])
 
   const remaining = now === null ? null : targetMs - now
   const done = remaining !== null && remaining <= 0
 
   useEffect(() => {
-    // The page was rendered before the release: fetch the live version once.
-    if (done && !refreshed.current) {
-      refreshed.current = true
+    // The page was rendered before the release, and with ISR the first
+    // refresh usually returns the still-cached upcoming page. Keep asking
+    // until the live page replaces this component (unmount), capped.
+    if (!done) return
+    router.refresh()
+    let attempts = 1
+    const id = window.setInterval(() => {
+      attempts += 1
       router.refresh()
-    }
+      if (attempts >= REFRESH_MAX_ATTEMPTS) window.clearInterval(id)
+    }, REFRESH_INTERVAL_MS)
+    return () => window.clearInterval(id)
   }, [done, router])
 
   const parts = remaining === null ? null : splitRemaining(remaining)
