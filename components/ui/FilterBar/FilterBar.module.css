@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: var(--s-4);
-  min-height: 52px;
+  height: 52px;
   max-width: var(--l-max);
   margin: 0 auto;
   padding: var(--s-2) var(--l-gutter);
@@ -51,7 +51,7 @@
 
 .chips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--s-2);
   margin: 0;
   padding: 0;
@@ -139,6 +139,13 @@
   .groups {
     display: flex;
     gap: var(--s-6);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .group {
+    flex: 0 0 auto;
   }
 
   .desktopSort {
