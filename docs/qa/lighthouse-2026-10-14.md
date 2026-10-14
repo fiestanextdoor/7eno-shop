@@ -30,3 +30,19 @@ HTTP status of the two warm-up requests per path (redirects not followed).
 - Best practices 96 (all pages): the console logs a 404 for `/_vercel/insights/script.js`, which only exists on Vercel. Not expected on the deployed site.
 - Accessibility 99 on PLP: `heading-order`, the product tile names are `h3` directly under the page `h1` with no `h2` in between (ProductTile from phase 1 to 3; axe does not flag it because it is not a WCAG rule).
 - Measured on localhost, not through the Vercel CDN; real field numbers will differ.
+
+## Second run, after the font split
+
+Same preset and warm-up (all paths 200, 200), on the build of `bf4240c`: Archivo italic is no longer preloaded (font preloads on the home HTML drop from 5 to 4), product tile names are `h2` on `/shop`, and the Printify dns-prefetch is gone.
+
+| Page | Path | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT | Target |
+|---|---|---|---|---|---|---|---|---|---|
+| Home | `/` | 90 | 100 | 96 | 100 | 3.5 s | 0.032 | 0 ms | met |
+| PLP | `/shop` | 89 | 100 | 96 | 100 | 3.8 s | 0 | 10 ms | not met |
+| PDP | `/shop/olympian-ocean-backpack-20-l` | 91 | 100 | 96 | 100 | 3.5 s | 0 | 0 ms | met |
+
+Below target: PLP performance 89.
+
+- Against the run above: Home LCP 3.7 s to 3.5 s, PLP 86 to 89 (LCP 4.3 s to 3.8 s), PDP 89 to 91 (LCP 3.8 s to 3.5 s). Within the spread of a few points noted above, but LCP moved the same way on all three pages.
+- Accessibility on PLP is 100 now: the `heading-order` audit passes with the `h2` tile names.
+- Home CLS is 0.032 in this run (0 before), still well under the 0.1 limit. A likely cause is the italic band title swapping in from its fallback now that the italic file is no longer preloaded; worth watching in the next run.
