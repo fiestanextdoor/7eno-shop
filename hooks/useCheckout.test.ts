@@ -81,13 +81,13 @@ describe('useCheckout payment', () => {
     expect(result.current.payLoading).toBe(false)
   })
 
-  it('shows the server error, for example the 409 for an unreleased product', async () => {
-    fetchMock.mockResolvedValue(respond(409, { error: 'One or more products are not available yet' }))
+  it('shows the server error, for example the 409 for a product outside a live drop', async () => {
+    fetchMock.mockResolvedValue(respond(409, { error: 'One or more products are not available' }))
     const { result } = setup()
     fillAddress(result)
     act(() => result.current.changeAgreed(true))
     await act(async () => { await result.current.pay() })
-    expect(result.current.payError).toBe('One or more products are not available yet')
+    expect(result.current.payError).toBe('One or more products are not available')
     expect(redirect).not.toHaveBeenCalled()
   })
 

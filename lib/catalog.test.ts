@@ -21,12 +21,15 @@ describe('mergeCatalogs', () => {
   })
 
   it('returns the surviving provider when the other rejects (never empty-on-partial-failure)', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     const { mergeCatalogs } = await import('./catalog')
     const merged = mergeCatalogs(
       { status: 'fulfilled', value: [pf] },
       { status: 'rejected', reason: new Error('printify down') }
     )
     expect(merged.map((p) => p.id)).toEqual(['1'])
+    expect(errorSpy).toHaveBeenCalledWith('[Catalog] Printify fetch failed:', expect.any(Error))
+    errorSpy.mockRestore()
   })
 })
 
@@ -68,33 +71,23 @@ describe('getCatalogProducts', () => {
     jest.mocked(printify.getProducts).mockReset()
   })
 
-  it('hides unreleased OLYMPN Sport products from both providers', async () => {
+  it('returns the raw catalogue of both providers, unfiltered', async () => {
     jest.mocked(printful.getProducts).mockResolvedValue([
       syncProduct(1, 'Olympian Hoodie Teal'),
       syncProduct(2, 'OLYMPN Sport Oversized Hoodie Rose Red'),
     ])
-    jest.mocked(printify.getProducts).mockResolvedValue([
-      { ...pi, id: 'x', name: 'olympn sport tee' },
-      pi,
-    ])
+    jest.mocked(printify.getProducts).mockResolvedValue([pi])
     const { getCatalogProducts } = await import('./catalog')
-    const names = (await getCatalogProducts()).map((p) => p.name)
-    expect(names).toEqual(['Olympian Hoodie Teal', 'Olympus Tee'])
-  })
-
-  it('keeps OG sport products whose name only contains "Sport"', async () => {
-    jest.mocked(printful.getProducts).mockResolvedValue([
-      syncProduct(433345476, 'Ink/Butter Sport Tee Unisex'),
-      syncProduct(433351405, 'Ink/Butter Sport Shorts Unisex'),
+    expect((await getCatalogProducts()).map((p) => p.name)).toEqual([
+      'Olympian Hoodie Teal',
+      'OLYMPN Sport Oversized Hoodie Rose Red',
+      'Olympus Tee',
     ])
-    jest.mocked(printify.getProducts).mockResolvedValue([])
-    const { getCatalogProducts } = await import('./catalog')
-    expect((await getCatalogProducts()).map((p) => p.id)).toEqual(['433345476', '433351405'])
   })
 
   it('still returns the surviving provider when the other one fails', async () => {
     jest.mocked(printful.getProducts).mockRejectedValue(new Error('printful down'))
-    jest.mocked(printify.getProducts).mockResolvedValue([pi, { ...pi, id: 'y', name: 'OLYMPN Sport Cap' }])
+    jest.mocked(printify.getProducts).mockResolvedValue([pi])
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     const { getCatalogProducts } = await import('./catalog')
     expect((await getCatalogProducts()).map((p) => p.id)).toEqual(['abc'])
@@ -126,6 +119,9 @@ describe('getShopProducts', () => {
     [4, 'OLYMPN Sport Oversized Hoodie Mocha'],
     [5, 'OLYMPN Sport Relaxed Hoodie Dune'],
     [6, 'Olympian Tee Ocean Unisex'],
+    // Alphabetically before Sand and after Ocean is not enough: colourOrder
+    // (ocean, coconut, sand) must win over the alphabet.
+    [7, 'Olympian Tee Coconut Unisex'],
   ]
   let details: Map<string, PrintfulProductDetail>
 
@@ -148,6 +144,7 @@ describe('getShopProducts', () => {
       'OLYMPN Sport Relaxed Hoodie Dune',
       'Olympian Knitted Tee Ocean Unisex',
       'Olympian Tee Ocean Unisex',
+      'Olympian Tee Coconut Unisex',
       'Olympian Tee Sand Unisex',
     ])
   })
@@ -216,6 +213,8 @@ describe('isRetiredProductSlug', () => {
   beforeEach(() => {
     jest.mocked(printful.getProducts).mockReset().mockResolvedValue([
       { id: 433345476, name: 'Ink/Butter Sport Tee Unisex', thumbnail_url: null, variants: 5, synced: 5 },
+      { id: 2, name: 'Olympian Tee Sand Unisex', thumbnail_url: null, variants: 5, synced: 5 },
+      { id: 4, name: 'OLYMPN Sport Oversized Hoodie Mocha', thumbnail_url: null, variants: 5, synced: 5 },
     ])
     jest.mocked(printify.getProducts).mockReset().mockResolvedValue([pi])
   })
@@ -224,6 +223,12 @@ describe('isRetiredProductSlug', () => {
     const { isRetiredProductSlug } = await import('./catalog')
     await expect(isRetiredProductSlug('ink-butter-sport-tee-unisex')).resolves.toBe(true)
     await expect(isRetiredProductSlug('olympus-tee')).resolves.toBe(true)
+  })
+
+  it('is false for a product of a live or upcoming drop, even though it is in the raw catalogue', async () => {
+    const { isRetiredProductSlug } = await import('./catalog')
+    await expect(isRetiredProductSlug('olympian-tee-sand-unisex')).resolves.toBe(false)
+    await expect(isRetiredProductSlug('olympn-sport-oversized-hoodie-mocha')).resolves.toBe(false)
   })
 
   it('is false for a slug that never existed', async () => {

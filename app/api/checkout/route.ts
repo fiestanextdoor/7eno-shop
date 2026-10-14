@@ -7,7 +7,8 @@ import { validateShippingAddress, computeShippingCents } from '@/lib/shipping'
 import { getBundle } from '@/lib/bundles'
 import { resolveBundleDiscountCents, type BundleMemberItem } from '@/lib/bundle-discount'
 import { findPromoCode, type PromoCode } from '@/lib/promo'
-import { isUnreleasedProductName } from '@/lib/unreleased'
+import { currentTimeMs, isPurchasable, matchDrop } from '@/lib/drops'
+import { PREVIEW_COOKIE, isPreviewCookieValue } from '@/lib/preview'
 import { createClient } from '@/lib/supabase/server'
 import type { NormalizedVariant } from '@/types/catalog'
 import type { CartItem } from '@/types/cart'
@@ -85,6 +86,9 @@ export async function POST(req: NextRequest) {
   const bundleMembers: BundleMemberItem[] = []
   let subtotalCents = 0
   let currency = 'eur'
+  // One clock for the whole cart, so every line is judged at the same moment.
+  const now = currentTimeMs()
+  const preview = isPreviewCookieValue(req.cookies.get(PREVIEW_COOKIE)?.value)
 
   for (const item of items) {
     // The variant is only present if it genuinely belongs to one of the products
@@ -98,12 +102,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Fase 0: OLYMPN Sport may already sit in the Printful store, but is not
-    // for sale before the drop. Checked against the server-resolved name, so a
-    // stale cart or a crafted request cannot buy it early.
-    if (isUnreleasedProductName(found.productName)) {
+    // Only products of a live drop are for sale (spec section 4): OG, Printify,
+    // unplanned products and teasers before release are refused. Judged on the
+    // server-resolved name and id, so a stale cart or a crafted request cannot
+    // buy early.
+    const drop = matchDrop({ id: item.productId, provider: item.provider, name: found.productName })
+    if (!isPurchasable(drop, now, { preview })) {
       return NextResponse.json(
-        { error: 'One or more products are not available yet' },
+        { error: 'One or more products are not available' },
         { status: 409 }
       )
     }

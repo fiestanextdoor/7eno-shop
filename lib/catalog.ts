@@ -3,7 +3,6 @@ import { productSlug } from '@/lib/slug'
 import * as printful from '@/lib/printful'
 import { normalizePrintfulProduct, normalizePrintfulDetail } from '@/lib/printful-normalize'
 import * as printify from '@/lib/printify'
-import { isUnreleasedProductName } from '@/lib/unreleased'
 import {
   colourRank, currentTimeMs, familyKey, getDropStatus, isVisibleInShop, matchDrop,
   type Drop, type DropClockOptions, type DropStatus,
@@ -55,7 +54,7 @@ export async function getCatalogProducts(): Promise<NormalizedProduct[]> {
     printful.getProducts().then((ps) => ps.map(normalizePrintfulProduct)),
     printify.getProducts(),
   ])
-  return mergeCatalogs(pf, pi).filter((p) => !isUnreleasedProductName(p.name))
+  return mergeCatalogs(pf, pi)
 }
 
 /** A single product with full variants, fetched from the right provider. */
@@ -135,10 +134,15 @@ export async function getShopProducts(
   )
 }
 
-/** A product URL that existed but is no longer in any visible drop (OG, Printify). */
+/**
+ * A product URL that existed but belongs to no drop (OG, Printify). A product
+ * of a planned drop is never retired, even while it is not visible yet or a
+ * Printful hiccup kept it out of the shop list, so it never gets a cached 308.
+ */
 export async function isRetiredProductSlug(slug: string): Promise<boolean> {
   try {
-    return findBySlug(await getCatalogProducts(), slug) !== null
+    const products = await getCatalogProducts()
+    return products.some((p) => productSlug(p.name) === slug && !matchDrop(p))
   } catch {
     return false
   }
