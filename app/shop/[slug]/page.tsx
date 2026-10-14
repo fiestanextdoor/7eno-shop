@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
 import { getShopProducts, getCatalogProduct, findBySlug, isRetiredProductSlug, type ShopProduct } from '@/lib/catalog'
-import { currentTimeMs } from '@/lib/drops'
+import { currentTimeMs, formatDropDate } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
 import { variantFrontImage, variantBackImage, variantMockupImages } from '@/lib/printful-normalize'
 import { getProductImageOverride } from '@/lib/product-images'
-import { getBundlesForProduct } from '@/lib/bundles'
 import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
 import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd, merchantPolicyJsonLd } from '@/lib/seo'
 import { FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES } from '@/lib/shipping'
@@ -19,6 +18,9 @@ import styles from './detail.module.css'
 interface Props {
   params: Promise<{ slug: string }>
 }
+
+// Teaser to live flips on the drop clock: re-render at least every minute.
+export const revalidate = 60
 
 export async function generateStaticParams() {
   try {
@@ -36,10 +38,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   )
   const match = findBySlug(products, slug)
   if (!match) return { title: 'Product not found' }
-  const collection = /olympian/i.test(match.name) ? 'Olympian' : 'OG'
-  const description = `Buy the ${match.name} from the 7ENO (Zeno) ${collection} collection. Official streetwear by Abra Entertainment — free shipping over €75, 14-day returns.`
+  const collection = match.drop.title
+  const description = `Buy the ${match.name} from the 7ENO (Zeno) ${collection} collection. Official streetwear by Abra Entertainment, with free shipping over €75 and 14-day returns.`
   return {
     title: match.name,
+    // A teaser is not for sale yet: keep it out of the index until the release (spec section 4).
+    ...(match.status === 'upcoming'
+      ? { robots: { index: false, follow: true, googleBot: { index: false, follow: true } } }
+      : {}),
     description,
     keywords: [match.name, `${match.name} 7ENO`, `${match.name} Zeno`, ...BRAND_KEYWORDS],
     alternates: { canonical: `/shop/${slug}` },
@@ -182,13 +188,6 @@ export default async function ProductPage({ params }: Props) {
   // (its name contains "Life4HSP", e.g. "7ENO X Life4HSP Sport Tee").
   const isLife4Hsp = /life4hsp/i.test(detail!.name)
 
-  // Combi-deals this product is part of (matched by live id or slug).
-  const deals = getBundlesForProduct({ productId: match.id, slug }).map((b) => ({
-    id: b.id,
-    title: b.title,
-    discountCents: b.discountCents,
-  }))
-
   // Olympian colourways are separate products (the name carries the colourway,
   // e.g. "Olympian Tee Ocean Unisex"). Collect the siblings of this product's
   // family so the detail page can offer colour swatches that link between them,
@@ -218,7 +217,7 @@ export default async function ProductPage({ params }: Props) {
   // availability, return + shipping terms) and ties the product to the
   // 7ENO/"Zeno" brand. Google ranks free product listings that carry return and
   // shipping details above ones that don't, so those are included.
-  const collectionName = /olympian/i.test(detail!.name) ? 'Olympian' : 'OG'
+  const collectionName = match.drop.title
   const priceCents = variants.map((v) => v.priceCents).filter((c) => c > 0)
   const inStock = variants.some((v) => v.inStock !== false)
   // Every distinct photo we resolved, so image search has more than one crop.
@@ -251,7 +250,8 @@ export default async function ProductPage({ params }: Props) {
     ...(sizes.length > 0 ? { size: sizes } : {}),
     ...(materials.length > 0 ? { material: materials.join(', ') } : {}),
     isPartOf: { '@id': `${BASE_URL}/#website` },
-    ...(priceCents.length > 0
+    // No Offer for a teaser: it is not for sale yet (spec section 4).
+    ...(match.purchasable && priceCents.length > 0
       ? {
           offers: {
             '@type': 'AggregateOffer',
@@ -274,7 +274,7 @@ export default async function ProductPage({ params }: Props) {
   const breadcrumbs = breadcrumbJsonLd([
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
-    { name: `${collectionName} collection`, path: `/shop?line=${collectionName.toLowerCase()}` },
+    { name: collectionName, path: `/collections/${match.drop.slug}` },
     { name: detail!.name, path: `/shop/${slug}` },
   ])
 
@@ -303,9 +303,10 @@ export default async function ProductPage({ params }: Props) {
         materials={materials}
         sizeGuide={sizeGuide}
         extraImages={extraImages}
-        deals={deals}
         charityPartner={isLife4Hsp}
         colorwaySiblings={colorwaySiblings}
+        purchasable={match.purchasable}
+        releaseLabel={match.status === 'upcoming' ? formatDropDate(match.drop.window.startsAt) : undefined}
       />
     </main>
   )

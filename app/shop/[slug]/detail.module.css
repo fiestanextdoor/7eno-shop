@@ -567,3 +567,23 @@
   .thumb,
   .disclosureIcon { transition: none; }
 }
+
+/* v2 teaser state (new tokens only; the rest of this file is rebuilt in phase 3). */
+.comingSoon {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  margin: var(--s-5) 0;
+  padding: var(--s-5);
+  border: 1px solid var(--c-stone);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.comingSoonDate {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

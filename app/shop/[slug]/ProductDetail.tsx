@@ -10,6 +10,9 @@ import { useVariantPicker } from '@/hooks/useVariantPicker'
 import DonationBanner from '@/components/DonationBanner/DonationBanner'
 import { resolveSwatchBackground, resolveHex, applyBrandOverride, brandColorName, isNearWhite } from '@/lib/color-utils'
 import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_RATE } from '@/lib/shipping'
+import { productSlug } from '@/lib/slug'
+import Badge from '@/components/ui/Badge/Badge'
+import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
 import styles from './detail.module.css'
 
 // Standard care for 7ENO's printed apparel. Printful exposes no care field, so
@@ -45,7 +48,6 @@ interface ProductDetailProps {
   materials?: string[]
   sizeGuide?: SizeGuide | null
   extraImages?: string[]
-  deals?: { id: string; title: string; discountCents: number }[]
   /** When true (the Life4HSP collaboration product), show the donation banner. */
   charityPartner?: boolean
   /**
@@ -53,6 +55,10 @@ interface ProductDetailProps {
    * swatches link between the sibling product pages (incl. the current one).
    */
   colorwaySiblings?: { name: string; hex: string; slug: string; current: boolean }[]
+  /** False for a teaser: no size picker or add-to-cart, a waitlist instead. Defaults to true. */
+  purchasable?: boolean
+  /** "1 November 2026 at 12:00 CET", shown on a teaser. */
+  releaseLabel?: string
 }
 
 export default function ProductDetail({
@@ -70,9 +76,10 @@ export default function ProductDetail({
   materials = [],
   sizeGuide = null,
   extraImages = [],
-  deals = [],
   charityPartner = false,
   colorwaySiblings = [],
+  purchasable = true,
+  releaseLabel,
 }: ProductDetailProps) {
   const isFootwear = Object.keys(euSizeMap).length > 0
   const currency = variants[0]?.currency ?? 'EUR'
@@ -261,18 +268,6 @@ export default function ProductDetail({
         {/* Charity: the Life4HSP collaboration product donates 100% of the product */}
         {charityPartner && <DonationBanner variant="inline" scope="product" />}
 
-        {/* Combi-deal: this product is part of one or more sets */}
-        {deals.length > 0 && (
-          <div className={styles.dealBanner}>
-            {deals.map((d) => (
-              <Link key={d.id} href={`/deals/${d.id}`} className={styles.dealLink}>
-                Combine &amp; save {currencySymbol}{(d.discountCents / 100).toFixed(2)} with the {d.title}
-                <span aria-hidden="true"> →</span>
-              </Link>
-            ))}
-          </div>
-        )}
-
         {/* Colors */}
         {hasColors && (
           <>
@@ -334,7 +329,7 @@ export default function ProductDetail({
         )}
 
         {/* Sizes */}
-        {uniqueSizes.length > 1 && (
+        {purchasable && uniqueSizes.length > 1 && (
           <>
             <div className={styles.sizeLabelRow}>
               <span className={styles.sizeLabel}>Select size{isFootwear ? ' (EU)' : ''}</span>
@@ -360,18 +355,26 @@ export default function ProductDetail({
           </>
         )}
 
-        {/* CTA */}
-        <button
-          className={[styles.addBtn, added ? styles.added : ''].join(' ')}
-          onClick={handleAddToCart}
-          disabled={!selectedVariantId && uniqueSizes.length > 1}
-        >
-          {added
-            ? '✓ Added to cart'
-            : !selectedVariantId && uniqueSizes.length > 1
-            ? 'Select a size'
-            : 'Add to cart'}
-        </button>
+        {/* CTA; a teaser gets the waitlist instead (spec section 4) */}
+        {purchasable ? (
+          <button
+            className={[styles.addBtn, added ? styles.added : ''].join(' ')}
+            onClick={handleAddToCart}
+            disabled={!selectedVariantId && uniqueSizes.length > 1}
+          >
+            {added
+              ? '✓ Added to cart'
+              : !selectedVariantId && uniqueSizes.length > 1
+              ? 'Select a size'
+              : 'Add to cart'}
+          </button>
+        ) : (
+          <div className={styles.comingSoon}>
+            <Badge kind="coming" />
+            {releaseLabel && <p className={styles.comingSoonDate}>Drops {releaseLabel}</p>}
+            <WaitlistForm productSlug={productSlug(productName)} />
+          </div>
+        )}
 
         {/* Size guide (apparel) */}
         {sizeGuide && sizeGuide.sizes.length > 0 && (

@@ -72,3 +72,23 @@ describe('ProductDetail variant picking', () => {
     expect(useCartStore.getState().items.map((i) => i.variantId)).toEqual(['cap'])
   })
 })
+
+describe('ProductDetail teaser', () => {
+  it('offers a waitlist instead of sizes and add-to-cart before the release', () => {
+    render(
+      <ProductDetail
+        provider="printful"
+        productId="p1"
+        productName="OLYMPN Sport Oversized Hoodie Mocha"
+        variants={twoColours}
+        purchasable={false}
+        releaseLabel="1 November 2026 at 12:00 CET"
+      />
+    )
+    expect(screen.queryByRole('button', { name: /Add to cart|Select a size/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'M' })).toBeNull()
+    expect(screen.getByText('Coming soon')).toBeInTheDocument()
+    expect(screen.getByText('Drops 1 November 2026 at 12:00 CET')).toBeInTheDocument()
+    expect(screen.getByLabelText('Get notified when it drops')).toBeInTheDocument()
+  })
+})
