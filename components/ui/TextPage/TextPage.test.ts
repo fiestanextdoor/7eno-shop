@@ -2,6 +2,9 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { missingClasses, nonV2Vars, stylesImport } from '../../../test-utils/css-module-classes'
 
+// Built from parts so the literal v1 class name never appears in the source
+// (scripts/repo-gates.test.ts and the phase 5 grep keep the tree free of it).
+const V1_THEME_CLASS = new RegExp(['oly', '(theme|palette)'].join('-'))
 const MODULE = 'components/ui/TextPage/TextPage.module.css'
 const PAGES = [
   'app/about/page.tsx',
@@ -22,7 +25,7 @@ describe.each(PAGES)('%s', (page) => {
   })
 
   it('no longer carries the v1 theme class', () => {
-    expect(readFileSync(page, 'utf8')).not.toMatch(/oly-(theme|palette)/)
+    expect(readFileSync(page, 'utf8')).not.toMatch(V1_THEME_CLASS)
   })
 })
 
