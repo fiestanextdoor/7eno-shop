@@ -58,6 +58,20 @@ describe('buildColourSiblings', () => {
     expect(buildColourSiblings([...ALL, cap], cap)).toEqual([])
   })
 
+  it('never mixes drops: a same-family product from another drop is left out', () => {
+    const archived = product('OLYMPN Sport Oversized Hoodie Olive', { drop: { ...olympian, colourOrder: sport.colourOrder } })
+    expect(buildColourSiblings([...ALL, archived], mocha).map((s) => s.name)).toEqual(['Rose Red', 'Pistachio', 'Mocha'])
+  })
+
+  it('leaves out a family member without a known colour', () => {
+    const plain = product('OLYMPN Sport Oversized Hoodie')
+    expect(buildColourSiblings([...ALL, plain], mocha).map((s) => s.name)).toEqual(['Rose Red', 'Pistachio', 'Mocha'])
+  })
+
+  it('lists a product once even when the catalogue repeats it', () => {
+    expect(buildColourSiblings([...ALL, mocha, roseRed], mocha).map((s) => s.name)).toEqual(['Rose Red', 'Pistachio', 'Mocha'])
+  })
+
   it('has a swatch for every OLYMPN Sport colour', () => {
     for (const colour of sport.colourOrder) expect(SWATCH_HEX[colour]).toMatch(/^#[0-9A-Fa-f]{6}$/)
   })

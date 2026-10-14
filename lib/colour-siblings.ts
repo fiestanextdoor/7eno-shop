@@ -29,6 +29,9 @@ const FALLBACK_HEX = '#C4C4B5'
 /**
  * The colours of `current`'s product family within its drop, in the drop's
  * colourOrder. Sold-out colours stay in the list: their page offers the waitlist.
+ * Excluded: products from another drop (even with the same family name) and
+ * family members whose name carries no colour from the drop's colourOrder.
+ * A product listed twice (same provider and id) appears once.
  */
 export function buildColourSiblings(products: readonly ShopProduct[], current: ShopProduct): ColourSibling[] {
   if (colourLabel(current.drop, current.name) === null) return []
@@ -39,8 +42,9 @@ export function buildColourSiblings(products: readonly ShopProduct[], current: S
       familyKey(p.drop, p.name) === family &&
       colourLabel(p.drop, p.name) !== null
   )
-  if (members.length < 2) return []
-  return [...members]
+  const unique = [...new Map(members.map((p) => [`${p.provider}:${p.id}`, p])).values()]
+  if (unique.length < 2) return []
+  return unique
     .sort((a, b) => colourRank(a.drop, a.name) - colourRank(b.drop, b.name))
     .map((p) => {
       const name = colourLabel(p.drop, p.name) as string

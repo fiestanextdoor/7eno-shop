@@ -1,6 +1,18 @@
+import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import type { ColourSibling } from '@/lib/colour-siblings'
 import ColourSiblings from './ColourSiblings'
+
+// next/link navigates through the mounted app router, which a unit test does
+// not have. A plain anchor with the same attributes is enough here.
+jest.mock('next/link', () => {
+  const { createElement } = jest.requireActual<typeof import('react')>('react')
+  return {
+    __esModule: true,
+    default: ({ href, children, ...rest }: { href: string; children?: ReactNode; [key: string]: unknown }) =>
+      createElement('a', { href, ...rest }, children),
+  }
+})
 
 const ITEMS: ColourSibling[] = [
   { name: 'Rose Red', hex: '#621926', href: '/shop/olympn-sport-oversized-hoodie-rose-red', current: false, soldOut: false },
