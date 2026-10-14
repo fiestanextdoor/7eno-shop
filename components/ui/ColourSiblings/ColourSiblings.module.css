@@ -1,0 +1,64 @@
+.siblings {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  margin: 0;
+}
+
+.labelText {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: var(--fs-small);
+  color: var(--c-text-muted);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatch {
+  position: relative;
+  display: block;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+}
+
+.swatch[data-current='true'] {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+/* Sold out: a diagonal stroke, never colour alone (the name says it too). */
+.swatch[data-sold-out='true']::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  right: -4px;
+  height: 2px;
+  background: var(--c-surface);
+  transform: rotate(-45deg);
+}
+
+a.swatch:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
