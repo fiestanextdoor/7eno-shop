@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server'
 import type { NormalizedProduct } from '@/types/catalog'
+import { matchDrop } from '@/lib/drops'
 import { POST } from './route'
 
 const mockCreateSession = jest.fn()
@@ -28,6 +29,15 @@ jest.mock('../../../lib/printify', () => ({
 jest.mock('../../../lib/supabase/server', () => ({
   createClient: async () => ({ auth: { getUser: async () => ({ data: { user: null } }) } }),
 }))
+
+// matchDrop runs for real, but through a spy so a test can see its input and
+// swap in a drop list with a Printful sync id.
+jest.mock('../../../lib/drops', () => {
+  const actual = jest.requireActual('../../../lib/drops')
+  return { ...actual, matchDrop: jest.fn(actual.matchDrop) }
+})
+const actualDrops = jest.requireActual<typeof import('../../../lib/drops')>('../../../lib/drops')
+const mockedMatchDrop = jest.mocked(matchDrop)
 
 function product(id: string, name: string): NormalizedProduct {
   return {
@@ -86,6 +96,7 @@ beforeEach(() => {
   mockCreateSession.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.test/s/1' })
   mockGetPrintfulProduct.mockReset().mockImplementation(async (id: string) => CATALOG[id])
   mockPrintifyLookup.mockReset().mockResolvedValue(new Map())
+  mockedMatchDrop.mockReset().mockImplementation(actualDrops.matchDrop)
   jest.spyOn(Date, 'now').mockReturnValue(BEFORE_SPORT)
   process.env = { ...ORIGINAL_ENV, SITE_PREVIEW_KEY: 'k3y', VERCEL_ENV: 'preview' }
 })
@@ -139,6 +150,26 @@ describe('POST /api/checkout purchasability guard', () => {
     )
     const res = await POST(checkoutRequest([line('pi1', 'printify')]))
     expect(res.status).toBe(409)
+  })
+
+  it('matches on the server-resolved product id, not the id the request claims', async () => {
+    // Olympian (live) owns sync id 1 by id, so a body that says productId '1'
+    // must not lend that drop to a variant of the OLYMPN Sport teaser (product 2).
+    const drops = actualDrops.DROPS.map((d) =>
+      d.id === 'olympian' ? { ...d, match: { ...d.match, printfulSyncIds: ['1'] } } : d
+    )
+    mockedMatchDrop.mockImplementation((p) => actualDrops.matchDrop(p, drops))
+    const teaserVariantUnderLiveId = { ...line('1'), variantId: 'v2' }
+    // The second line only makes the server fetch product 2, so v2 resolves.
+    const liveVariantUnderTeaserId = { ...line('2'), variantId: 'v1' }
+    const res = await POST(checkoutRequest([teaserVariantUnderLiveId, liveVariantUnderTeaserId]))
+    expect(res.status).toBe(409)
+    expect(await res.json()).toEqual(REFUSED)
+    expect(mockCreateSession).not.toHaveBeenCalled()
+    expect(mockedMatchDrop).toHaveBeenCalledTimes(1)
+    expect(mockedMatchDrop).toHaveBeenCalledWith({
+      id: '2', provider: 'printful', name: 'OLYMPN Sport Oversized Hoodie Rose Red',
+    })
   })
 
   it('flips on the exact release millisecond (12:00 Amsterdam, 11:00 UTC)', async () => {

@@ -105,8 +105,9 @@ export async function POST(req: NextRequest) {
     // Only products of a live drop are for sale (spec section 4): OG, Printify,
     // unplanned products and teasers before release are refused. Judged on the
     // server-resolved name and id, so a stale cart or a crafted request cannot
-    // buy early.
-    const drop = matchDrop({ id: item.productId, provider: item.provider, name: found.productName })
+    // buy early. The id is the variant's own product, never the body's
+    // productId: a sync-id match outranks the name.
+    const drop = matchDrop({ id: found.variant.productId, provider: found.variant.provider, name: found.productName })
     if (!isPurchasable(drop, now, { preview })) {
       return NextResponse.json(
         { error: 'One or more products are not available' },
