@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import FilterBar from '@/components/ui/FilterBar/FilterBar'
 import GridDensityToggle from '@/components/ui/GridDensityToggle/GridDensityToggle'
 import ProductTile from '@/components/ui/ProductTile/ProductTile'
@@ -15,10 +16,12 @@ export interface ShopViewProps {
   sortOptions: SortOption[]
   tiles: TileProduct[]
   emptyMessage?: string
+  /** Shown under the empty message, e.g. the upcoming drop the filter points to. */
+  emptyLink?: { href: string; label: string } | null
 }
 
 /** FilterBar plus the 2px-gap grid; owns the grid density (desktop 2/4, mobile 1/2). */
-export default function ShopView({ filters, sort, sortOptions, tiles, emptyMessage = 'Nothing here yet.' }: ShopViewProps) {
+export default function ShopView({ filters, sort, sortOptions, tiles, emptyMessage = 'Nothing here yet.', emptyLink = null }: ShopViewProps) {
   const [density, setDensity] = useGridDensity()
 
   const controls = (
@@ -45,7 +48,14 @@ export default function ShopView({ filters, sort, sortOptions, tiles, emptyMessa
     <>
       <FilterBar filters={filters} sort={sort} sortOptions={sortOptions} controls={controls} resultCount={tiles.length} />
       {tiles.length === 0 ? (
-        <p className={styles.empty}>{emptyMessage}</p>
+        <div className={styles.empty}>
+          <p className={styles.emptyText}>{emptyMessage}</p>
+          {emptyLink && (
+            <Link href={emptyLink.href} className={styles.emptyLink}>
+              {emptyLink.label}
+            </Link>
+          )}
+        </div>
       ) : (
         <ul className={styles.grid} data-mobile={density.mobile} data-desktop={density.desktop}>
           {tiles.map((tile, i) => (

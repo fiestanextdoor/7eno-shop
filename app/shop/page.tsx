@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import ShopView from '@/components/ui/ShopView/ShopView'
 import { getShopProducts, type ShopProduct } from '@/lib/catalog'
-import { DROPS, currentTimeMs, isDropListed } from '@/lib/drops'
+import { DROPS, currentTimeMs, getDropStatus, isDropListed } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
 import {
   applyShopQuery, buildFilterGroups, buildSortOptions, describeShopQuery, parseShopQuery, type RawSearchParams,
@@ -44,6 +44,11 @@ export default async function ShopPage({ searchParams }: Props) {
   const tiles = await toTiles(visible, now)
   const { title, description } = describeShopQuery(query)
   const drops = DROPS.filter((d) => isDropListed(d, now, { preview }))
+  // Filtering on a drop that has not opened yet: point to its waitlist.
+  const upcomingDrop = drops.find((d) => d.id === query.collection && getDropStatus(d, now, { preview }) === 'upcoming')
+  const emptyLink = upcomingDrop
+    ? { href: `/collections/${upcomingDrop.slug}`, label: 'See the drop and join the waitlist' }
+    : null
 
   const collectionJsonLd = {
     '@context': 'https://schema.org',
@@ -83,6 +88,7 @@ export default async function ShopPage({ searchParams }: Props) {
         sortOptions={buildSortOptions(query)}
         tiles={tiles}
         emptyMessage="No pieces match these filters yet."
+        emptyLink={emptyLink}
       />
     </main>
   )

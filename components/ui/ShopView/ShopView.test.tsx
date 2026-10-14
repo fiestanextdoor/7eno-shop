@@ -49,4 +49,16 @@ describe('ShopView', () => {
     expect(screen.getByText('No pieces match these filters yet.')).toBeInTheDocument()
     expect(screen.queryByRole('list')).toBeNull()
   })
+
+  it('links an empty listing to the upcoming drop when one is given', () => {
+    render(
+      <ShopView
+        filters={[]} sort="featured" sortOptions={[]} tiles={[]}
+        emptyMessage="No pieces match these filters yet."
+        emptyLink={{ href: '/collections/olympn-sport', label: 'See the drop and join the waitlist' }}
+      />,
+    )
+    expect(screen.getByText('No pieces match these filters yet.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'See the drop and join the waitlist' })).toHaveAttribute('href', '/collections/olympn-sport')
+  })
 })

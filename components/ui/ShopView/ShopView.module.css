@@ -26,6 +26,18 @@
   text-align: center;
 }
 
+.emptyText {
+  margin: 0;
+}
+
+.emptyLink {
+  display: inline-block;
+  margin-top: var(--s-4);
+  color: var(--c-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .mobileOnly {
   display: block;
 }
