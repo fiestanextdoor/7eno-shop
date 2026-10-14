@@ -63,7 +63,7 @@ const CATALOG: Record<string, NormalizedProduct> = {
   '3': product('3', 'olympn sport relaxed hoodie dune'),
   '4': product('4', 'Ink/Butter Sport Tee Unisex'),
   // Printful sometimes sends a non-breaking space inside the name.
-  '5': product('5', 'OLYMPN Sport Relaxed Hoodie Olive'),
+  '5': product('5', 'OLYMPN\u00a0Sport Relaxed Hoodie Olive'),
 }
 
 function line(productId: string, provider: 'printful' | 'printify' = 'printful') {
@@ -117,6 +117,7 @@ describe('POST /api/checkout purchasability guard', () => {
   it('refuses a teaser product before the release with 409 and no Stripe session', async () => {
     const res = await POST(checkoutRequest([line('2')]))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
     expect(await res.json()).toEqual(REFUSED)
     expect(mockCreateSession).not.toHaveBeenCalled()
   })
@@ -124,6 +125,7 @@ describe('POST /api/checkout purchasability guard', () => {
   it('matches the drop prefix case-insensitively', async () => {
     const res = await POST(checkoutRequest([line('3')]))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
   })
 
   it('matches the drop prefix across a non-breaking space', async () => {
@@ -150,6 +152,7 @@ describe('POST /api/checkout purchasability guard', () => {
     )
     const res = await POST(checkoutRequest([line('pi1', 'printify')]))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
   })
 
   it('matches on the server-resolved product id, not the id the request claims', async () => {
@@ -164,6 +167,7 @@ describe('POST /api/checkout purchasability guard', () => {
     const liveVariantUnderTeaserId = { ...line('2'), variantId: 'v1' }
     const res = await POST(checkoutRequest([teaserVariantUnderLiveId, liveVariantUnderTeaserId]))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
     expect(await res.json()).toEqual(REFUSED)
     expect(mockCreateSession).not.toHaveBeenCalled()
     expect(mockedMatchDrop).toHaveBeenCalledTimes(1)
@@ -187,11 +191,13 @@ describe('POST /api/checkout purchasability guard', () => {
   it('ignores a hand-made preview cookie', async () => {
     const res = await POST(checkoutRequest([line('2')], 'drop_preview=1'))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
   })
 
   it('ignores the preview cookie on Vercel production', async () => {
     process.env.VERCEL_ENV = 'production'
     const res = await POST(checkoutRequest([line('2')], 'drop_preview=k3y'))
     expect(res.status).toBe(409)
+    expect(mockCreateSession).not.toHaveBeenCalled()
   })
 })
