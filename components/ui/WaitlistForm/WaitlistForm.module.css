@@ -1,0 +1,67 @@
+.form {
+  display: grid;
+  gap: var(--s-2);
+  width: 100%;
+  color: inherit;
+}
+
+.label {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.input {
+  flex: 1 1 220px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid currentColor;
+  border-radius: var(--r-1);
+  background: transparent;
+  color: inherit;
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+}
+
+.input::placeholder {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.input[aria-invalid='true'] {
+  border-width: 2px;
+}
+
+.form[data-compact='true'] .row {
+  flex-direction: column;
+}
+
+/* Off-screen, not display:none: some bots skip hidden inputs. */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 0;
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}

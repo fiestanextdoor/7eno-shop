@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
 import { HELP_NAV, LEGAL_NAV, type NavItem } from '@/lib/nav'
 import styles from './SiteFooter.module.css'
 
@@ -37,6 +38,10 @@ export default function SiteFooter({ nav }: SiteFooterProps) {
             ))}
           </ul>
         </nav>
+        <div className={styles.col}>
+          <p className={styles.colTitle}>Drop alerts</p>
+          <WaitlistForm compact />
+        </div>
       </div>
       <div className={styles.bottom}>
         <p className={styles.legal}>© 2026 7ENO · KvK 42081073</p>

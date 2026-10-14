@@ -23,4 +23,9 @@ describe('SiteFooter', () => {
     render(<SiteFooter nav={MAIN_NAV} />)
     expect(screen.getByText(/KvK 42081073/)).toBeInTheDocument()
   })
+
+  it('offers drop alerts', () => {
+    render(<SiteFooter nav={MAIN_NAV} />)
+    expect(screen.getByLabelText('Email for drop alerts')).toBeInTheDocument()
+  })
 })
