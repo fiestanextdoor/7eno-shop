@@ -1,19 +1,15 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
-import { getEuSizeMapForProduct, getCatalogProductId, getProductMaterials, getSizeGuide, getProduct as getPrintfulProduct } from '@/lib/printful'
-import { getShopProducts, getCatalogProduct, findBySlug, isRetiredProductSlug, type ShopProduct } from '@/lib/catalog'
-import { currentTimeMs, formatDropDate } from '@/lib/drops'
+import { findBySlug, getShopProducts, isRetiredProductSlug, type ShopProduct } from '@/lib/catalog'
+import { buildColourSiblings } from '@/lib/colour-siblings'
+import { currentTimeMs, formatDropDate, toDropView } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
-import { variantFrontImage, variantBackImage, variantMockupImages } from '@/lib/printful-normalize'
-import { getProductImageOverride } from '@/lib/product-images'
-import { olympianColorway, OLYMPIAN_COLORWAYS } from '@/lib/color-utils'
+import { categoryLabel, productInfoSections } from '@/lib/product-copy'
+import { loadProductMedia } from '@/lib/product-page'
 import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd, merchantPolicyJsonLd } from '@/lib/seo'
-import { FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES } from '@/lib/shipping'
-import { productSlug } from '@/lib/slug'
-import { HIDDEN_SIZES } from '@/lib/product-classify'
-import { removeBackground } from '@/lib/remove-bg'
-import ProductDetail from './ProductDetail'
-import styles from './detail.module.css'
+import { ALLOWED_COUNTRIES, FLAT_SHIPPING_RATE } from '@/lib/shipping'
+import ProductView from './ProductView'
+import styles from './product.module.css'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -67,15 +63,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params
+  const now = currentTimeMs()
+  const preview = await isPreviewSession()
 
   let products: ShopProduct[] = []
   try {
-    products = await getShopProducts(currentTimeMs(), { preview: await isPreviewSession() })
+    products = await getShopProducts(now, { preview })
   } catch {
     products = []
   }
 
-  // Back-compat: old numeric-id Printful URLs (/shop/433351254) redirect to slug.
+  // Back-compat: old numeric-id Printful URLs (/shop/433351254) redirect to the slug.
   if (/^\d+$/.test(slug)) {
     const byId = products.find((p) => p.provider === 'printful' && p.id === slug)
     if (byId) permanentRedirect(`/shop/${byId.slug}`)
@@ -90,179 +88,40 @@ export default async function ProductPage({ params }: Props) {
     notFound()
   }
 
-  let detail
-  try {
-    detail = await getCatalogProduct(match.provider, match.id)
-  } catch {
-    notFound()
-  }
+  const media = await loadProductMedia(match)
+  const drop = toDropView(match.drop, now, { preview })
+  const teaser = match.status === 'upcoming'
 
-  const variants = detail!.variants
-  const productThumbnail = detail!.thumbnailUrl
-
-  // Background-removed base image (shared by both providers).
-  const bgRemovedBase = productThumbnail
-    ? await removeBackground(productThumbnail).catch(() => null)
-    : null
-
-  // Per-colour front images, background-removed (result cached in storage).
-  const rawColorImages: Record<string, string> = {}
-  for (const v of variants) {
-    if (!v.color || rawColorImages[v.color] || !v.imageUrl) continue
-    rawColorImages[v.color] = v.imageUrl
-  }
-  const colorImages: Record<string, string> = {}
-  await Promise.all(
-    Object.entries(rawColorImages).map(async ([color, url]) => {
-      const processed = await removeBackground(url).catch(() => null)
-      colorImages[color] = processed ?? url
-    })
-  )
-
-  // ── Printful-only enrichment (basis Printify: skip EU sizes / size guide / materials) ──
-  let euSizeMap: Record<string, string> = {}
-  let materials: string[] = []
-  let sizeGuide = null
-  const colorBackImages: Record<string, string> = {}
-  const colorGalleryImages: Record<string, string[]> = {}
-
-  if (match.provider === 'printful') {
-    const detailPf = await getPrintfulProduct(match.id)
-    const syncVariants = detailPf.sync_variants
-    euSizeMap = await getEuSizeMapForProduct(syncVariants)
-    const catalogProductId = syncVariants[0]?.variant_id
-      ? await getCatalogProductId(syncVariants[0].variant_id)
-      : null
-    const isFootwear = Object.keys(euSizeMap).length > 0
-    const offeredSizes = [...new Set(syncVariants.map((v) => v.size).filter(Boolean))].filter(
-      (s) => !HIDDEN_SIZES.has(s)
-    )
-    const [mats, guide] = await Promise.all([
-      catalogProductId ? getProductMaterials(catalogProductId) : Promise.resolve([]),
-      catalogProductId && !isFootwear ? getSizeGuide(catalogProductId, offeredSizes) : Promise.resolve(null),
-    ])
-    materials = mats
-    sizeGuide = guide
-
-    // Back-view mockups: only genuine back-angle product mockups, and only when
-    // they differ from the front mockup (some products ship a back mockup as
-    // their sole image, which is then already used as the front).
-    const rawBack: Record<string, string> = {}
-    for (const variant of syncVariants) {
-      if (!variant.color || rawBack[variant.color]) continue
-      const back = variantBackImage(variant)
-      if (back && back !== variantFrontImage(variant)) rawBack[variant.color] = back
-    }
-    await Promise.all(
-      Object.entries(rawBack).map(async ([color, url]) => {
-        const processed = await removeBackground(url).catch(() => null)
-        colorBackImages[color] = processed ?? url
-      })
-    )
-
-    // Remaining mockups per colour (flat, on-model, folded, detail crops) for
-    // the gallery. Used as-is: these are photographed scenes, so cutting the
-    // background out would ruin them — and it would spend remove.bg credits on
-    // images that don't need it. The front/back are dropped since the gallery
-    // already leads with those.
-    for (const variant of syncVariants) {
-      if (!variant.color || colorGalleryImages[variant.color]) continue
-      const front = variantFrontImage(variant)
-      const back = variantBackImage(variant)
-      const rest = variantMockupImages(variant).filter((u) => u !== front && u !== back)
-      if (rest.length > 0) colorGalleryImages[variant.color] = rest
-    }
-  }
-
-  // Local image overrides (used as-is, no remove.bg): front/back replacements
-  // for products whose provider mockups are incomplete, plus lifestyle photos.
-  const imageOverride = getProductImageOverride(slug)
-  const extraImages = imageOverride?.galleryImages ?? []
-
-  // Per-colour local photos win over the provider mockups (used as-is, no
-  // remove.bg). Used for multi-colour tees where Printful lacks a back mockup.
-  if (imageOverride?.colorFrontImages) Object.assign(colorImages, imageOverride.colorFrontImages)
-  if (imageOverride?.colorBackImages) Object.assign(colorBackImages, imageOverride.colorBackImages)
-
-  // Charity collaboration: only the Life4HSP product carries the donation banner
-  // (its name contains "Life4HSP", e.g. "7ENO X Life4HSP Sport Tee").
-  const isLife4Hsp = /life4hsp/i.test(detail!.name)
-
-  // Olympian colourways are separate products (the name carries the colourway,
-  // e.g. "Olympian Tee Ocean Unisex"). Collect the siblings of this product's
-  // family so the detail page can offer colour swatches that link between them,
-  // mirroring the in-product colour switcher the OG products get from variants.
-  const currentColorway = olympianColorway(detail!.name)
-  const colorwayPattern = new RegExp(OLYMPIAN_COLORWAYS.map((c) => c.key).join('|'), 'g')
-  const familyKey = (name: string) =>
-    name.toLowerCase().replace(colorwayPattern, '').replace(/\s+/g, ' ').trim()
-  const colorwaySiblings = currentColorway
-    ? products
-        .filter((p) => olympianColorway(p.name) && familyKey(p.name) === familyKey(detail!.name))
-        .map((p) => {
-          const cw = olympianColorway(p.name)!
-          return {
-            name: cw.name,
-            hex: cw.hex,
-            slug: productSlug(p.name),
-            current: p.id === match.id,
-            order: OLYMPIAN_COLORWAYS.findIndex((c) => c.key === cw.key),
-          }
-        })
-        .sort((a, b) => a.order - b.order)
-        .map(({ name, hex, slug: s, current }) => ({ name, hex, slug: s, current }))
-    : []
-
-  // Product structured data: lets search engines show rich results (price,
-  // availability, return + shipping terms) and ties the product to the
-  // 7ENO/"Zeno" brand. Google ranks free product listings that carry return and
-  // shipping details above ones that don't, so those are included.
-  const collectionName = match.drop.title
-  const priceCents = variants.map((v) => v.priceCents).filter((c) => c > 0)
-  const inStock = variants.some((v) => v.inStock !== false)
-  // Every distinct photo we resolved, so image search has more than one crop.
-  const schemaImages = [
-    ...new Set(
-      [
-        productThumbnail,
-        ...Object.values(colorImages),
-        ...Object.values(colorGalleryImages).flat(),
-        ...extraImages,
-      ].filter(
-        (u): u is string => typeof u === 'string' && u.length > 0,
-      ),
-    ),
-  ].slice(0, 8)
-  const sizes = [...new Set(variants.map((v) => v.size).filter(Boolean))]
-  const colorNames = [...new Set(variants.map((v) => v.color).filter(Boolean))]
-
+  // Product structured data: price, availability, return and shipping terms,
+  // tied to the 7ENO/"Zeno" brand. No Offer for a teaser (spec section 4).
+  const priceCents = media.variants.map((v) => v.priceCents).filter((c) => c > 0)
+  const inStock = media.variants.some((v) => v.inStock !== false)
+  const sizes = [...new Set(media.variants.map((v) => v.size).filter(Boolean))]
+  const colorNames = [...new Set(media.variants.map((v) => v.color).filter(Boolean))]
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     '@id': `${absoluteUrl(`/shop/${slug}`)}#product`,
-    name: detail!.name,
-    description: `${detail!.name} from the 7ENO (Zeno) ${collectionName} collection, by Abra Entertainment.`,
-    ...(schemaImages.length > 0 ? { image: schemaImages } : {}),
+    name: match.name,
+    description: `${match.name} from the 7ENO (Zeno) ${match.drop.title} collection, by Abra Entertainment.`,
+    ...(media.schemaImages.length > 0 ? { image: media.schemaImages } : {}),
     url: absoluteUrl(`/shop/${slug}`),
     sku: `${match.provider}-${match.id}`,
     brand: { '@type': 'Brand', name: '7ENO', alternateName: 'Zeno' },
     ...(colorNames.length > 0 ? { color: colorNames.join(', ') } : {}),
     ...(sizes.length > 0 ? { size: sizes } : {}),
-    ...(materials.length > 0 ? { material: materials.join(', ') } : {}),
+    ...(media.materials.length > 0 ? { material: media.materials.join(', ') } : {}),
     isPartOf: { '@id': `${BASE_URL}/#website` },
-    // No Offer for a teaser: it is not for sale yet (spec section 4).
     ...(match.purchasable && priceCents.length > 0
       ? {
           offers: {
             '@type': 'AggregateOffer',
-            priceCurrency: detail!.currency || 'EUR',
+            priceCurrency: media.currency,
             lowPrice: (Math.min(...priceCents) / 100).toFixed(2),
             highPrice: (Math.max(...priceCents) / 100).toFixed(2),
-            offerCount: variants.length,
+            offerCount: media.variants.length,
             url: absoluteUrl(`/shop/${slug}`),
-            availability: inStock
-              ? 'https://schema.org/InStock'
-              : 'https://schema.org/OutOfStock',
+            availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
             itemCondition: 'https://schema.org/NewCondition',
             seller: { '@id': `${BASE_URL}/#organization` },
             ...merchantPolicyJsonLd(FLAT_SHIPPING_RATE, ALLOWED_COUNTRIES),
@@ -274,39 +133,42 @@ export default async function ProductPage({ params }: Props) {
   const breadcrumbs = breadcrumbJsonLd([
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
-    { name: collectionName, path: `/collections/${match.drop.slug}` },
-    { name: detail!.name, path: `/shop/${slug}` },
+    { name: match.drop.title, path: `/collections/${match.drop.slug}` },
+    { name: match.name, path: `/shop/${slug}` },
   ])
 
   return (
     <main className={styles.page}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
-      />
-      <ProductDetail
-        provider={match.provider}
-        productId={match.id}
-        productName={detail!.name}
-        variants={variants}
-        baseImageUrl={bgRemovedBase}
-        colorImages={colorImages}
-        colorBackImages={colorBackImages}
-        colorGalleryImages={colorGalleryImages}
-        frontOverride={imageOverride?.frontImage ?? null}
-        backOverride={imageOverride?.backImage ?? null}
-        euSizeMap={euSizeMap}
-        materials={materials}
-        sizeGuide={sizeGuide}
-        extraImages={extraImages}
-        charityPartner={isLife4Hsp}
-        colorwaySiblings={colorwaySiblings}
-        purchasable={match.purchasable}
-        releaseLabel={match.status === 'upcoming' ? formatDropDate(match.drop.window.startsAt) : undefined}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <ProductView
+        product={{
+          provider: match.provider,
+          id: match.id,
+          name: match.name,
+          slug: match.slug,
+          purchasable: match.purchasable,
+          soldOut: match.soldOut,
+          releaseLabel: teaser ? formatDropDate(match.drop.window.startsAt) : undefined,
+        }}
+        drop={drop}
+        variants={media.variants}
+        galleries={media.galleries}
+        siblings={buildColourSiblings(products, match)}
+        euSizeMap={media.euSizeMap}
+        sizeGuide={
+          media.sizeGuide && media.sizeGuide.sizes.length > 0
+            ? { category: categoryLabel(match.name), guide: media.sizeGuide }
+            : null
+        }
+        modelNote={match.drop.modelNote}
+        info={productInfoSections({
+          productName: match.name,
+          materials: media.materials,
+          modelNote: match.drop.modelNote,
+          dropTitle: match.drop.title,
+          editionLabel: drop.editionLabel,
+        })}
       />
     </main>
   )
