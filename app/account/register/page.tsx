@@ -46,7 +46,7 @@ export default function RegisterPage() {
         <div className={styles.card}>
           <p className={styles.brand}>7ENO</p>
           <h1 className={styles.title}>Confirm your email</h1>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--stone)', lineHeight: 1.6 }}>
+          <p className={styles.note}>
             We sent a confirmation link to <strong>{email}</strong>. Click the link to activate your account.
           </p>
         </div>
@@ -71,8 +71,9 @@ export default function RegisterPage() {
         <div className={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleRegister} className={styles.form}>
-          <label className={styles.fieldLabel}>Full name</label>
+          <label htmlFor="register-name" className={styles.fieldLabel}>Full name</label>
           <input
+            id="register-name"
             type="text"
             className={styles.input}
             value={fullName}
@@ -82,8 +83,9 @@ export default function RegisterPage() {
             placeholder="John Smith"
           />
 
-          <label className={styles.fieldLabel}>Email address</label>
+          <label htmlFor="register-email" className={styles.fieldLabel}>Email address</label>
           <input
+            id="register-email"
             type="email"
             className={styles.input}
             value={email}
@@ -93,8 +95,9 @@ export default function RegisterPage() {
             placeholder="you@example.com"
           />
 
-          <label className={styles.fieldLabel}>Password</label>
+          <label htmlFor="register-password" className={styles.fieldLabel}>Password</label>
           <input
+            id="register-password"
             type="password"
             className={styles.input}
             value={password}
