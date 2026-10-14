@@ -9,12 +9,22 @@ export interface WaitlistFormProps {
   dropId?: string
   productSlug?: string
   compact?: boolean
+  /** Field label; defaults to the drop wording. The sold-out notify form says "Email me when it is back". */
+  label?: string
+  /** Shown after a successful signup. */
+  doneMessage?: string
 }
 
 type Status = 'idle' | 'sending' | 'done' | 'error'
 
 /** Email signup for a drop or product. Colours follow the surrounding surface. */
-export default function WaitlistForm({ dropId, productSlug, compact = false }: WaitlistFormProps) {
+export default function WaitlistForm({
+  dropId,
+  productSlug,
+  compact = false,
+  label,
+  doneMessage = "You're on the list. We'll email you when it drops.",
+}: WaitlistFormProps) {
   const id = useId()
   const [email, setEmail] = useState('')
   const [trap, setTrap] = useState('')
@@ -39,7 +49,7 @@ export default function WaitlistForm({ dropId, productSlug, compact = false }: W
       const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (res.ok) {
         setStatus('done')
-        setMessage("You're on the list. We'll email you when it drops.")
+        setMessage(doneMessage)
       } else {
         setStatus('error')
         setMessage(data.error ?? 'Could not join the waitlist. Please try again.')
@@ -55,7 +65,7 @@ export default function WaitlistForm({ dropId, productSlug, compact = false }: W
   return (
     <form className={styles.form} data-compact={compact ? 'true' : 'false'} onSubmit={onSubmit}>
       <label htmlFor={`${id}-email`} className={styles.label}>
-        {compact ? 'Email for drop alerts' : 'Get notified when it drops'}
+        {label ?? (compact ? 'Email for drop alerts' : 'Get notified when it drops')}
       </label>
       <div className={styles.row}>
         <input

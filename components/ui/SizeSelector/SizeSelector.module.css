@@ -33,6 +33,7 @@
 }
 
 .option {
+  position: relative;
   min-height: 44px;
   padding: 0 var(--s-3);
   border: 1px solid var(--c-border-strong);
