@@ -1,5 +1,5 @@
-// Builds the v2 brand files in public/brand (and app/apple-icon.png) from the
-// sources in docs/brand (spec section 8). Deterministic: run it again after a
+// Builds the v2 brand files in public/brand (and app/apple-icon.png and
+// app/favicon.ico) from the sources in docs/brand (spec section 8). Deterministic: run it again after a
 // source changes, with `npm run brand:assets`. PNG until Joep delivers the SVG
 // exports; then the wordmark and mark files are replaced and this script goes.
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -57,6 +57,47 @@ async function icon(file, size, share) {
   return { width: info.width, height: info.height }
 }
 
+/**
+ * app/favicon.ico: the cream mark on navy at 16, 32 and 48 px, stored as
+ * PNG frames in a minimal ICO container (ICONDIR, one ICONDIRENTRY per frame,
+ * then the PNG payloads). Every current browser reads PNG-in-ICO.
+ */
+async function favicon(file, sides) {
+  const frames = []
+  for (const side of sides) {
+    const mark = await sharp(path.join(OUT, 'beeldmerk-cream.png'))
+      .resize({ height: Math.round(side * 0.7) })
+      .png()
+      .toBuffer()
+    frames.push(
+      await sharp({ create: { width: side, height: side, channels: 4, background: NAVY_HEX } })
+        .composite([{ input: mark, gravity: 'center' }])
+        .png({ compressionLevel: 9 })
+        .toBuffer(),
+    )
+  }
+  const header = Buffer.alloc(6)
+  header.writeUInt16LE(0, 0) // reserved
+  header.writeUInt16LE(1, 2) // type 1: icon
+  header.writeUInt16LE(frames.length, 4)
+  const entries = Buffer.alloc(16 * frames.length)
+  let offset = header.length + entries.length
+  frames.forEach((png, i) => {
+    const at = i * 16
+    const side = sides[i]
+    entries.writeUInt8(side >= 256 ? 0 : side, at) // width, 0 means 256
+    entries.writeUInt8(side >= 256 ? 0 : side, at + 1) // height
+    entries.writeUInt8(0, at + 2) // no palette
+    entries.writeUInt8(0, at + 3) // reserved
+    entries.writeUInt16LE(1, at + 4) // colour planes
+    entries.writeUInt16LE(32, at + 6) // bits per pixel
+    entries.writeUInt32LE(png.length, at + 8)
+    entries.writeUInt32LE(offset, at + 12)
+    offset += png.length
+  })
+  await writeFile(file, Buffer.concat([header, entries, ...frames]))
+}
+
 await mkdir(OUT, { recursive: true })
 await wordmarks()
 await marks()
@@ -65,7 +106,8 @@ sizes['icon-512.png'] = await icon(path.join(OUT, 'icon-512.png'), 512, 0.62)
 // Maskable icons are cropped to a circle of 80% of the side: keep the mark at half.
 sizes['icon-maskable-512.png'] = await icon(path.join(OUT, 'icon-maskable-512.png'), 512, 0.5)
 await icon(path.join(ROOT, 'app/apple-icon.png'), 180, 0.62)
+await favicon(path.join(ROOT, 'app/favicon.ico'), [16, 32, 48])
 
 const sorted = Object.fromEntries(Object.entries(sizes).sort(([a], [b]) => a.localeCompare(b)))
 await writeFile(path.join(ROOT, 'lib/brand-assets.json'), `${JSON.stringify(sorted, null, 2)}\n`)
-console.log(`Wrote ${Object.keys(sorted).length} files to public/brand, app/apple-icon.png and lib/brand-assets.json`)
+console.log(`Wrote ${Object.keys(sorted).length} files to public/brand, app/apple-icon.png, app/favicon.ico and lib/brand-assets.json`)

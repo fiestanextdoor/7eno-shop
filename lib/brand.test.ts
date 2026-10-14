@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { existsSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
 import generated from './brand-assets.json'
@@ -104,6 +104,28 @@ describe('brand register', () => {
     expect(statSync(file(ad.src)).size).toBeGreaterThan(100_000)
     const meta = await sharp(file(ad.poster)).metadata()
     expect([meta.width, meta.height]).toEqual([ad.width, ad.height])
+  })
+
+  it('serves the beeldmerk as app/favicon.ico with three PNG frames', async () => {
+    const ico = readFileSync(path.join(process.cwd(), 'app/favicon.ico'))
+    expect(ico.length).toBeLessThan(20_000)
+    expect([...ico.subarray(0, 4)]).toEqual([0x00, 0x00, 0x01, 0x00])
+    expect(ico.readUInt16LE(4)).toBe(3)
+    const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+    const sides: number[] = []
+    for (let i = 0; i < 3; i += 1) {
+      const entry = 6 + i * 16
+      const size = ico.readUInt32LE(entry + 8)
+      const offset = ico.readUInt32LE(entry + 12)
+      const payload = ico.subarray(offset, offset + size)
+      expect([...payload.subarray(0, 8)]).toEqual(png)
+      const meta = await sharp(payload).metadata()
+      expect(meta.width).toBe(ico.readUInt8(entry))
+      // RGBA, never a palette PNG: the Next.js ICO decoder rejects anything else.
+      expect([meta.channels, meta.isPalette]).toEqual([4, false])
+      sides.push(meta.width ?? 0)
+    }
+    expect(sides).toEqual([16, 32, 48])
   })
 
   it('scales by the natural ratio', () => {
