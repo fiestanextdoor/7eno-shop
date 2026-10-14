@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Mono, Cormorant_Garamond } from 'next/font/google'
+import { Space_Mono, Cormorant_Garamond, Archivo, Instrument_Sans, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import AppShell from '@/components/AppShell/AppShell'
-import SmoothScroll from '@/components/SmoothScroll/SmoothScroll'
-import PageTransition from '@/components/PageTransition/PageTransition'
 import { BASE_URL, BRAND_KEYWORDS, organizationJsonLd, webSiteJsonLd } from '@/lib/seo'
 import '@/styles/globals.css'
+import '@/styles/tokens.css'
 
 // Cormorant Garamond is the site-wide typeface for headings and body: a soft,
 // high-contrast renaissance serif that gives the "Divine Authority" brand an
@@ -26,6 +25,34 @@ const spaceMono = Space_Mono({
   weight: ['400', '700'],
   variable: '--font-mono',
   display: 'swap',
+})
+
+// Rebrand v2 type (spec section 2). Archivo is loaded as a variable font with
+// the width axis, so the display face can run at wdth 125 / wght 900 and in
+// italic for drop titles. adjustFontFallback keeps the swap from shifting the
+// layout (CLS). Self-hosted by next/font, so the CSP stays `font-src 'self'`.
+const archivo = Archivo({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  axes: ['wdth'],
+  variable: '--font-archivo',
+  display: 'swap',
+  adjustFontFallback: true,
+})
+
+const instrumentSans = Instrument_Sans({
+  subsets: ['latin'],
+  variable: '--font-instrument',
+  display: 'swap',
+  adjustFontFallback: true,
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-plex-mono',
+  display: 'swap',
+  adjustFontFallback: true,
 })
 
 const SITE_DESCRIPTION =
@@ -98,7 +125,10 @@ export default function RootLayout({
 }) {
   const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   return (
-    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${spaceMono.variable} ${archivo.variable} ${instrumentSans.variable} ${plexMono.variable}`}
+    >
       <head>
         {supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />}
         {/* Product photos are served from the print providers' CDNs; warming the
@@ -124,11 +154,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <AppShell>
-          <SmoothScroll />
-          <PageTransition />
-          {children}
-        </AppShell>
+        <AppShell>{children}</AppShell>
         <Analytics />
       </body>
     </html>

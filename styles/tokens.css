@@ -1,0 +1,107 @@
+/*
+ * 7ENO rebrand v2 design tokens (spec section 2). New prefixes only, so they
+ * sit next to the old tokens in globals.css without clashing. New components
+ * use these tokens and nothing else.
+ */
+:root {
+  /* Colour */
+  --c-bg: #F7F1DA;
+  --c-surface: #FFFFFF;
+  --c-stone: #C4C4B5;
+  --c-text: #2D3A4F;
+  --c-text-muted: #5B5A58;
+  --c-border-strong: #8A897F;
+  --c-accent: #7995C7;
+  --c-accent-ink: #3E5A8F;
+  --c-live: #FEAB27;
+  --c-sage: #BACCB1;
+  --c-rose: #E8697D;
+  --c-peach: #F5C190;
+  --c-inverse-bg: #2D3A4F;
+  --c-inverse-text: #F7F1DA;
+  --c-success: #3E5A2E;
+  --c-error: #A32020;
+  --c-focus: #2D3A4F;
+  --c-swatch-rose-red: #621926;
+  --c-swatch-pistachio: #9CAF92;
+  --c-swatch-mocha: #9E7551;
+  --c-swatch-obsidian: #0E0B0B;
+  --c-swatch-dune: #C3B99C;
+  --c-swatch-olive: #3C3D2E;
+  --c-swatch-maritime: #071429;
+
+  /* Type */
+  --f-display: var(--font-archivo), 'Archivo Black', 'Arial Black', sans-serif;
+  --f-body: var(--font-instrument), system-ui, sans-serif;
+  --f-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --fs-display: clamp(2.75rem, 8vw, 7.5rem);
+  --fs-h1: clamp(2rem, 5vw, 4rem);
+  --fs-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --fs-h3: 1.25rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-label: 0.75rem;
+
+  /* Space */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* Radius */
+  --r-0: 0;
+  --r-1: 2px;
+
+  /* Layout */
+  --l-gutter: 16px;
+  --l-grid-gap: 2px;
+  --l-max: 1600px;
+  --l-text-max: 68ch;
+  --l-nav: 56px;
+  --l-announce: 32px;
+  --l-chrome: calc(var(--l-announce) + var(--l-nav));
+
+  /* Motion */
+  --m-fast: 120ms;
+  --m-base: 200ms;
+  --m-slow: 400ms;
+  --m-ease: cubic-bezier(0.2, 0, 0, 1);
+  --m-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --l-gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --l-nav: 64px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --l-gutter: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --m-fast: 0.01ms;
+    --m-base: 0.01ms;
+    --m-slow: 0.01ms;
+  }
+
+  [data-announcement-track] {
+    animation: none !important;
+    transform: none !important;
+  }
+}
