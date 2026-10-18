@@ -46,7 +46,7 @@ describe('MobileNav', () => {
   it('closes when a link is followed', () => {
     const onClose = jest.fn()
     render(<MobileNav nav={MAIN_NAV} open onClose={onClose} currentPath="/" />)
-    fireEvent.click(screen.getByRole('link', { name: 'Archive' }))
+    fireEvent.click(screen.getByRole('link', { name: 'Contact' }))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 

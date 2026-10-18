@@ -129,7 +129,10 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: opacity var(--m-fast) var(--m-ease);
+  transition:
+    background-color var(--m-base) var(--m-ease),
+    color var(--m-base) var(--m-ease),
+    border-color var(--m-base) var(--m-ease);
 }
 
 .cta {
@@ -142,9 +145,15 @@
   color: var(--c-text);
 }
 
-.cta:hover,
+.cta:hover {
+  background: var(--c-live);
+  border-color: var(--c-live);
+  color: var(--c-text);
+}
+
 .ctaGhost:hover {
-  opacity: 0.85;
+  background: var(--c-text);
+  color: var(--c-inverse-text);
 }
 
 .facts {

@@ -33,7 +33,7 @@
 
   .buy {
     position: sticky;
-    top: calc(var(--l-chrome) + var(--s-5));
+    top: calc(var(--l-sticky-top) + var(--s-5));
     max-height: calc(100vh - var(--l-chrome) - var(--s-7));
     overflow-y: auto;
     padding: 0;

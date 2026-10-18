@@ -9,10 +9,6 @@
   background: var(--c-stone);
 }
 
-.grid[data-mobile='1'] {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .cell {
   min-width: 0;
 }
@@ -38,28 +34,8 @@
   text-underline-offset: 0.2em;
 }
 
-.mobileOnly {
-  display: block;
-}
-
-.desktopOnly {
-  display: none;
-}
-
 @media (min-width: 768px) {
-  .grid[data-desktop='4'] {
+  .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .grid[data-desktop='2'] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .mobileOnly {
-    display: none;
-  }
-
-  .desktopOnly {
-    display: block;
   }
 }

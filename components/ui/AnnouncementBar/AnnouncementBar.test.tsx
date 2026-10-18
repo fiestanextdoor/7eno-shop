@@ -1,15 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import AnnouncementBar from './AnnouncementBar'
+import AnnouncementBar, { LOOP_REPEAT } from './AnnouncementBar'
 
 const MESSAGES = ['Free shipping on orders over €75', '14-day returns']
 
 describe('AnnouncementBar', () => {
-  it('reads each message once and hides the loop copy from assistive tech', () => {
+  it('reads each message once and hides the loop copies from assistive tech', () => {
     const { container } = render(<AnnouncementBar messages={MESSAGES} />)
     for (const m of MESSAGES) {
       const copies = screen.getAllByText(m)
-      expect(copies).toHaveLength(2)
-      expect(copies.filter((el) => el.getAttribute('aria-hidden') === 'true')).toHaveLength(1)
+      // Two halves of LOOP_REPEAT copies each, so the loop never runs empty.
+      expect(copies).toHaveLength(LOOP_REPEAT * 2)
+      expect(copies.filter((el) => el.getAttribute('aria-hidden') === 'true')).toHaveLength(LOOP_REPEAT * 2 - 1)
     }
     expect(container.querySelector('[data-announcement-track]')).not.toBeNull()
   })

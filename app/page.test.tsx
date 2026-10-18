@@ -15,7 +15,7 @@ jest.mock('../lib/tiles', () => ({
   toTiles: async (products: { slug: string; name: string }[]): Promise<TileProduct[]> =>
     products.map((p) => ({
       slug: p.slug, href: `/shop/${p.slug}`, name: p.name, image: null, imageAlt: p.name,
-      price: '€34.95', badges: [], note: null,
+      price: '€34.95', badges: [], note: null, dropId: 'olympian', category: 'tees', priceCents: 3495,
     })),
 }))
 

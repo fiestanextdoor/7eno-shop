@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { usePathname } from 'next/navigation'
 import CartDrawer from '@/components/CartDrawer/CartDrawer'
 import CheckoutHeader from '@/components/CheckoutHeader/CheckoutHeader'
@@ -27,6 +27,29 @@ function useMounted(): boolean {
   return useSyncExternalStore(noSubscribe, () => true, () => false)
 }
 
+/** Scrolled this far, the announcement bar slides away above the header. */
+export const ANNOUNCE_HIDE_AT = 48
+
+/**
+ * True once the page is scrolled past ANNOUNCE_HIDE_AT. The chrome is fixed,
+ * so this is the only signal; the attribute it drives also moves the sticky
+ * offsets (tokens.css, --l-sticky-top) so filter bars stay under the header.
+ */
+function useAnnounceHidden(): boolean {
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    const update = () => setHidden(window.scrollY > ANNOUNCE_HIDE_AT)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-announce-hidden', hidden)
+    return () => document.documentElement.removeAttribute('data-announce-hidden')
+  }, [hidden])
+  return hidden
+}
+
 /**
  * Route chrome around every page: which header, drawer and footer a route
  * gets. It provides no context; the cart lives in the Zustand store.
@@ -42,6 +65,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
   const menuOpen = menuOpenAt !== null
   const mounted = useMounted()
+  const announceHidden = useAnnounceHidden()
   const storeCount = useCartStore((s) => s.itemCount())
   const cartCount = mounted ? storeCount : 0
   const openCart = useCartStore((s) => s.openCart)
@@ -65,7 +89,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <StoreHydration />
       <CookieBanner />
       <a href="#main" className={styles.skipLink}>Skip to content</a>
-      <div className={styles.chrome}>
+      <div className={styles.chrome} data-announce-hidden={announceHidden ? 'true' : 'false'}>
         <AnnouncementBar messages={ANNOUNCEMENTS} />
         <SiteHeader
           nav={MAIN_NAV}

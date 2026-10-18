@@ -1,5 +1,7 @@
 import type { BadgeKind } from '@/components/ui/Badge/Badge'
 import type { ShopProduct } from '@/lib/catalog'
+import type { DropId } from '@/lib/drops'
+import { categoryOf, type Category } from '@/lib/product-category'
 import { resolveCardImage } from '@/lib/card-image'
 import { NEW_IN_MS, formatDropDate } from '@/lib/drops'
 import { formatPrice } from '@/lib/money'
@@ -15,6 +17,10 @@ export interface TileProduct {
   badges: BadgeKind[]
   /** "Drops 1 November 2026 at 12:00 CET" on a teaser tile. */
   note: string | null
+  /** For client-side filtering and sorting (lib/shop-query, ShopBrowser). */
+  dropId: DropId
+  category: Category | null
+  priceCents: number | null
 }
 
 /** At most one badge: Coming soon before Sold out before New in. */
@@ -37,6 +43,9 @@ export function toTile(p: ShopProduct, image: string | null, now: number): TileP
     price: formatPrice(p.priceCents, p.currency),
     badges: tileBadges(p, now),
     note: p.status === 'upcoming' ? `Drops ${formatDropDate(p.drop.window.startsAt)}` : null,
+    dropId: p.drop.id,
+    category: categoryOf(p.name),
+    priceCents: typeof p.priceCents === 'number' && p.priceCents > 0 ? p.priceCents : null,
   }
 }
 

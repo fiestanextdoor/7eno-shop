@@ -121,7 +121,7 @@ export default async function HomePage() {
             {tiles.length > 0
               ? tiles.map((tile) => (
                   <li key={tile.slug}>
-                    <ProductTile product={tile} density={4} eager={rowIndex === 0} />
+                    <ProductTile product={tile} eager={rowIndex === 0} />
                   </li>
                 ))
               : view.hero.lineup.slice(0, ROW_SIZE).map((src, i) => (

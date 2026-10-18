@@ -6,8 +6,8 @@ describe('MAIN_NAV', () => {
       { label: 'Shop', href: '/shop' },
       { label: 'Olympian', href: '/collections/olympian' },
       { label: 'OLYMPN Sport', href: '/collections/olympn-sport' },
-      { label: 'Archive', href: '/archive' },
       { label: 'About', href: '/about' },
+      { label: 'Contact', href: '/contact' },
     ])
   })
 })

@@ -1,7 +1,8 @@
 import type { ShopProduct } from './catalog'
 import { DROPS, type Drop } from './drops'
+import { categoryOf } from './product-category'
 import {
-  applyShopQuery, buildFilterGroups, buildSortOptions, describeShopQuery, parseShopQuery, shopHref, type ShopQuery,
+  applyShopQuery, applyTileQuery, buildFilterGroups, buildSortOptions, describeShopQuery, parseShopQuery, shopHref, type ShopQuery,
 } from './shop-query'
 
 const [olympian, sport] = DROPS
@@ -61,6 +62,28 @@ describe('applyShopQuery', () => {
   it('sorts by price both ways, with an unknown price always last', () => {
     expect(slugs(applyShopQuery(LIST, { ...ALL, sort: 'price-asc' }))).toEqual(['tee', 'knit', 'hoodie', 'bag'])
     expect(slugs(applyShopQuery(LIST, { ...ALL, sort: 'price-desc' }))).toEqual(['hoodie', 'knit', 'tee', 'bag'])
+  })
+})
+
+describe('applyTileQuery', () => {
+  const tiles = LIST.map((p) => ({
+    slug: p.slug, href: `/shop/${p.slug}`, name: p.name, image: null, imageAlt: p.name, price: null, badges: [], note: null,
+    dropId: p.drop.id, category: categoryOf(p.name), priceCents: p.priceCents ?? null,
+  }))
+  const tileSlugs = (list: { slug: string }[]) => list.map((t) => t.slug)
+
+  it('filters and sorts tiles exactly like the products they came from', () => {
+    for (const query of [
+      ALL,
+      { ...ALL, collection: 'olympian' as const },
+      { ...ALL, category: 'tees' as const },
+      { ...ALL, category: 'knits' as const },
+      { ...ALL, sort: 'price-asc' as const },
+      { ...ALL, sort: 'price-desc' as const },
+      { ...ALL, collection: 'olympian' as const, category: 'bags' as const },
+    ]) {
+      expect(tileSlugs(applyTileQuery(tiles, query))).toEqual(slugs(applyShopQuery(LIST, query)))
+    }
   })
 })
 

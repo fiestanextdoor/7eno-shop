@@ -8,6 +8,12 @@
   left: 0;
   right: 0;
   z-index: 300;
+  transition: transform var(--m-slow) var(--m-ease);
+}
+
+/* Scrolled: the announcement bar slides up out of view, the header stays. */
+.chrome[data-announce-hidden='true'] {
+  transform: translateY(calc(var(--l-announce) * -1));
 }
 
 .page {

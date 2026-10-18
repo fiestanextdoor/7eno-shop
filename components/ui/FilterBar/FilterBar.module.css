@@ -1,6 +1,7 @@
 .bar {
   position: sticky;
-  top: var(--l-chrome);
+  top: var(--l-sticky-top);
+  transition: top var(--m-slow) var(--m-ease);
   z-index: 100;
   background: var(--c-bg);
   border-bottom: 1px solid var(--c-stone);

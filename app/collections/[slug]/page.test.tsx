@@ -56,7 +56,7 @@ function product(id: string, name: string, drop = olympian): ShopProduct {
 
 const TILE: TileProduct = {
   slug: 'olympian-tee-sand-unisex', href: '/shop/olympian-tee-sand-unisex', name: 'Olympian Tee Sand Unisex',
-  image: '/olympian/olympian-wheat-model.jpg', imageAlt: 'Olympian Tee Sand Unisex', price: '€34.95', badges: [], note: null,
+  image: '/olympian/olympian-wheat-model.jpg', imageAlt: 'Olympian Tee Sand Unisex', price: '€34.95', badges: [], note: null, dropId: 'olympian', category: 'tees', priceCents: 3495,
 }
 
 beforeEach(() => {
@@ -112,7 +112,6 @@ describe('/collections/[slug]', () => {
     render(await CollectionPage(params('olympian')))
     expect(mockToTiles.mock.calls[0][0].map((p: ShopProduct) => p.drop.id)).toEqual(['olympian'])
     expect(screen.getByRole('link', { name: /Olympian Tee Sand Unisex/ })).toHaveAttribute('href', '/shop/olympian-tee-sand-unisex')
-    expect(screen.getByRole('radiogroup', { name: 'Products per row' })).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: /line-up/ })).toBeNull()
   })
 

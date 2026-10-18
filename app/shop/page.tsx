@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import ShopView from '@/components/ui/ShopView/ShopView'
+import { Suspense } from 'react'
+import ShopBrowser from '@/components/ui/ShopBrowser/ShopBrowser'
 import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import { DROPS, currentTimeMs, getDropStatus, isDropListed } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
-import {
-  applyShopQuery, buildFilterGroups, buildSortOptions, describeShopQuery, parseShopQuery, type RawSearchParams,
-} from '@/lib/shop-query'
+import { applyShopQuery, describeShopQuery, parseShopQuery, type FilterDrop, type RawSearchParams } from '@/lib/shop-query'
 import { toTiles } from '@/lib/tiles'
 import { BASE_URL, BRAND_KEYWORDS, absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
 import styles from './shop.module.css'
@@ -40,15 +39,14 @@ export default async function ShopPage({ searchParams }: Props) {
     console.error('[Catalog] getShopProducts failed:', err)
   }
 
+  // The JSON-LD lists what this URL shows; the browser gets every tile and
+  // filters in place (ShopBrowser), so a chip never waits on Printful.
   const visible = applyShopQuery(products, query)
-  const tiles = await toTiles(visible, now)
+  const tiles = await toTiles(products, now)
   const { title, description } = describeShopQuery(query)
-  const drops = DROPS.filter((d) => isDropListed(d, now, { preview }))
-  // Filtering on a drop that has not opened yet: point to its waitlist.
-  const upcomingDrop = drops.find((d) => d.id === query.collection && getDropStatus(d, now, { preview }) === 'upcoming')
-  const emptyLink = upcomingDrop
-    ? { href: `/collections/${upcomingDrop.slug}`, label: 'See the drop and join the waitlist' }
-    : null
+  const drops: FilterDrop[] = DROPS.filter((d) => isDropListed(d, now, { preview })).map((d) => ({
+    id: d.id, slug: d.slug, title: d.title, edition: d.edition, status: getDropStatus(d, now, { preview }),
+  }))
 
   const collectionJsonLd = {
     '@context': 'https://schema.org',
@@ -78,18 +76,9 @@ export default async function ShopPage({ searchParams }: Props) {
     <main className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
-      <header className={styles.header}>
-        <p className={styles.label}>Shop</p>
-        <h1 className={styles.title}>{title}</h1>
-      </header>
-      <ShopView
-        filters={buildFilterGroups(query, drops)}
-        sort={query.sort}
-        sortOptions={buildSortOptions(query)}
-        tiles={tiles}
-        emptyMessage="No pieces match these filters yet."
-        emptyLink={emptyLink}
-      />
+      <Suspense fallback={null}>
+        <ShopBrowser tiles={tiles} drops={drops} />
+      </Suspense>
     </main>
   )
 }

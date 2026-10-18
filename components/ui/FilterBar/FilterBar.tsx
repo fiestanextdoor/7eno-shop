@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, type ReactNode } from 'react'
+import { useState, type MouseEvent, type ReactNode } from 'react'
 import Button from '@/components/ui/Button/Button'
 import Drawer from '@/components/ui/Drawer/Drawer'
 import type { FilterGroup } from '@/lib/filter-types'
@@ -16,10 +16,16 @@ export interface FilterBarProps {
   /** Extra controls on the right, e.g. the grid density toggle. */
   controls?: ReactNode
   resultCount?: number
+  /**
+   * Given, chips and the sort apply the href in place of a page navigation
+   * (the shop filters in the browser, see ShopBrowser). Without it they are
+   * ordinary route links.
+   */
+  onNavigate?(href: string): void
 }
 
 /** Sticky filter and sort bar under the header; below 1024px the chips live in a Drawer. */
-export default function FilterBar({ filters, sort, sortOptions = [], controls, resultCount }: FilterBarProps) {
+export default function FilterBar({ filters, sort, sortOptions = [], controls, resultCount, onNavigate }: FilterBarProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   // A group counts as filtered when its active option is not the first ("All").
@@ -27,7 +33,9 @@ export default function FilterBar({ filters, sort, sortOptions = [], controls, r
 
   const onSort = (value: string) => {
     const option = sortOptions.find((o) => o.value === value)
-    if (option) router.push(option.href, { scroll: false })
+    if (!option) return
+    if (onNavigate) onNavigate(option.href)
+    else router.push(option.href, { scroll: false })
   }
 
   const sortControl = (id: string) =>
@@ -42,7 +50,7 @@ export default function FilterBar({ filters, sort, sortOptions = [], controls, r
       </div>
     ) : null
 
-  const chipGroups = (onNavigate?: () => void) =>
+  const chipGroups = (afterClick?: () => void) =>
     filters.map((group) => (
       <div key={group.label} className={styles.group} role="group" aria-label={group.label}>
         <span className={styles.groupLabel} aria-hidden="true">{group.label}</span>
@@ -52,9 +60,17 @@ export default function FilterBar({ filters, sort, sortOptions = [], controls, r
               <Link
                 href={item.href}
                 scroll={false}
+                // In-page filtering never loads the href, so do not prefetch it either.
+                prefetch={onNavigate ? false : undefined}
                 className={styles.chip}
                 aria-current={item.active ? 'true' : undefined}
-                onClick={onNavigate}
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                  if (onNavigate) {
+                    event.preventDefault()
+                    onNavigate(item.href)
+                  }
+                  afterClick?.()
+                }}
               >
                 {item.label}
               </Link>

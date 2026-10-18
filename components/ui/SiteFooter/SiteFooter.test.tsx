@@ -14,7 +14,8 @@ describe('SiteFooter', () => {
   it('links help, contact and the legal pages', () => {
     render(<SiteFooter nav={MAIN_NAV} />)
     expect(screen.getByRole('link', { name: 'Size guide' })).toHaveAttribute('href', '/size-guide')
-    expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute('href', 'mailto:info@7eno.shop')
+    expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute('href', '/contact')
+    expect(screen.getByRole('link', { name: 'Archive' })).toHaveAttribute('href', '/archive')
     expect(screen.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms')
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy')
   })

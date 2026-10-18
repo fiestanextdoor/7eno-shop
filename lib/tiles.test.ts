@@ -65,6 +65,9 @@ describe('toTiles', () => {
       price: '€64.95',
       badges: ['coming'],
       note: 'Drops 1 November 2026 at 12:00 CET',
+      dropId: 'olympn-sport',
+      category: 'hoodies',
+      priceCents: 6495,
     })
     expect(tiles[1].image).toBe('https://files.cdn.printful.com/dune.png')
   })

@@ -10,22 +10,33 @@ export interface AnnouncementBarProps {
 }
 
 /**
- * Fixed-height USP strip. The messages scroll as a seamless loop (a second,
- * aria-hidden copy follows the first); a pause button keeps it WCAG 2.2.2
- * compliant, and under reduced motion tokens.css stops it entirely.
+ * How often the message set is repeated in each half of the track. The loop
+ * animation slides the track by half its width, so a half must be at least as
+ * wide as the viewport or the bar runs empty for a moment before the next
+ * copy arrives. Three messages are about 1200px; four repeats cover 4K.
+ */
+export const LOOP_REPEAT = 4
+
+/**
+ * Fixed-height USP strip. The messages scroll as a seamless loop: one readable
+ * copy, then aria-hidden repeats that fill the track past any viewport width.
+ * A pause button keeps it WCAG 2.2.2 compliant, and under reduced motion
+ * tokens.css stops it entirely.
  */
 export default function AnnouncementBar({ messages, href }: AnnouncementBarProps) {
   const [paused, setPaused] = useState(false)
   if (messages.length === 0) return null
 
+  const copies = Array.from({ length: LOOP_REPEAT * 2 }, (_, i) => i)
   const track = (
     <ul className={styles.track} data-announcement-track="" data-paused={paused ? 'true' : 'false'}>
-      {messages.map((m) => (
-        <li key={m} className={styles.item}>{m}</li>
-      ))}
-      {messages.map((m) => (
-        <li key={`loop-${m}`} className={styles.item} aria-hidden="true">{m}</li>
-      ))}
+      {copies.map((copy) =>
+        messages.map((m) => (
+          <li key={`${copy}-${m}`} className={styles.item} aria-hidden={copy === 0 ? undefined : 'true'}>
+            {m}
+          </li>
+        ))
+      )}
     </ul>
   )
 

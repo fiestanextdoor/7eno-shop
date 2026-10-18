@@ -12,15 +12,15 @@ export const MAIN_NAV: NavItem[] = [
   { label: 'Shop', href: '/shop' },
   { label: 'Olympian', href: '/collections/olympian' },
   { label: 'OLYMPN Sport', href: '/collections/olympn-sport' },
-  { label: 'Archive', href: '/archive' },
   { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 export const HELP_NAV: NavItem[] = [
+  { label: 'Archive', href: '/archive' },
   { label: 'Size guide', href: '/size-guide' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Returns', href: '/returns' },
-  { label: 'Contact', href: 'mailto:info@7eno.shop', external: true },
 ]
 
 export const LEGAL_NAV: NavItem[] = [

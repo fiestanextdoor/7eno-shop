@@ -1,17 +1,12 @@
 import type { FilterGroup } from '@/lib/filter-types'
 import type { ShopProduct } from '@/lib/catalog'
-import { DROPS, listDropsNewestFirst, type Drop, type DropId } from '@/lib/drops'
-import { classify } from '@/lib/product-classify'
+import { DROPS, type DropId, type DropStatus } from '@/lib/drops'
+import { CATEGORIES, matchesCategory, type Category } from '@/lib/product-category'
+import type { TileProduct } from '@/lib/tiles'
 
 export type RawSearchParams = Record<string, string | string[] | undefined>
 
-export const CATEGORIES = [
-  { value: 'tees', label: 'Tees' },
-  { value: 'knits', label: 'Knits' },
-  { value: 'hoodies', label: 'Hoodies' },
-  { value: 'bags', label: 'Bags' },
-] as const
-export type Category = (typeof CATEGORIES)[number]['value']
+export { CATEGORIES, matchesCategory, type Category }
 
 export const SORTS = [
   { value: 'featured', label: 'Featured' },
@@ -49,23 +44,22 @@ export function parseShopQuery(params: RawSearchParams): ShopQuery {
   }
 }
 
-/** Every piece sits in exactly one category: a knitted tee is a knit, not a tee. */
-export function matchesCategory(name: string, category: Category): boolean {
-  const kind = classify(name)
-  switch (category) {
-    case 'tees':
-      return kind.isTee && !kind.isKnit
-    case 'knits':
-      return kind.isKnit
-    case 'hoodies':
-      return kind.isHoodie
-    case 'bags':
-      return kind.isBag
-  }
-}
-
 function priceOf(p: ShopProduct): number | null {
   return typeof p.priceCents === 'number' && p.priceCents > 0 ? p.priceCents : null
+}
+
+/** Featured keeps the catalogue order; price sorts put an unknown price last. */
+function sortByQuery<T>(list: T[], query: ShopQuery, price: (item: T) => number | null): T[] {
+  if (query.sort === 'featured') return list
+  const direction = query.sort === 'price-asc' ? 1 : -1
+  return [...list].sort((a, b) => {
+    const pa = price(a)
+    const pb = price(b)
+    if (pa === null && pb === null) return 0
+    if (pa === null) return 1
+    if (pb === null) return -1
+    return (pa - pb) * direction
+  })
 }
 
 export function applyShopQuery(products: ShopProduct[], query: ShopQuery): ShopProduct[] {
@@ -74,16 +68,26 @@ export function applyShopQuery(products: ShopProduct[], query: ShopQuery): ShopP
       (query.collection === null || p.drop.id === query.collection) &&
       (query.category === null || matchesCategory(p.name, query.category))
   )
-  if (query.sort === 'featured') return filtered
-  const direction = query.sort === 'price-asc' ? 1 : -1
-  return [...filtered].sort((a, b) => {
-    const pa = priceOf(a)
-    const pb = priceOf(b)
-    if (pa === null && pb === null) return 0
-    if (pa === null) return 1
-    if (pb === null) return -1
-    return (pa - pb) * direction
-  })
+  return sortByQuery(filtered, query, priceOf)
+}
+
+/** The same filter and sort on resolved tiles, so the shop can filter in the browser without a round trip. */
+export function applyTileQuery(tiles: TileProduct[], query: ShopQuery): TileProduct[] {
+  const filtered = tiles.filter(
+    (t) =>
+      (query.collection === null || t.dropId === query.collection) &&
+      (query.category === null || t.category === query.category)
+  )
+  return sortByQuery(filtered, query, (t) => t.priceCents)
+}
+
+/** What the filter chips need to know about a drop; serialisable, so the server can hand it to the client. */
+export interface FilterDrop {
+  id: DropId
+  slug: string
+  title: string
+  edition: number
+  status?: DropStatus
 }
 
 export function shopHref(query: ShopQuery): string {
@@ -96,13 +100,14 @@ export function shopHref(query: ShopQuery): string {
 }
 
 /** Chips for the FilterBar, in the URL-state shape from lib/filter-types.ts. */
-export function buildFilterGroups(query: ShopQuery, drops: readonly Drop[] = DROPS): FilterGroup[] {
+export function buildFilterGroups(query: ShopQuery, drops: readonly FilterDrop[] = DROPS): FilterGroup[] {
+  const newestFirst = [...drops].sort((a, b) => b.edition - a.edition)
   return [
     {
       label: 'Collection',
       items: [
         { label: 'All', href: shopHref({ ...query, collection: null }), active: query.collection === null },
-        ...listDropsNewestFirst(drops).map((d) => ({
+        ...newestFirst.map((d) => ({
           label: d.title,
           href: shopHref({ ...query, collection: d.id }),
           active: query.collection === d.id,

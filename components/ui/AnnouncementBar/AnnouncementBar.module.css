@@ -29,7 +29,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  animation: announce 40s linear infinite;
+  /* Four repeats per half: 160s keeps the same reading speed as one copy in 40s. */
+  animation: announce 160s linear infinite;
+  will-change: transform;
 }
 
 .track[data-paused='true'] {

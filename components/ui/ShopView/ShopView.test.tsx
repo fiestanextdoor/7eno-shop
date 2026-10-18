@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
 import ShopView from './ShopView'
 import type { TileProduct } from '@/lib/tiles'
@@ -8,14 +8,13 @@ jest.mock('next/navigation', () => ({ useRouter: jest.fn() }))
 function tile(n: number): TileProduct {
   return {
     slug: `piece-${n}`, href: `/shop/piece-${n}`, name: `Piece ${n}`, image: '/drops/olympn-sport/mocha.webp',
-    imageAlt: `Piece ${n}`, price: '€64.95', badges: [], note: null,
+    imageAlt: `Piece ${n}`, price: '€64.95', badges: [], note: null, dropId: 'olympn-sport', category: 'hoodies', priceCents: 6495,
   }
 }
 
 const TILES = [1, 2, 3, 4, 5, 6].map(tile)
 
 beforeEach(() => {
-  window.localStorage.clear()
   jest.mocked(useRouter).mockReturnValue({ push: jest.fn() } as unknown as ReturnType<typeof useRouter>)
 })
 
@@ -34,20 +33,9 @@ describe('ShopView', () => {
     expect(screen.queryByRole('heading', { level: 3 })).toBeNull()
   })
 
-  it('switches the desktop grid to two per row', () => {
-    const { container } = render(<ShopView filters={[]} sort="featured" sortOptions={[]} tiles={TILES} />)
-    const grid = container.querySelector('ul[data-desktop]')
-    expect(grid).toHaveAttribute('data-desktop', '4')
-    const desktop = screen.getByRole('radiogroup', { name: 'Products per row' })
-    fireEvent.click(within(desktop).getByRole('radio', { name: '2 per row' }))
-    expect(grid).toHaveAttribute('data-desktop', '2')
-  })
-
-  it('switches the mobile grid to one per row', () => {
-    const { container } = render(<ShopView filters={[]} sort="featured" sortOptions={[]} tiles={TILES} />)
-    const mobile = screen.getByRole('radiogroup', { name: 'Products per row (mobile)' })
-    fireEvent.click(within(mobile).getByRole('radio', { name: '1 per row' }))
-    expect(container.querySelector('ul[data-mobile]')).toHaveAttribute('data-mobile', '1')
+  it('offers no products-per-row switch: the grid is fixed', () => {
+    render(<ShopView filters={[]} sort="featured" sortOptions={[]} tiles={TILES} />)
+    expect(screen.queryByRole('radiogroup')).toBeNull()
   })
 
   it('shows the empty message instead of an empty grid', () => {

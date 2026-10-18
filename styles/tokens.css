@@ -67,6 +67,9 @@
   --l-nav: 56px;
   --l-announce: 32px;
   --l-chrome: calc(var(--l-announce) + var(--l-nav));
+  /* Offset for sticky elements under the chrome; shrinks to the header once
+     the announcement bar has slid away (AppShell sets data-announce-hidden). */
+  --l-sticky-top: var(--l-chrome);
 
   /* Motion */
   --m-fast: 120ms;
@@ -74,6 +77,10 @@
   --m-slow: 400ms;
   --m-ease: cubic-bezier(0.2, 0, 0, 1);
   --m-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-announce-hidden] {
+  --l-sticky-top: var(--l-nav);
 }
 
 @media (min-width: 768px) {

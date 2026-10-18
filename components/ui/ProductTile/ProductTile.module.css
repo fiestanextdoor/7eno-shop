@@ -54,10 +54,6 @@
   padding: var(--s-3) var(--s-3) var(--s-5);
 }
 
-.tile[data-density='1'] .info {
-  padding-inline: var(--l-gutter);
-}
-
 .name {
   margin: 0;
   font-family: var(--f-body);
