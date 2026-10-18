@@ -1,5 +1,5 @@
 -- =====================================================
--- 7ENO Webshop — Supabase Database Schema
+-- 7ENO Webshop: Supabase Database Schema
 -- Voer dit uit in de Supabase SQL Editor
 -- =====================================================
 

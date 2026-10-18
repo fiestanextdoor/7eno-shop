@@ -1,0 +1,43 @@
+.page {
+  min-height: 100vh;
+  padding-top: var(--l-chrome);
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.view {
+  max-width: var(--l-max);
+  margin: 0 auto;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.media {
+  min-width: 0;
+}
+
+.buy {
+  padding: var(--s-6) var(--l-gutter) var(--s-8);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 7fr) minmax(360px, 5fr);
+    gap: var(--s-7);
+    align-items: start;
+    padding: var(--s-5) var(--l-gutter) var(--s-9);
+  }
+
+  .buy {
+    position: sticky;
+    top: calc(var(--l-sticky-top) + var(--s-5));
+    max-height: calc(100vh - var(--l-chrome) - var(--s-7));
+    overflow-y: auto;
+    /* The scroll box clips outlines; 4px of padding keeps the colour ring whole. */
+    padding: 4px;
+    margin: -4px;
+  }
+}

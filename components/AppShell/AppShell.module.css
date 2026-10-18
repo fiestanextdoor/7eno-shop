@@ -1,0 +1,46 @@
+/*
+ * Stacking order: chrome 300 < cart drawer 350/351 < mobile nav and Drawer
+ * 400 < skip link 500 < cookie banner 999. Overlays must cover the chrome.
+ */
+.chrome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  transition: transform var(--m-slow) var(--m-ease);
+}
+
+/* Scrolled: the announcement bar slides up out of view, the header stays. */
+.chrome[data-announce-hidden='true'] {
+  transform: translateY(calc(var(--l-announce) * -1));
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+}
+
+.skipLink {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-4);
+  z-index: 500;
+  padding: var(--s-2) var(--s-4);
+  background: var(--c-text);
+  color: var(--c-inverse-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+  outline: 2px solid var(--c-live);
+  outline-offset: 2px;
+}

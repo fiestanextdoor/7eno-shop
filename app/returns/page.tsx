@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Nav from '@/components/Nav/Nav'
-import styles from './returns.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 export const metadata: Metadata = {
-  title: 'Returns — 7ENO',
+  title: 'Returns',
   description: 'How returns work at 7ENO: a simple 14-day return process for your order.',
 }
 
@@ -32,7 +31,6 @@ const STEPS = [
 export default function ReturnsPage() {
   return (
     <>
-      <Nav />
       <main className={styles.page}>
         <div className={styles.inner}>
           <h1 className={styles.title}>Returns</h1>
@@ -43,7 +41,7 @@ export default function ReturnsPage() {
             14 days of delivery, without giving a reason. Here is how it works.
           </p>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>How to return in 3 steps</h2>
             <ol className={styles.steps}>
               {STEPS.map((step, i) => (
@@ -58,7 +56,7 @@ export default function ReturnsPage() {
             </ol>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>What can I return?</h2>
             <p>
               Standard print-on-demand items without personalisation can be returned within the 14-day
@@ -70,7 +68,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Defective or incorrect items</h2>
             <p>
               Received something damaged, faulty, or different from what you ordered? Contact us within 30
@@ -80,7 +78,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Return shipping costs</h2>
             <p>
               Return shipping is at your own expense, unless the product is defective or we sent the wrong
@@ -88,7 +86,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Refunds</h2>
             <p>
               Refunds are issued to your original payment method within 14 days after we receive and

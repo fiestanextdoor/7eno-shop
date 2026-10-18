@@ -4,6 +4,7 @@ import Script from 'next/script'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { buttonClasses } from '@/components/ui/Button/Button'
 import styles from './GoogleSignIn.module.css'
 
 // Public Web-application OAuth client ID. When set, the sign-in flow uses
@@ -127,7 +128,8 @@ export default function GoogleSignIn({
       theme: 'filled_black',
       size: 'large',
       text,
-      shape: 'rectangular',
+      // Pill matches the site's 25px radius (styles/tokens.css, --r-ui).
+      shape: 'pill',
       logo_alignment: 'left',
       width: 320,
     })
@@ -143,7 +145,11 @@ export default function GoogleSignIn({
       })
     }
     return (
-      <button type="button" className={fallbackClassName} onClick={handleFallback}>
+      <button
+        type="button"
+        className={[buttonClasses('ghost', 'lg'), styles.fallback, fallbackClassName].filter(Boolean).join(' ')}
+        onClick={handleFallback}
+      >
         <GoogleGlyph />
         {fallbackLabel}
       </button>

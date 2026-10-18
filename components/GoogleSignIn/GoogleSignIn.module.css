@@ -8,3 +8,13 @@
   min-height: 44px;
   margin-bottom: 8px;
 }
+
+/* Fallback (no Google client id): the site's ghost button, full width. */
+.fallback {
+  width: 100%;
+  gap: var(--s-3);
+}
+
+.fallback svg {
+  flex: 0 0 auto;
+}

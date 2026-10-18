@@ -102,37 +102,37 @@ export default function ProfilePage() {
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Full name</label>
-              <input className={styles.input} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="John Smith" />
+              <label htmlFor="profile-name" className={styles.fieldLabel}>Full name</label>
+              <input id="profile-name" className={styles.input} value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="John Smith" />
             </div>
           </div>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Street address</label>
-              <input className={styles.input} value={line1} onChange={(e) => setLine1(e.target.value)} required placeholder="123 Main St" />
+              <label htmlFor="profile-line1" className={styles.fieldLabel}>Street address</label>
+              <input id="profile-line1" className={styles.input} value={line1} onChange={(e) => setLine1(e.target.value)} required placeholder="123 Main St" />
             </div>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Apartment, suite, etc. (optional)</label>
-              <input className={styles.input} value={line2} onChange={(e) => setLine2(e.target.value)} placeholder="Apt. B" />
-            </div>
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <div className={styles.field}>
-              <label className={styles.fieldLabel}>Postal code</label>
-              <input className={styles.input} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required placeholder="1234 AB" />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.fieldLabel}>City</label>
-              <input className={styles.input} value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Amsterdam" />
+              <label htmlFor="profile-line2" className={styles.fieldLabel}>Apartment, suite, etc. (optional)</label>
+              <input id="profile-line2" className={styles.input} value={line2} onChange={(e) => setLine2(e.target.value)} placeholder="Apt. B" />
             </div>
           </div>
 
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>Country</label>
-              <select className={styles.input} value={country} onChange={(e) => setCountry(e.target.value)}>
+              <label htmlFor="profile-postal" className={styles.fieldLabel}>Postal code</label>
+              <input id="profile-postal" className={styles.input} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required placeholder="1234 AB" />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="profile-city" className={styles.fieldLabel}>City</label>
+              <input id="profile-city" className={styles.input} value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Amsterdam" />
+            </div>
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <div className={styles.field}>
+              <label htmlFor="profile-country" className={styles.fieldLabel}>Country</label>
+              <select id="profile-country" className={styles.input} value={country} onChange={(e) => setCountry(e.target.value)}>
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.name}</option>
                 ))}

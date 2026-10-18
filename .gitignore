@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+docs/brand/olympn-marketing-3/mockups/
+
+# Playwright (npm run qa:a11y)
+/test-results/
+/playwright-report/

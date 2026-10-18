@@ -1,19 +1,19 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getCatalogProducts } from '@/lib/catalog'
+import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import {
   getProduct as getPrintfulProduct, getCatalogProductId, getSizeGuide, type SizeGuide,
 } from '@/lib/printful'
 import { HIDDEN_SIZES } from '@/lib/product-classify'
 import { productSlug } from '@/lib/slug'
 import { absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
-import styles from '../landing.module.css'
+import styles from '@/components/ui/TextPage/TextPage.module.css'
 
 const DESCRIPTION =
-  'Size guide for 7ENO (Zeno) streetwear: body measurements in centimetres for the tees, how to measure yourself, and how each fit runs.'
+  'Size guide for 7ENO (Zeno) streetwear: body measurements in centimetres for the tees and hoodies, how to measure yourself, and how each fit runs.'
 
 export const metadata: Metadata = {
-  title: 'Size guide — find your fit',
+  title: 'Size guide: find your fit',
   description: DESCRIPTION,
   keywords: [
     'size guide', 'maattabel', 'maattabel t-shirt', 'welke maat t-shirt', 'unisex tee size',
@@ -36,7 +36,7 @@ export const revalidate = 86400
 const MEASURE_STEPS = [
   {
     title: 'Chest',
-    body: 'Measure around the fullest part of your chest, keeping the tape flat and level under your arms. Breathe normally — do not pull it tight.',
+    body: 'Measure around the fullest part of your chest, keeping the tape flat and level under your arms. Breathe normally and do not pull it tight.',
   },
   {
     title: 'Length',
@@ -58,19 +58,19 @@ interface GuideTarget {
 const TARGETS: GuideTarget[] = [
   {
     label: 'Olympian ringer tee',
-    match: (n) => n.includes('olympian') && n.includes('tee') && !n.includes('knitted'),
+    match: (n) => n.startsWith('olympian ') && n.includes('tee') && !n.includes('knitted'),
   },
   {
     label: 'Olympian knitted tee',
-    match: (n) => n.includes('olympian') && n.includes('knitted'),
+    match: (n) => n.startsWith('olympian ') && n.includes('knitted'),
   },
   {
-    label: 'OG tee',
-    match: (n) => !n.includes('olympian') && n.includes('tee') && !n.includes('sport'),
+    label: 'OLYMPN Sport oversized hoodie',
+    match: (n) => n.startsWith('olympn sport ') && n.includes('oversized'),
   },
   {
-    label: 'Sport tee',
-    match: (n) => n.includes('sport') && n.includes('tee'),
+    label: 'OLYMPN Sport relaxed hoodie',
+    match: (n) => n.startsWith('olympn sport ') && n.includes('relaxed'),
   },
 ]
 
@@ -84,7 +84,7 @@ interface ResolvedGuide {
 /** Pull the real Printful size table for one representative product. */
 async function guideFor(
   target: GuideTarget,
-  products: Awaited<ReturnType<typeof getCatalogProducts>>,
+  products: ShopProduct[],
 ): Promise<ResolvedGuide | null> {
   const product = products.find((p) => p.provider === 'printful' && target.match(p.name.toLowerCase()))
   if (!product) return null
@@ -109,11 +109,11 @@ async function guideFor(
 }
 
 export default async function SizeGuidePage() {
-  let products: Awaited<ReturnType<typeof getCatalogProducts>> = []
+  let products: ShopProduct[] = []
   try {
-    products = await getCatalogProducts()
+    products = await getShopProducts()
   } catch {
-    // fall through — page renders without the tables
+    // fall through: page renders without the tables
   }
 
   const resolved = (await Promise.all(TARGETS.map((t) => guideFor(t, products)))).filter(
@@ -136,21 +136,21 @@ export default async function SizeGuidePage() {
   ])
 
   return (
-    <main className={`${styles.page} oly-theme`}>
+    <main className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>
-        <header className={styles.hero}>
+        <header className={styles.hero} data-reveal="hero">
           <p className={styles.eyebrow}>Sizing</p>
           <h1 className={styles.title}>Find your fit</h1>
           <p className={styles.lead}>
             Every piece is made to order, so getting the size right the first time saves everyone a
-            return. These are body measurements in centimetres — the size that matches your body,
+            return. These are body measurements in centimetres: the size that matches your body,
             not the flat width of the garment.
           </p>
         </header>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>How to measure yourself</h2>
           <p className={styles.body}>
             You need a soft tape measure and, ideally, someone to help. Measure over the underwear
@@ -179,7 +179,7 @@ export default async function SizeGuidePage() {
               </p>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
-                  <caption>{g.label} — body measurements ({g.guide.unit})</caption>
+                  <caption>{g.label}: body measurements ({g.guide.unit})</caption>
                   <thead>
                     <tr>
                       <th scope="col">Measurement</th>
@@ -193,7 +193,7 @@ export default async function SizeGuidePage() {
                       <tr key={row.label}>
                         <th scope="row">{row.label}</th>
                         {g.guide.sizes.map((s) => (
-                          <td key={s}>{row.values[s] ?? '—'}</td>
+                          <td key={s}>{row.values[s] || '-'}</td>
                         ))}
                       </tr>
                     ))}
@@ -203,7 +203,7 @@ export default async function SizeGuidePage() {
             </section>
           ))
         ) : (
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.h2}>Size tables</h2>
             <p className={styles.body}>
               The measurement tables are shown on each product page, under &ldquo;Size guide&rdquo;,
@@ -214,16 +214,20 @@ export default async function SizeGuidePage() {
           </section>
         )}
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>How the fits run</h2>
           <p className={styles.body}>
-            The Olympian ringer tee is a heavyweight, garment-dyed blank with a boxy body — it sits
+            The Olympian ringer tee is a heavyweight, garment-dyed blank with a boxy body: it sits
             wide rather than long. If you want the relaxed look it is drawn for, stay at your
             normal size; size up only if you want it clearly oversized.
           </p>
           <p className={styles.body}>
             The knitted tee is the heavier of the two and has less give, so if you are between
-            sizes there, take the larger one. Sport tees run closer to the body by design.
+            sizes there, take the larger one.
+          </p>
+          <p className={styles.body}>
+            The OLYMPN Sport hoodies come in two cuts, oversized and relaxed, each with its own
+            table on its product page. Compare your chest measurement with the table of the cut you want.
           </p>
           <p className={styles.body}>
             Unisex sizing is cut to the men&rsquo;s measurements. If you usually wear a women&rsquo;s
@@ -231,10 +235,10 @@ export default async function SizeGuidePage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Still not sure?</h2>
           <p className={styles.body}>
-            Order the size you think is right — you have{' '}
+            Order the size you think is right: you have{' '}
             <Link href="/returns" className={styles.link}>14 days to return</Link> it if it is not.
             Or just ask: mail{' '}
             <a href="mailto:info@7eno.shop" className={styles.link}>info@7eno.shop</a> with your

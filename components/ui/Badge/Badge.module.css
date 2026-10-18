@@ -1,0 +1,44 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 22px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-1);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+.new {
+  background: var(--c-peach);
+}
+
+.coming {
+  background: var(--c-sage);
+}
+
+/* Rose on its own is too light for small navy text (spec section 2), so the
+   sold-out badge is a white chip with a rose marker plus the text. */
+.sold-out {
+  background: var(--c-surface);
+  border: 1px solid var(--c-rose);
+}
+
+.sold-out::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-rose);
+}
+
+.edition {
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}

@@ -1,0 +1,162 @@
+.bar {
+  position: sticky;
+  top: var(--l-sticky-top);
+  transition: top var(--m-slow) var(--m-ease);
+  z-index: 100;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-stone);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  height: 52px;
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding: var(--s-2) var(--l-gutter);
+}
+
+.filtersButton {
+  min-height: 36px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+  background: transparent;
+  color: var(--c-text);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.groups {
+  display: none;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.groupLabel,
+.sortLabel {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+  color: var(--c-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  text-decoration: none;
+}
+
+/* Periwinkle behind small navy text is below 4.5:1, so the active chip is
+   navy with cream text. */
+.chip[aria-current='true'] {
+  border-color: var(--c-text);
+  background: var(--c-text);
+  color: var(--c-inverse-text);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin-left: auto;
+}
+
+.desktopSort {
+  display: none;
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* Same look as a chip: transparent, 1px border, body text, with the
+   chevron drawn right after the label instead of the browser's wide box. */
+.select {
+  min-height: 32px;
+  padding: 0 calc(var(--s-3) + 18px) 0 var(--s-3);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%232D3A4F' stroke-width='1.5'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E") no-repeat right var(--s-3) center;
+  color: var(--c-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+}
+
+.select:hover {
+  border-color: var(--c-text);
+}
+
+.drawerGroups {
+  display: grid;
+  gap: var(--s-6);
+  margin-bottom: var(--s-6);
+}
+
+.drawerGroups .group {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.showResults {
+  width: 100%;
+}
+
+.filtersButton:focus-visible,
+.chip:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .filtersButton {
+    display: none;
+  }
+
+  .groups {
+    display: flex;
+    gap: var(--s-6);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .group {
+    flex: 0 0 auto;
+  }
+
+  .desktopSort {
+    display: block;
+  }
+}

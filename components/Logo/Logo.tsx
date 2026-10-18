@@ -1,61 +1,77 @@
 import Image from 'next/image'
+import { BEELDMERK, WORDMARK, widthAt, type BrandTone } from '@/lib/brand'
 import styles from './Logo.module.css'
 
-type Variant = 'wit' | 'zwart' | 'butter' | 'ink' | 'blood' | 'stone'
-
-const WORDMARK_ASPECT_RATIO = 3.5
+/** Navy on cream surfaces, cream on navy ones. */
+export type LogoVariant = BrandTone
 
 interface BadgeProps {
-  variant?: Variant
+  variant?: LogoVariant
   size?: number
   priority?: boolean
 }
 
 interface WordmarkProps {
-  variant?: Variant
+  variant?: LogoVariant
   height?: number
   priority?: boolean
   align?: 'left' | 'center'
 }
 
-export function LogoBadge({ variant = 'wit', size = 64, priority = false }: BadgeProps) {
+function eager(priority: boolean) {
+  return priority ? ({ loading: 'eager', fetchPriority: 'high' } as const) : {}
+}
+
+export function LogoBadge({ variant = 'navy', size = 64, priority = false }: BadgeProps) {
+  const mark = BEELDMERK[variant]
   return (
     <div className={styles.wrap} style={{ width: size, height: size }}>
       <Image
-        src={`/logos/beeldmerk-${variant}.png`}
+        src={mark.src}
         alt=""
         width={size}
         height={size}
-        style={{ objectFit: 'contain' }}
-        priority={priority}
+        style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+        {...eager(priority)}
       />
     </div>
   )
 }
 
-export function LogoWordmark({ variant = 'wit', height = 36, priority = false, align = 'left' }: WordmarkProps) {
-  const width = Math.round(height * WORDMARK_ASPECT_RATIO)
-  // Size by width + aspect-ratio with max-width:100% so the wordmark can never
-  // overflow its container: on a narrow cell it shrinks proportionally (height
-  // follows the ratio) instead of spilling over neighbouring layout. This keeps
-  // the logo consistent across all device widths.
+export function LogoWordmark({ variant = 'navy', height = 36, priority = false, align = 'left' }: WordmarkProps) {
+  const mark = WORDMARK[variant]
+  const width = widthAt(mark, height)
+  // Explicit width and height reserve the box before the file loads. The
+  // fixed height with an automatic width keeps the natural ratio; on a narrow
+  // cell max-width caps the box and object-fit keeps the mark undistorted.
   return (
     <div
       className={styles.wrap}
-      style={{ width, maxWidth: '100%', aspectRatio: String(WORDMARK_ASPECT_RATIO) }}
+      style={{
+        maxWidth: '100%',
+        width: align === 'center' ? 'fit-content' : undefined,
+        marginInline: align === 'center' ? 'auto' : undefined,
+      }}
     >
       <Image
-        src={`/logos/woordmerk-${variant}.png`}
+        src={mark.src}
         alt="7ENO"
-        fill
-        sizes={`${width}px`}
-        style={{ objectFit: 'contain', objectPosition: align === 'center' ? 'center' : 'left center' }}
-        priority={priority}
+        width={width}
+        height={height}
+        style={{
+          display: 'block',
+          width: 'auto',
+          height,
+          maxWidth: '100%',
+          objectFit: 'contain',
+          objectPosition: align === 'center' ? 'center' : 'left center',
+        }}
+        {...eager(priority)}
       />
     </div>
   )
 }
 
-export default function Logo({ variant = 'wit', height = 32 }: WordmarkProps) {
+export default function Logo({ variant = 'navy', height = 32 }: WordmarkProps) {
   return <LogoWordmark variant={variant} height={height} />
 }

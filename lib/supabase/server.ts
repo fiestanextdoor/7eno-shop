@@ -19,7 +19,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // Server Component — cookies can only be set in middleware or route handlers
+            // Server Component: cookies can only be set in middleware or route handlers
           }
         },
       },

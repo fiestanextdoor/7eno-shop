@@ -1,0 +1,94 @@
+/* Rounded top corners over whatever is above: the page colour, or a band
+   that tucks itself under the footer (home waitlist). */
+.footer {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--r-ui) var(--r-ui) 0 0;
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+  font-family: var(--f-body);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-7);
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding: var(--s-8) var(--l-gutter) var(--s-7);
+}
+
+.wordmark {
+  display: block;
+  margin: 0;
+}
+
+.tagline {
+  max-width: 32ch;
+  margin: var(--s-3) 0 0;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.colTitle {
+  margin: 0 0 var(--s-4);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.list,
+.legalLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  color: var(--c-inverse-text);
+  font-size: var(--fs-small);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--c-inverse-text);
+  outline-offset: 2px;
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-4);
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding: var(--s-5) var(--l-gutter);
+  border-top: 1px solid var(--c-text-muted);
+}
+
+.legal {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legalLinks {
+  flex-direction: row;
+  gap: var(--s-5);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+  }
+}

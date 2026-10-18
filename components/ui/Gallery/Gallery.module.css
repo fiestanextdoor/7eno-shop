@@ -1,0 +1,118 @@
+.gallery {
+  position: relative;
+}
+
+.placeholder {
+  aspect-ratio: 4 / 5;
+  background: var(--c-surface);
+}
+
+.track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--r-ui);
+  background: var(--c-surface);
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.track:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--c-surface);
+  scroll-snap-align: start;
+  scroll-margin-top: calc(var(--l-chrome) + var(--s-4));
+}
+
+.image {
+  object-fit: contain;
+}
+
+.thumbs {
+  display: none;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  width: 72px;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--c-stone);
+  border-radius: calc(var(--r-ui) / 2);
+  background: var(--c-surface);
+  cursor: pointer;
+}
+
+.thumb[aria-current='true'] {
+  border-color: var(--c-text);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.thumbImage {
+  object-fit: contain;
+}
+
+.counter {
+  position: absolute;
+  right: var(--l-gutter);
+  bottom: var(--s-3);
+  margin: 0;
+  padding: var(--s-1) var(--s-2);
+  background: var(--c-surface);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 1024px) {
+  .gallery {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: start;
+  }
+
+  .thumbs {
+    position: sticky;
+    top: calc(var(--l-sticky-top) + var(--s-5));
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .track {
+    grid-column: 2;
+    flex-direction: column;
+    gap: var(--l-grid-gap);
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .counter {
+    display: none;
+  }
+}

@@ -52,8 +52,9 @@ function LoginForm() {
         <div className={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleLogin} className={styles.form}>
-          <label className={styles.fieldLabel}>Email address</label>
+          <label htmlFor="login-email" className={styles.fieldLabel}>Email address</label>
           <input
+            id="login-email"
             type="email"
             className={styles.input}
             value={email}
@@ -63,8 +64,9 @@ function LoginForm() {
             placeholder="you@example.com"
           />
 
-          <label className={styles.fieldLabel}>Password</label>
+          <label htmlFor="login-password" className={styles.fieldLabel}>Password</label>
           <input
+            id="login-password"
             type="password"
             className={styles.input}
             value={password}

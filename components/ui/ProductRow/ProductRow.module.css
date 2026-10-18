@@ -1,0 +1,124 @@
+.row {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding-top: var(--s-8);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  padding: 0 var(--l-gutter) var(--s-4);
+}
+
+.label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-display-italic);
+  font-size: var(--fs-h2);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* Right after the title, so the arrows read as part of the heading. */
+.arrows {
+  display: flex;
+  gap: var(--s-2);
+  margin-left: var(--s-2);
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+  background: transparent;
+  color: var(--c-text);
+  cursor: pointer;
+  transition:
+    background-color var(--m-base) var(--m-ease),
+    color var(--m-base) var(--m-ease),
+    border-color var(--m-base) var(--m-ease);
+}
+
+.arrow:hover:not(:disabled) {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-inverse-text);
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.link {
+  margin-left: auto;
+  font-family: var(--f-body);
+  font-size: var(--fs-small);
+  color: var(--c-accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.arrow:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - var(--l-grid-gap)) / 2);
+  gap: var(--l-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.cell {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.lineupItem {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--r-ui);
+  background: var(--c-surface);
+}
+
+.lineupImage {
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .track {
+    grid-auto-columns: calc((100% - 3 * var(--l-grid-gap)) / 4);
+  }
+}

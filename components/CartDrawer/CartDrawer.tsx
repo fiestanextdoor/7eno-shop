@@ -1,36 +1,64 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { useCartStore } from '@/store/cart'
+import { buttonClasses } from '@/components/ui/Button/Button'
+import Drawer from '@/components/ui/Drawer/Drawer'
+import { useCartTotals } from '@/hooks/useCartTotals'
 import { cartItemKey } from '@/lib/cart-key'
-import { productSlug } from '@/lib/slug'
-import { getBundle } from '@/lib/bundles'
-import { resolveBundleDiscountCents } from '@/lib/bundle-discount'
+import { formatEuro } from '@/lib/money'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping'
+import { useCartStore } from '@/store/cart'
 import type { CartItem } from '@/types/cart'
+import CartLine from './CartLine'
 import styles from './CartDrawer.module.css'
 
+/** Top of the drawer: how far the order is from free shipping (threshold in lib/shipping). */
+function FreeShippingProgress({ total }: { total: number }) {
+  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total)
+  const percent = Math.min(100, Math.round((total / FREE_SHIPPING_THRESHOLD) * 100))
+  const unlocked = remaining === 0
+  return (
+    <div className={styles.progress} data-unlocked={unlocked ? 'true' : 'false'}>
+      <p className={styles.progressText} aria-live="polite">
+        {unlocked ? (
+          <>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7.5l3.2 3L12 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" />
+            </svg>
+            Free shipping unlocked.
+          </>
+        ) : (
+          <>
+            <strong className={styles.amount}>{formatEuro(remaining)}</strong> away from free shipping.
+          </>
+        )}
+      </p>
+      <div
+        className={styles.track}
+        role="progressbar"
+        aria-label="Progress to free shipping"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+      >
+        <span className={styles.fill} style={{ transform: `scaleX(${percent / 100})` }} />
+      </div>
+    </div>
+  )
+}
+
+/** The cart: a right-hand Drawer (focus trap, Esc) over the store; logic unchanged. */
 export default function CartDrawer() {
   const isOpen = useCartStore((s) => s.isCartOpen)
   const closeCart = useCartStore((s) => s.closeCart)
   const items = useCartStore((s) => s.items)
   const removeItem = useCartStore((s) => s.removeItem)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
-  const total = useCartStore((s) => s.total())
 
-  // Client-side display of the bundle discount. The checkout API re-validates
-  // this authoritatively; here it only keeps the shown total honest.
-  const subtotalCents = Math.round(total * 100)
-  const discountCents = resolveBundleDiscountCents(
-    items.filter((i) => i.bundleId).map((i) => ({ bundleId: i.bundleId!, productId: i.productId, resolved: true })),
-    subtotalCents,
-    getBundle,
-  )
-  const currency = items[0]?.currency ?? 'EUR'
-  const discountedTotal = (subtotalCents - discountCents) / 100
+  // Display only: the checkout API recomputes the bundle discount and totals.
+  const { bundleDiscountCents, discountedTotal } = useCartTotals()
 
-  // Group set items together; standalone items keep their order after the sets.
+  // Set items grouped together; standalone items after the sets.
   const bundleGroups = new Map<string, CartItem[]>()
   const standalone: CartItem[] = []
   for (const item of items) {
@@ -43,104 +71,62 @@ export default function CartDrawer() {
     }
   }
 
-  const renderItem = (item: CartItem) => {
-    // Link each line back to its product page. The slug is derived from the
-    // product name the same way the catalog builds it, so no slug needs storing
-    // on the cart item itself.
-    const href = `/shop/${productSlug(item.productName)}`
+  const renderLine = (item: CartItem) => {
+    const key = cartItemKey(item.provider, item.variantId, item.bundleId, item.productId)
     return (
-    <li key={cartItemKey(item.provider, item.variantId, item.bundleId, item.productId)} className={styles.item}>
-      {item.imageUrl ? (
-        <Link href={href} className={styles.thumb} onClick={closeCart} aria-label={item.productName}>
-          <Image src={item.imageUrl} alt={item.productName} fill style={{ objectFit: 'cover' }} />
-        </Link>
-      ) : (
-        <Link href={href} className={styles.thumbPlaceholder} onClick={closeCart} aria-label={item.productName} />
-      )}
-      <div className={styles.itemInfo}>
-        <Link href={href} className={styles.itemName} onClick={closeCart}>{item.productName}</Link>
-        <div className={styles.itemVariant}>{item.variantName}</div>
-        <div className={styles.itemPrice}>
-          {item.currency} {(parseFloat(item.price) * item.quantity).toFixed(2)}
-        </div>
-        <div className={styles.qtyRow}>
-          <button className={styles.qtyBtn} onClick={() => updateQuantity(cartItemKey(item.provider, item.variantId, item.bundleId, item.productId), item.quantity - 1)}>−</button>
-          <span className={styles.qty}>{item.quantity}</span>
-          <button className={styles.qtyBtn} onClick={() => updateQuantity(cartItemKey(item.provider, item.variantId, item.bundleId, item.productId), item.quantity + 1)}>+</button>
-        </div>
-      </div>
-      <button className={styles.removeBtn} onClick={() => removeItem(cartItemKey(item.provider, item.variantId, item.bundleId, item.productId))} aria-label="Remove item">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M2 4h12M5 4V2.5A.5.5 0 015.5 2h5a.5.5 0 01.5.5V4M6 7v5M10 7v5M3 4l.8 9.2A.8.8 0 003.8 14h8.4a.8.8 0 00.8-.8L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-    </li>
+      <CartLine
+        key={key}
+        item={item}
+        onQuantity={(quantity) => updateQuantity(key, quantity)}
+        onRemove={() => removeItem(key)}
+        onNavigate={closeCart}
+      />
     )
   }
 
-  return (
-    <>
-      <div
-        className={isOpen ? styles.overlayVisible : styles.overlayHidden}
-        onClick={closeCart}
-        onKeyDown={(e) => e.key === 'Escape' && closeCart()}
-        role="button"
-        tabIndex={0}
-        aria-label="Close cart"
-      />
-      <aside
-        className={isOpen ? styles.drawerOpen : styles.drawerClosed}
-        aria-label="Shopping cart"
-        aria-hidden={!isOpen}
-      >
-        <div className={styles.header}>
-          <h2 className={styles.title}>Cart</h2>
-          <button className={styles.closeBtn} onClick={closeCart} aria-label="Close cart">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        {items.length === 0 ? (
-          <p className={styles.empty}>Your cart is empty.</p>
-        ) : (
-          <>
-            {/* data-lenis-prevent: let this list scroll natively instead of the
-                global Lenis smooth-scroll hijacking the wheel to the page. */}
-            <ul className={styles.items} data-lenis-prevent>
-              {[...bundleGroups.entries()].map(([bundleId, group]) => (
-                <li key={`group-${bundleId}`} className={styles.group}>
-                  <span className={styles.groupTitle}>{group[0].bundleTitle ?? 'Set'}</span>
-                  <ul className={styles.groupItems}>{group.map(renderItem)}</ul>
-                </li>
-              ))}
-              {standalone.map(renderItem)}
-            </ul>
-            <div className={styles.footer}>
-              {discountCents > 0 && (
-                <div className={styles.discountRow}>
-                  <span>Combi-deal discount</span>
-                  <span>− {currency} {(discountCents / 100).toFixed(2)}</span>
-                </div>
-              )}
-              <p className={styles.shippingNote}>
-                {discountedTotal >= FREE_SHIPPING_THRESHOLD
-                  ? '✓ Your order ships free.'
-                  : `Free shipping on orders over €${FREE_SHIPPING_THRESHOLD.toFixed(0)} (add €${(FREE_SHIPPING_THRESHOLD - discountedTotal).toFixed(2)}).`}
-              </p>
-              <div className={styles.total}>
-                <span>Total</span>
-                <span>{currency} {discountedTotal.toFixed(2)}</span>
-              </div>
-              <a href="/checkout" className={styles.checkoutBtn} onClick={closeCart}>
-                Checkout
-              </a>
-            </div>
-          </>
+  const footer =
+    items.length > 0 ? (
+      <div className={styles.footer}>
+        {bundleDiscountCents > 0 && (
+          <p className={styles.row}>
+            <span>Combi-deal discount</span>
+            <span className={styles.amount}>-{formatEuro(bundleDiscountCents / 100)}</span>
+          </p>
         )}
-      </aside>
-    </>
+        <p className={styles.row}>
+          <span>Subtotal</span>
+          <span className={styles.amount}>{formatEuro(discountedTotal)}</span>
+        </p>
+        <p className={styles.note}>Taxes included. Shipping is calculated at checkout.</p>
+        <a href="/checkout" className={`${buttonClasses('primary', 'lg')} ${styles.checkout}`} onClick={closeCart}>
+          Checkout
+        </a>
+      </div>
+    ) : undefined
+
+  return (
+    <Drawer open={isOpen} onClose={closeCart} side="right" title="Cart" closeLabel="Close cart" footer={footer}>
+      {items.length === 0 ? (
+        <div className={styles.empty}>
+          <p className={styles.emptyText}>Your cart is empty.</p>
+          <Link href="/shop" className={buttonClasses('ghost')} onClick={closeCart}>
+            Shop the drops
+          </Link>
+        </div>
+      ) : (
+        <>
+          <FreeShippingProgress total={discountedTotal} />
+          <ul className={styles.lines}>
+          {[...bundleGroups.entries()].map(([bundleId, group]) => (
+            <li key={`group-${bundleId}`} className={styles.group}>
+              <span className={styles.groupTitle}>{group[0].bundleTitle ?? 'Set'}</span>
+              <ul className={styles.lines}>{group.map(renderLine)}</ul>
+            </li>
+          ))}
+          {standalone.map(renderLine)}
+          </ul>
+        </>
+      )}
+    </Drawer>
   )
 }

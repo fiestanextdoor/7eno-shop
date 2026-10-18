@@ -1,0 +1,127 @@
+.panel {
+  display: grid;
+  gap: var(--s-5);
+  color: var(--c-text);
+}
+
+.edition {
+  justify-self: start;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-accent-ink);
+  text-decoration: none;
+}
+
+.edition:hover {
+  text-decoration: underline;
+}
+
+.edition:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: var(--fs-h2);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.price {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.tax {
+  margin-left: var(--s-1);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.guideRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fit {
+  display: flex;
+  gap: var(--s-3);
+  align-items: baseline;
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+.fitLabel {
+  flex: none;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.fitText {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-2);
+}
+
+.nudge {
+  margin: calc(-1 * var(--s-3)) 0 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--c-text-muted);
+}
+
+.cta {
+  width: 100%;
+}
+
+.notify,
+.teaser {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-5);
+  border: 1px solid var(--c-stone);
+  background: var(--c-surface);
+}
+
+.notify:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.notifyText,
+.teaserDate {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.infoList {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding-left: var(--s-5);
+}

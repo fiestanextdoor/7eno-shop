@@ -32,7 +32,7 @@ function loadEnvLocal() {
       if (!(key in process.env) || process.env[key] === '') process.env[key] = value
     }
   } catch {
-    // no .env.local — rely on real environment variables
+    // no .env.local: rely on real environment variables
   }
 }
 
