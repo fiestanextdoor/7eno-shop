@@ -63,5 +63,7 @@ describe('ProductTile', () => {
     expect(button.closest('a')).toBeNull()
     fireEvent.click(button)
     expect(onQuickAdd).toHaveBeenCalled()
+    rerender(<ProductTile product={{ ...tile, quick: { ...quick, soldOut: true } }} onQuickAdd={onQuickAdd} />)
+    expect(screen.queryByRole('button')).toBeNull()
   })
 })

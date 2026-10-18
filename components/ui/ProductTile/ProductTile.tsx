@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge/Badge'
-import { buttonClasses } from '@/components/ui/Button/Button'
 import type { TileProduct } from '@/lib/tiles'
 import styles from './ProductTile.module.css'
 
@@ -50,18 +49,21 @@ export default function ProductTile({ product, eager = false, headingLevel = 'h3
           {product.note && <p className={styles.note}>{product.note}</p>}
         </div>
       </Link>
-      {onQuickAdd && product.quick && (
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={`${buttonClasses('ghost')} ${styles.quick}`}
-            onClick={onQuickAdd}
-            aria-haspopup="dialog"
-            aria-label={`Add ${product.name} to cart`}
-          >
-            {product.quick.soldOut ? 'Sold out' : 'Add to cart'}
-          </button>
-        </div>
+      {onQuickAdd && product.quick && !product.quick.soldOut && (
+        <button
+          type="button"
+          className={styles.quick}
+          onClick={onQuickAdd}
+          aria-haspopup="dialog"
+          aria-label={`Add ${product.name} to cart`}
+          title="Add to cart"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <path d="M3 6h18" />
+            <path d="M12 10v8M8 14h8" />
+          </svg>
+        </button>
       )}
     </article>
   )

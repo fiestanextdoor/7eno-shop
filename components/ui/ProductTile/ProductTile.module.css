@@ -1,4 +1,5 @@
 .tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -52,21 +53,44 @@
   gap: var(--s-1);
 }
 
+/* Right padding keeps the name clear of the quick-add square. */
 .info {
   display: grid;
   gap: var(--s-1);
-  padding: var(--s-3) var(--s-3) var(--s-4);
+  padding: var(--s-3) calc(var(--s-3) + 48px) var(--s-4) var(--s-3);
 }
 
-/* Outside the link: a button inside an anchor is not allowed. */
-.actions {
-  padding: 0 var(--s-3) var(--s-4);
-}
-
+/* Quick add: a square on the name line, bottom right, outside the link
+   (a button inside an anchor is not allowed). */
 .quick {
-  width: 100%;
-  min-height: 40px;
-  font-size: var(--fs-label);
+  position: absolute;
+  right: var(--s-3);
+  bottom: var(--s-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: calc(var(--r-ui) / 2);
+  background: transparent;
+  color: var(--c-text);
+  cursor: pointer;
+  transition:
+    background-color var(--m-base) var(--m-ease),
+    color var(--m-base) var(--m-ease),
+    border-color var(--m-base) var(--m-ease);
+}
+
+.quick:hover {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-inverse-text);
+}
+
+.quick:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
 }
 
 .name {
