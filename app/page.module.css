@@ -77,7 +77,8 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--l-grid-gap);
-  margin: 0;
+  /* Breathing room before the sage band below. */
+  margin: 0 0 var(--s-9);
   padding: 0;
   list-style: none;
 }
@@ -128,8 +129,12 @@
 }
 
 /* Waitlist strip */
+/* Bands open with rounded top corners over the page colour, like the tiles.
+   This one runs on under the footer, so its corners sit on sage, not cream. */
 .waitlist {
-  padding: var(--s-9) var(--l-gutter);
+  margin-bottom: calc(var(--r-ui) * -1);
+  padding: var(--s-9) var(--l-gutter) calc(var(--s-9) + var(--r-ui));
+  border-radius: var(--r-ui) var(--r-ui) 0 0;
   background: var(--c-sage);
   color: var(--c-text);
 }

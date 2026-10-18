@@ -1,6 +1,7 @@
 .band {
   margin-top: var(--s-9);
   padding: var(--s-9) var(--l-gutter);
+  border-radius: var(--r-ui) var(--r-ui) 0 0;
   background: var(--c-inverse-bg);
   color: var(--c-inverse-text);
 }

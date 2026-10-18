@@ -1,4 +1,9 @@
+/* Rounded top corners over whatever is above: the page colour, or a band
+   that tucks itself under the footer (home waitlist). */
 .footer {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--r-ui) var(--r-ui) 0 0;
   background: var(--c-inverse-bg);
   color: var(--c-inverse-text);
   font-family: var(--f-body);

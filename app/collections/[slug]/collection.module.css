@@ -1,6 +1,8 @@
 .page {
   min-height: 100vh;
   padding-top: var(--l-chrome);
+  /* Room between the last tiles and the rounded footer. */
+  padding-bottom: calc(var(--s-9) + var(--r-ui));
   background: var(--c-bg);
   color: var(--c-text);
 }
