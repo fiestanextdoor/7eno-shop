@@ -24,7 +24,8 @@
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--r-ui);
+  /* Hard edges on purpose: the hero photo bleeds to the page edge (Joep, 18-10). */
+  border-radius: 0;
   background: var(--c-accent);
 }
 
