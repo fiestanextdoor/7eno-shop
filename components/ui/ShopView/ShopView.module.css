@@ -1,4 +1,4 @@
-/* The stone background shows through the 2px gaps as hairlines between tiles. */
+/* Rounded tiles on the page background, separated by the grid gap. */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6,7 +6,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--c-stone);
 }
 
 .cell {

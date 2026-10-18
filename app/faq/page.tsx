@@ -144,7 +144,7 @@ export default function FaqPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>
-        <header className={styles.hero}>
+        <header className={styles.hero} data-reveal="hero">
           <p className={styles.eyebrow}>Help</p>
           <h1 className={styles.title}>Questions, answered</h1>
           <p className={styles.lead}>
@@ -178,7 +178,7 @@ export default function FaqPage() {
           </section>
         ))}
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Ready when you are</h2>
           <div className={styles.ctaRow}>
             <Link href="/shop" className={styles.cta}>Shop the collection</Link>

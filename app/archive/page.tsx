@@ -28,11 +28,11 @@ export default async function ArchivePage() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={styles.header} data-reveal="hero">
         <p className={styles.label}>Archive</p>
         <h1 className={styles.title}>Every edition</h1>
       </header>
-      <ol className={styles.list}>
+      <ol className={styles.list} data-reveal="stagger">
         {editions.map((drop) => (
           <li key={drop.id}>
             <EditionCard drop={drop} />

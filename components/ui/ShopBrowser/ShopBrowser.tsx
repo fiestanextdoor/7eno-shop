@@ -48,7 +48,7 @@ export default function ShopBrowser({ tiles, drops }: ShopBrowserProps) {
 
   return (
     <>
-      <header className={styles.header}>
+      <header className={styles.header} data-reveal="hero">
         <p className={styles.label}>Shop</p>
         <h1 className={styles.title}>{title}</h1>
       </header>

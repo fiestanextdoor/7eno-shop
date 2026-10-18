@@ -140,7 +140,7 @@ export default async function SizeGuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>
-        <header className={styles.hero}>
+        <header className={styles.hero} data-reveal="hero">
           <p className={styles.eyebrow}>Sizing</p>
           <h1 className={styles.title}>Find your fit</h1>
           <p className={styles.lead}>
@@ -150,7 +150,7 @@ export default async function SizeGuidePage() {
           </p>
         </header>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>How to measure yourself</h2>
           <p className={styles.body}>
             You need a soft tape measure and, ideally, someone to help. Measure over the underwear
@@ -203,7 +203,7 @@ export default async function SizeGuidePage() {
             </section>
           ))
         ) : (
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.h2}>Size tables</h2>
             <p className={styles.body}>
               The measurement tables are shown on each product page, under &ldquo;Size guide&rdquo;,
@@ -214,7 +214,7 @@ export default async function SizeGuidePage() {
           </section>
         )}
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>How the fits run</h2>
           <p className={styles.body}>
             The Olympian ringer tee is a heavyweight, garment-dyed blank with a boxy body: it sits
@@ -235,7 +235,7 @@ export default async function SizeGuidePage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Still not sure?</h2>
           <p className={styles.body}>
             Order the size you think is right: you have{' '}

@@ -35,11 +35,13 @@
 
 .root[data-side='left'] .panel {
   left: 0;
+  border-radius: 0 var(--r-ui) var(--r-ui) 0;
   transform: translateX(-100%);
 }
 
 .root[data-side='right'] .panel {
   right: 0;
+  border-radius: var(--r-ui) 0 0 var(--r-ui);
   transform: translateX(100%);
 }
 

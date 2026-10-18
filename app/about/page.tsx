@@ -48,7 +48,7 @@ export default function AboutPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>
-        <header className={styles.hero}>
+        <header className={styles.hero} data-reveal="hero">
           <p className={styles.eyebrow}>The brand</p>
           <h1 className={styles.title}>7ENO is said &ldquo;Zeno&rdquo;</h1>
           <p className={styles.lead}>
@@ -62,7 +62,7 @@ export default function AboutPage() {
           </div>
         </header>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Who is behind it</h2>
           <p className={styles.body}>
             7ENO is the clothing label of {BRAND.parent}, based in Eindhoven. It started from the
@@ -77,7 +77,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Numbered editions</h2>
           <p className={styles.body}>
             7ENO releases in editions. Each one has a number, a release window and its own look,
@@ -93,7 +93,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Nothing is made before you order it</h2>
           <p className={styles.body}>
             Every piece is produced on demand and shipped from within the EU. That is a deliberate
@@ -107,7 +107,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Where to find us</h2>
           <div className={styles.facts}>
             <div className={styles.fact}>
@@ -130,7 +130,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Keep reading</h2>
           <div className={styles.related}>
             <Link href="/archive" className={styles.relatedCard}>

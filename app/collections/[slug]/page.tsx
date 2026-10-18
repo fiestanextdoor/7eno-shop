@@ -74,7 +74,7 @@ export default async function CollectionPage({ params }: Props) {
         <ShopView filters={[]} sort="featured" sortOptions={[]} tiles={tiles} />
       ) : (
         <section className={styles.lineup} aria-label={`${drop.title} line-up`}>
-          <ul className={styles.lineupGrid}>
+          <ul className={styles.lineupGrid} data-reveal="stagger">
             {drop.hero.lineup.map((src, i) => (
               <li key={src} className={styles.lineupItem}>
                 <Image

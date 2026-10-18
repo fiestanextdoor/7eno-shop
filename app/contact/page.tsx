@@ -41,7 +41,7 @@ export default function ContactPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
 
       <div className={styles.inner}>
-        <header className={styles.hero}>
+        <header className={styles.hero} data-reveal="hero">
           <p className={styles.eyebrow}>Get in touch</p>
           <h1 className={styles.title}>Contact</h1>
           <p className={styles.lead}>
@@ -54,7 +54,7 @@ export default function ContactPage() {
           </div>
         </header>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>About an order</h2>
           <p className={styles.body}>
             Mention your order number (it is in the confirmation email) so we can look it up
@@ -68,7 +68,7 @@ export default function ContactPage() {
           </p>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Details</h2>
           <div className={styles.facts}>
             <div className={styles.fact}>
@@ -91,7 +91,7 @@ export default function ContactPage() {
           </div>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.section} data-reveal="up">
           <h2 className={styles.h2}>Keep reading</h2>
           <div className={styles.related}>
             <Link href="/faq" className={styles.relatedCard}>

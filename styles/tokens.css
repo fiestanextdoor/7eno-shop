@@ -55,13 +55,14 @@
   --s-9: 96px;
   --s-10: 128px;
 
-  /* Radius */
-  --r-0: 0;
-  --r-1: 2px;
+  /* Radius: one knob. Set --r-ui to 0 to go back to hard edges everywhere. */
+  --r-ui: 25px;
+  --r-0: var(--r-ui);
+  --r-1: var(--r-ui);
 
   /* Layout */
   --l-gutter: 16px;
-  --l-grid-gap: 2px;
+  --l-grid-gap: 8px;
   --l-max: 1600px;
   --l-text-max: 68ch;
   --l-nav: 56px;

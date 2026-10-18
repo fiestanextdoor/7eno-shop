@@ -40,7 +40,7 @@ export default function ShopView({
           )}
         </div>
       ) : (
-        <ul className={styles.grid}>
+        <ul className={styles.grid} data-reveal="stagger">
           {tiles.map((tile, i) => (
             <li key={tile.slug} className={styles.cell}>
               <ProductTile product={tile} eager={i < DESKTOP_COLUMNS} headingLevel="h2" />

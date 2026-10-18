@@ -64,7 +64,7 @@ export default function ProductView({
         <div className={styles.media}>
           <Gallery key={purchase.selectedColour} images={images} label={product.name} />
         </div>
-        <div className={styles.buy}>
+        <div className={styles.buy} data-reveal="hero">
           <BuyPanel
             product={product}
             drop={drop}

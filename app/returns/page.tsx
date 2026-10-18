@@ -41,7 +41,7 @@ export default function ReturnsPage() {
             14 days of delivery, without giving a reason. Here is how it works.
           </p>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>How to return in 3 steps</h2>
             <ol className={styles.steps}>
               {STEPS.map((step, i) => (
@@ -56,7 +56,7 @@ export default function ReturnsPage() {
             </ol>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>What can I return?</h2>
             <p>
               Standard print-on-demand items without personalisation can be returned within the 14-day
@@ -68,7 +68,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Defective or incorrect items</h2>
             <p>
               Received something damaged, faulty, or different from what you ordered? Contact us within 30
@@ -78,7 +78,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Return shipping costs</h2>
             <p>
               Return shipping is at your own expense, unless the product is defective or we sent the wrong
@@ -86,7 +86,7 @@ export default function ReturnsPage() {
             </p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.section} data-reveal="up">
             <h2 className={styles.heading}>Refunds</h2>
             <p>
               Refunds are issued to your original payment method within 14 days after we receive and

@@ -93,10 +93,10 @@ export default async function HomePage() {
     <main className={styles.page}>
       {nextView && (
         <div className={styles.hero} data-tone={nextView.tone}>
-          <div className={styles.heroCopy}>
+          <div className={styles.heroCopy} data-reveal="hero">
             <DropBlock drop={nextView} now={now} as="h1" withIntro />
           </div>
-          <div className={styles.heroMedia}>
+          <div className={styles.heroMedia} data-reveal="media">
             <Image
               src={nextView.hero.image}
               alt={nextView.hero.alt}
@@ -112,12 +112,12 @@ export default async function HomePage() {
 
       {rows.map(({ view, tiles }, rowIndex) => (
         <section key={view.id} className={styles.row} aria-labelledby={`row-${view.id}`}>
-          <div className={styles.rowHead}>
+          <div className={styles.rowHead} data-reveal="up">
             <p className={styles.rowLabel}>{view.editionLabel}</p>
             <h2 id={`row-${view.id}`} className={styles.rowTitle}>{view.title}</h2>
             <Link href={view.href} className={styles.rowLink}>View the collection</Link>
           </div>
-          <ul className={styles.rowGrid}>
+          <ul className={styles.rowGrid} data-reveal="stagger">
             {tiles.length > 0
               ? tiles.map((tile) => (
                   <li key={tile.slug}>
@@ -143,7 +143,7 @@ export default async function HomePage() {
       {olympian && olympianView && (
         <section className={styles.olyBand} aria-labelledby="olympian-band-title">
           <div className={styles.olyLead}>
-            <div className={styles.olyPoster}>
+            <div className={styles.olyPoster} data-reveal="media">
               <Image
                 src={olympian.hero.poster ?? olympian.hero.image}
                 alt="Olympian campaign still"
@@ -152,14 +152,14 @@ export default async function HomePage() {
                 className={styles.cover}
               />
             </div>
-            <div className={styles.olyText}>
+            <div className={styles.olyText} data-reveal="up">
               <p className={styles.rowLabel}>{olympianView.editionLabel}</p>
               <h2 id="olympian-band-title" className={styles.bandTitle}>Olympian in four colours</h2>
               <p className={styles.bandText}>{olympianView.intro}</p>
               <Link href={olympianView.href} className={styles.rowLink}>Shop Olympian</Link>
             </div>
           </div>
-          <ul className={styles.olyModels}>
+          <ul className={styles.olyModels} data-reveal="stagger">
             {OLYMPIAN_MODELS.map((model) => (
               <li key={model.src} className={styles.olyModel}>
                 <Image
@@ -178,7 +178,7 @@ export default async function HomePage() {
       {sportView && (
         <section className={styles.sportBand} data-band="sport" aria-labelledby="sport-band-title">
           <div className={styles.sportInner}>
-            <div className={styles.sportHead}>
+            <div className={styles.sportHead} data-reveal="up">
               <h2 id="sport-band-title" className={styles.sportTitle}>
                 <Image
                   src={OLYMPN_SPORT_WORDMARK.src}
@@ -192,7 +192,7 @@ export default async function HomePage() {
               <p className={styles.sportMeta}>{statusLine(sportView)}</p>
               <Link href={sportView.href} className={buttonClasses('accent', 'lg')}>Explore OLYMPN Sport</Link>
             </div>
-            <ul className={styles.sportMedia} style={{ '--tiles': sportTiles } as CSSProperties}>
+            <ul className={styles.sportMedia} data-reveal="stagger" style={{ '--tiles': sportTiles } as CSSProperties}>
               {sportView.status === 'upcoming' && (
                 <li className={styles.sportTile} data-teaser="true">
                   <Image
@@ -215,7 +215,7 @@ export default async function HomePage() {
       )}
 
       <section className={styles.waitlist} aria-labelledby="waitlist-title">
-        <div className={styles.waitlistInner}>
+        <div className={styles.waitlistInner} data-reveal="up">
           <p className={styles.waitlistLabel}>Drop alerts</p>
           <h2 id="waitlist-title" className={styles.bandTitle}>Never miss an edition</h2>
           <p className={styles.bandText}>One email when a new edition opens. No newsletter, no spam.</p>

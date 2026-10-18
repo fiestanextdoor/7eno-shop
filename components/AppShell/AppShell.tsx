@@ -11,6 +11,7 @@ import SiteHeader from '@/components/ui/SiteHeader/SiteHeader'
 import MobileNav from '@/components/ui/MobileNav/MobileNav'
 import SiteFooter from '@/components/ui/SiteFooter/SiteFooter'
 import { ANNOUNCEMENTS, MAIN_NAV } from '@/lib/nav'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { useCartStore } from '@/store/cart'
 import styles from './AppShell.module.css'
 
@@ -66,6 +67,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const menuOpen = menuOpenAt !== null
   const mounted = useMounted()
   const announceHidden = useAnnounceHidden()
+  useScrollReveal(pathname)
   const storeCount = useCartStore((s) => s.itemCount())
   const cartCount = mounted ? storeCount : 0
   const openCart = useCartStore((s) => s.openCart)

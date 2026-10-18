@@ -31,6 +31,8 @@
   position: relative;
   flex: 0 0 100%;
   aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-surface);
   scroll-snap-align: start;
   scroll-margin-top: calc(var(--l-chrome) + var(--s-4));
@@ -50,8 +52,9 @@
   width: 72px;
   aspect-ratio: 4 / 5;
   padding: 0;
+  overflow: hidden;
   border: 1px solid var(--c-stone);
-  border-radius: var(--r-0);
+  border-radius: calc(var(--r-ui) / 2);
   background: var(--c-surface);
   cursor: pointer;
 }

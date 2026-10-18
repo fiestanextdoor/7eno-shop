@@ -23,6 +23,8 @@
 .heroMedia {
   position: relative;
   aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-accent);
 }
 
@@ -93,12 +95,13 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--c-stone);
 }
 
 .lineupItem {
   position: relative;
   aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-surface);
 }
 
@@ -127,6 +130,8 @@
 .olyPoster {
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-stone);
 }
 
@@ -145,6 +150,8 @@
 .olyModel {
   position: relative;
   aspect-ratio: 939 / 1400;
+  overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-surface);
 }
 
@@ -207,6 +214,7 @@
   position: relative;
   aspect-ratio: 9 / 16;
   overflow: hidden;
+  border-radius: var(--r-ui);
   background: var(--c-inverse-bg);
 }
 
