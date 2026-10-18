@@ -11,16 +11,16 @@ function tile(n: number): TileProduct {
 
 describe('ProductRow', () => {
   it('shows every tile of the collection, and arrows only when there is more than one page', () => {
-    const { rerender } = render(<ProductRow tiles={[1, 2, 3, 4].map(tile)} labelledBy="row-x" />)
+    const { rerender } = render(<ProductRow tiles={[1, 2, 3, 4].map(tile)} id="row-x" label="Edition 01" title="Olympian" href="/collections/olympian" />)
     expect(screen.getAllByRole('listitem')).toHaveLength(4)
     expect(screen.queryByRole('button', { name: 'Next products' })).toBeNull()
-    rerender(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map(tile)} labelledBy="row-x" />)
+    rerender(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map(tile)} id="row-x" label="Edition 01" title="Olympian" href="/collections/olympian" />)
     expect(screen.getAllByRole('listitem')).toHaveLength(6)
     expect(screen.getByRole('button', { name: 'Next products' })).toBeInTheDocument()
   })
 
   it('pages the track by its own width and disables the arrow at the start', () => {
-    render(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map(tile)} labelledBy="row-x" />)
+    render(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map(tile)} id="row-x" label="Edition 01" title="Olympian" href="/collections/olympian" />)
     const track = screen.getByRole('list')
     const scrollBy = jest.fn()
     // jsdom has no layout: give the track two pages and tell it to re-measure.
@@ -34,8 +34,17 @@ describe('ProductRow', () => {
     expect(scrollBy).toHaveBeenCalledWith({ left: 800, behavior: 'smooth' })
   })
 
+  it('shows the line-up with arrows when there are no products yet', () => {
+    const lineup = [1, 2, 3, 4, 5, 6].map((n) => ({ src: `/drops/olympn-sport/${n}.webp`, alt: `Piece ${n}` }))
+    render(<ProductRow tiles={[]} lineup={lineup} id="row-x" label="Edition 02" title="OLYMPN Sport" href="/collections/olympn-sport" />)
+    expect(screen.getAllByRole('img')).toHaveLength(6)
+    expect(screen.getByRole('button', { name: 'Next products' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'OLYMPN Sport' })).toHaveAttribute('id', 'row-x')
+    expect(screen.getByRole('link', { name: 'View the collection' })).toHaveAttribute('href', '/collections/olympn-sport')
+  })
+
   it('loads only the first visible tiles eagerly', () => {
-    render(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map((n) => ({ ...tile(n), image: '/drops/olympn-sport/mocha.webp' }))} labelledBy="row-x" eager />)
+    render(<ProductRow tiles={[1, 2, 3, 4, 5, 6].map((n) => ({ ...tile(n), image: '/drops/olympn-sport/mocha.webp' }))} id="row-x" label="Edition 01" title="Olympian" href="/collections/olympian" eager />)
     const images = screen.getAllByRole('img')
     expect(images.slice(0, 4).every((img) => img.getAttribute('loading') === 'eager')).toBe(true)
     expect(images[4]).toHaveAttribute('loading', 'lazy')

@@ -35,21 +35,6 @@
 }
 
 /* Drop rows */
-.row {
-  max-width: var(--l-max);
-  margin: 0 auto;
-  padding-top: var(--s-8);
-}
-
-.rowHead {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--s-2) var(--s-4);
-  /* Right padding leaves room for the ProductRow arrows (2 x 36px + gap). */
-  padding: 0 calc(var(--l-gutter) + 88px) var(--s-4) var(--l-gutter);
-}
-
 .rowLabel {
   margin: 0;
   font-family: var(--f-mono);
@@ -59,7 +44,6 @@
   color: var(--c-text-muted);
 }
 
-.rowTitle,
 .bandTitle {
   margin: 0;
   font-family: var(--f-display-italic);
@@ -89,7 +73,6 @@
   outline-offset: 2px;
 }
 
-.rowGrid,
 .olyModels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -99,15 +82,6 @@
   list-style: none;
 }
 
-.lineupItem {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--r-ui);
-  background: var(--c-surface);
-}
-
-.lineupImage,
 .contain {
   object-fit: contain;
 }
@@ -250,7 +224,6 @@
 }
 
 @media (min-width: 768px) {
-  .rowGrid,
   .olyModels {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

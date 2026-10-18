@@ -44,8 +44,6 @@ export const metadata: Metadata = {
 export const revalidate = 60
 
 /** Tiles per drop row. */
-/** Line-up images shown when an edition has no products yet. */
-const ROW_SIZE = 4
 
 /** The Olympian model photos in public/olympian (939x1400), one per colourway. */
 const OLYMPIAN_MODELS = [
@@ -113,31 +111,16 @@ export default async function HomePage() {
       )}
 
       {rows.map(({ view, tiles }, rowIndex) => (
-        <section key={view.id} className={styles.row} aria-labelledby={`row-${view.id}`}>
-          <div className={styles.rowHead} data-reveal="up">
-            <p className={styles.rowLabel}>{view.editionLabel}</p>
-            <h2 id={`row-${view.id}`} className={styles.rowTitle}>{view.title}</h2>
-            <Link href={view.href} className={styles.rowLink}>View the collection</Link>
-          </div>
-          {tiles.length > 0 ? (
-            <ProductRow tiles={tiles} labelledBy={`row-${view.id}`} eager={rowIndex === 0} />
-          ) : (
-            <ul className={styles.rowGrid} data-reveal="stagger">
-              {view.hero.lineup.slice(0, ROW_SIZE).map((src, i) => (
-                  <li key={src} className={styles.lineupItem}>
-                    <Image
-                      src={src}
-                      alt={`${view.title} line-up, piece ${i + 1}`}
-                      fill
-                      sizes="(min-width: 768px) 25vw, 50vw"
-                      loading={rowIndex === 0 ? 'eager' : 'lazy'}
-                      className={styles.lineupImage}
-                    />
-                  </li>
-                ))}
-            </ul>
-          )}
-        </section>
+        <ProductRow
+          key={view.id}
+          id={`row-${view.id}`}
+          label={view.editionLabel}
+          title={view.title}
+          href={view.href}
+          tiles={tiles}
+          lineup={view.hero.lineup.map((src, i) => ({ src, alt: `${view.title} line-up, piece ${i + 1}` }))}
+          eager={rowIndex === 0}
+        />
       ))}
 
       {olympian && olympianView && (
