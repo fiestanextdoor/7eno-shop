@@ -29,7 +29,7 @@ export const BRAND = {
    * brand's other identities (knowledge panel). Add the real profile URLs
    * here; an empty list is simply omitted from the schema.
    */
-  sameAs: ['https://www.instagram.com/7enobyabraent/', 'https://www.tiktok.com/@7enobyabraent'] as string[],
+  sameAs: ['https://www.instagram.com/7enobyabraent/', 'https://www.tiktok.com/@7enobyabraentertainment'] as string[],
 } as const
 
 /** Keyword set reused across the site-wide and collection pages. */

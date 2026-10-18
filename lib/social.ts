@@ -2,8 +2,7 @@
 
 export const INSTAGRAM_HANDLE = '7enobyabraent'
 export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`
-/** Same handle as Instagram; confirm with the account owner before launch (go-live checklist). */
-export const TIKTOK_HANDLE = '7enobyabraent'
+export const TIKTOK_HANDLE = '7enobyabraentertainment'
 export const TIKTOK_URL = `https://www.tiktok.com/@${TIKTOK_HANDLE}`
 
 export interface SocialPost {
