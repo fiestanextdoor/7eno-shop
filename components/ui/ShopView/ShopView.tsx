@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import FilterBar from '@/components/ui/FilterBar/FilterBar'
 import ProductTile from '@/components/ui/ProductTile/ProductTile'
+import QuickAddDialog from '@/components/ui/QuickAdd/QuickAddDialog'
 import type { FilterGroup } from '@/lib/filter-types'
 import type { SortOption } from '@/lib/shop-query'
 import type { TileProduct } from '@/lib/tiles'
@@ -27,6 +29,7 @@ const DESKTOP_COLUMNS = 4
 export default function ShopView({
   filters, sort, sortOptions, tiles, emptyMessage = 'Nothing here yet.', emptyLink = null, onNavigate,
 }: ShopViewProps) {
+  const [quickTile, setQuickTile] = useState<TileProduct | null>(null)
   return (
     <>
       <FilterBar filters={filters} sort={sort} sortOptions={sortOptions} resultCount={tiles.length} onNavigate={onNavigate} />
@@ -43,11 +46,12 @@ export default function ShopView({
         <ul className={styles.grid} data-reveal="stagger">
           {tiles.map((tile, i) => (
             <li key={tile.slug} className={styles.cell}>
-              <ProductTile product={tile} eager={i < DESKTOP_COLUMNS} headingLevel="h2" />
+              <ProductTile product={tile} eager={i < DESKTOP_COLUMNS} headingLevel="h2" onQuickAdd={() => setQuickTile(tile)} />
             </li>
           ))}
         </ul>
       )}
+      <QuickAddDialog tile={quickTile} tiles={tiles} onClose={() => setQuickTile(null)} onSwitch={setQuickTile} />
     </>
   )
 }

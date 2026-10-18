@@ -79,7 +79,7 @@ export default async function HomePage() {
       .map(async (drop) => ({
         view: toDropView(drop, now, clock),
         // Every product of the edition: the row scrolls, four in view at a time.
-        tiles: await toTiles(products.filter((p) => p.drop.id === drop.id), now),
+        tiles: await toTiles(products.filter((p) => p.drop.id === drop.id), now, products),
       }))
   )
 

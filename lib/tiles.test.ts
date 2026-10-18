@@ -68,6 +68,7 @@ describe('toTiles', () => {
       dropId: 'olympn-sport',
       category: 'hoodies',
       priceCents: 6495,
+      quick: null,
     })
     expect(tiles[1].image).toBe('https://files.cdn.printful.com/dune.png')
   })

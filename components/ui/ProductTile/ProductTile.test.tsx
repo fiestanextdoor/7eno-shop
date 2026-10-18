@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import ProductTile from './ProductTile'
 import type { TileProduct } from '@/lib/tiles'
 
@@ -49,5 +49,19 @@ describe('ProductTile', () => {
     const { container } = render(<ProductTile product={{ ...tile, image: null }} />)
     expect(screen.queryByRole('img')).toBeNull()
     expect(container.querySelector('.placeholder')).not.toBeNull()
+  })
+
+  it('offers "Add to cart" only with quick-add data and a handler', () => {
+    const onQuickAdd = jest.fn()
+    const quick = {
+      provider: 'printful' as const, productId: 'p1', variants: [], soldOut: false, colours: [],
+    }
+    const { rerender } = render(<ProductTile product={tile} onQuickAdd={onQuickAdd} />)
+    expect(screen.queryByRole('button')).toBeNull()
+    rerender(<ProductTile product={{ ...tile, quick }} onQuickAdd={onQuickAdd} />)
+    const button = screen.getByRole('button', { name: `Add ${tile.name} to cart` })
+    expect(button.closest('a')).toBeNull()
+    fireEvent.click(button)
+    expect(onQuickAdd).toHaveBeenCalled()
   })
 })

@@ -1,4 +1,6 @@
 .tile {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
   border-radius: var(--r-ui);
@@ -8,7 +10,7 @@
 .link {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   color: var(--c-text);
   text-decoration: none;
 }
@@ -53,7 +55,18 @@
 .info {
   display: grid;
   gap: var(--s-1);
-  padding: var(--s-3) var(--s-3) var(--s-5);
+  padding: var(--s-3) var(--s-3) var(--s-4);
+}
+
+/* Outside the link: a button inside an anchor is not allowed. */
+.actions {
+  padding: 0 var(--s-3) var(--s-4);
+}
+
+.quick {
+  width: 100%;
+  min-height: 40px;
+  font-size: var(--fs-label);
 }
 
 .name {

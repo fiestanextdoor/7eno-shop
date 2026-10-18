@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import ProductTile from '@/components/ui/ProductTile/ProductTile'
+import QuickAddDialog from '@/components/ui/QuickAdd/QuickAddDialog'
 import type { TileProduct } from '@/lib/tiles'
 import styles from './ProductRow.module.css'
 
@@ -40,6 +41,7 @@ export default function ProductRow({ id, label, title, href, tiles, lineup = [],
   const track = useRef<HTMLUListElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(true)
+  const [quickTile, setQuickTile] = useState<TileProduct | null>(null)
   const count = tiles.length > 0 ? tiles.length : lineup.length
 
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function ProductRow({ id, label, title, href, tiles, lineup = [],
         {tiles.length > 0
           ? tiles.map((tile, i) => (
               <li key={tile.slug} className={styles.cell}>
-                <ProductTile product={tile} eager={eager && i < ROW_VISIBLE} />
+                <ProductTile product={tile} eager={eager && i < ROW_VISIBLE} onQuickAdd={() => setQuickTile(tile)} />
               </li>
             ))
           : lineup.map((item, i) => (
@@ -106,6 +108,7 @@ export default function ProductRow({ id, label, title, href, tiles, lineup = [],
               </li>
             ))}
       </ul>
+      <QuickAddDialog tile={quickTile} tiles={tiles} onClose={() => setQuickTile(null)} onSwitch={setQuickTile} />
     </section>
   )
 }
