@@ -46,7 +46,8 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--s-2) var(--s-4);
-  padding: 0 var(--l-gutter) var(--s-4);
+  /* Right padding leaves room for the ProductRow arrows (2 x 36px + gap). */
+  padding: 0 calc(var(--l-gutter) + 88px) var(--s-4) var(--l-gutter);
 }
 
 .rowLabel {

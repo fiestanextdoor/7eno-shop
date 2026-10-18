@@ -1,0 +1,74 @@
+.row {
+  position: relative;
+}
+
+/* The arrows sit in the row head, top right, above the track. */
+.arrows {
+  position: absolute;
+  right: var(--l-gutter);
+  bottom: calc(100% + var(--s-4));
+  display: flex;
+  gap: var(--s-2);
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-1);
+  background: transparent;
+  color: var(--c-text);
+  cursor: pointer;
+  transition:
+    background-color var(--m-base) var(--m-ease),
+    color var(--m-base) var(--m-ease),
+    border-color var(--m-base) var(--m-ease);
+}
+
+.arrow:hover:not(:disabled) {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-inverse-text);
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - var(--l-grid-gap)) / 2);
+  gap: var(--l-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.cell {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .track {
+    grid-auto-columns: calc((100% - 3 * var(--l-grid-gap)) / 4);
+  }
+}

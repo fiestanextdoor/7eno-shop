@@ -5,7 +5,7 @@ import Link from 'next/link'
 import AutoplayVideo from '@/components/ui/AutoplayVideo/AutoplayVideo'
 import { buttonClasses } from '@/components/ui/Button/Button'
 import DropBlock from '@/components/ui/DropBlock/DropBlock'
-import ProductTile from '@/components/ui/ProductTile/ProductTile'
+import ProductRow from '@/components/ui/ProductRow/ProductRow'
 import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
 import { OLYMPN_SPORT_WORDMARK, SOMETHING_IS_COMING, SPORT_ADS } from '@/lib/brand'
 import { getShopProducts, type ShopProduct } from '@/lib/catalog'
@@ -44,6 +44,7 @@ export const metadata: Metadata = {
 export const revalidate = 60
 
 /** Tiles per drop row. */
+/** Line-up images shown when an edition has no products yet. */
 const ROW_SIZE = 4
 
 /** The Olympian model photos in public/olympian (939x1400), one per colourway. */
@@ -79,7 +80,8 @@ export default async function HomePage() {
       .filter((drop) => isDropListed(drop, now, clock))
       .map(async (drop) => ({
         view: toDropView(drop, now, clock),
-        tiles: await toTiles(products.filter((p) => p.drop.id === drop.id).slice(0, ROW_SIZE), now),
+        // Every product of the edition: the row scrolls, four in view at a time.
+        tiles: await toTiles(products.filter((p) => p.drop.id === drop.id), now),
       }))
   )
 
@@ -117,14 +119,11 @@ export default async function HomePage() {
             <h2 id={`row-${view.id}`} className={styles.rowTitle}>{view.title}</h2>
             <Link href={view.href} className={styles.rowLink}>View the collection</Link>
           </div>
-          <ul className={styles.rowGrid} data-reveal="stagger">
-            {tiles.length > 0
-              ? tiles.map((tile) => (
-                  <li key={tile.slug}>
-                    <ProductTile product={tile} eager={rowIndex === 0} />
-                  </li>
-                ))
-              : view.hero.lineup.slice(0, ROW_SIZE).map((src, i) => (
+          {tiles.length > 0 ? (
+            <ProductRow tiles={tiles} labelledBy={`row-${view.id}`} eager={rowIndex === 0} />
+          ) : (
+            <ul className={styles.rowGrid} data-reveal="stagger">
+              {view.hero.lineup.slice(0, ROW_SIZE).map((src, i) => (
                   <li key={src} className={styles.lineupItem}>
                     <Image
                       src={src}
@@ -136,7 +135,8 @@ export default async function HomePage() {
                     />
                   </li>
                 ))}
-          </ul>
+            </ul>
+          )}
         </section>
       ))}
 
