@@ -61,7 +61,8 @@ describe('home', () => {
     expect([...document.querySelectorAll('[id^="row-"]')].map((h) => h.textContent)).toEqual(['OLYMPN Sport', 'Olympian'])
     // The whole line-up, in a scrolling row with arrows (four in view at a time).
     expect(screen.getAllByRole('img', { name: /OLYMPN Sport line-up/ })).toHaveLength(8)
-    expect(screen.getAllByRole('button', { name: 'Next products' })).toHaveLength(2)
+    // Only the eight-piece line-up needs arrows; the Olympian row has one product here.
+    expect(screen.getAllByRole('button', { name: 'Next products' })).toHaveLength(1)
     expect(screen.getByRole('link', { name: /Olympian Tee Sand Unisex/ })).toHaveAttribute('href', '/shop/olympian-tee-sand-unisex')
     expect(screen.getAllByRole('link', { name: 'View the collection' }).map((a) => a.getAttribute('href'))).toEqual([
       '/collections/olympn-sport',
