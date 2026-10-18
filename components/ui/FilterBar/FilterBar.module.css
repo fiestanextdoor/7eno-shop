@@ -97,15 +97,24 @@
   gap: var(--s-2);
 }
 
+/* Same look as a chip: transparent, 1px border, body text, with the
+   chevron drawn right after the label instead of the browser's wide box. */
 .select {
-  min-height: 36px;
-  padding: 0 var(--s-3);
+  min-height: 32px;
+  padding: 0 calc(var(--s-3) + 18px) 0 var(--s-3);
   border: 1px solid var(--c-border-strong);
   border-radius: var(--r-1);
-  background: var(--c-surface);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%232D3A4F' stroke-width='1.5'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E") no-repeat right var(--s-3) center;
   color: var(--c-text);
   font-family: var(--f-body);
   font-size: var(--fs-small);
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+}
+
+.select:hover {
+  border-color: var(--c-text);
 }
 
 .drawerGroups {
