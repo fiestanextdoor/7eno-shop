@@ -78,7 +78,7 @@ describe('BuyPanel', () => {
     expect(screen.getByRole('heading', { level: 1, name: NAME })).toBeInTheDocument()
     expect(screen.getByText('€64.95')).toBeInTheDocument()
     for (const title of ['Details', 'Fit', 'Shipping and returns']) {
-      expect(screen.getByText(title).closest('summary')).not.toBeNull()
+      expect(screen.getAllByText(title).some((el) => el.closest('summary'))).toBe(true)
     }
   })
 
@@ -133,6 +133,24 @@ describe('BuyPanel', () => {
     expect(screen.queryByText(/€/)).toBeNull()
     expect(screen.queryByRole('button', { name: /Add to cart|Select a size/ })).toBeNull()
     expect(screen.getByRole('button', { name: 'Notify me' })).toBeInTheDocument()
+  })
+
+  it('shows a Fit row with the cut from the name and the model note, also before the release', () => {
+    const { unmount } = render(<Harness />)
+    const fit = screen.getByTestId('fit')
+    expect(fit).toHaveTextContent('Oversized fit: roomy through the body and sleeves.')
+    expect(fit).toHaveTextContent('Model is 1,85 m and wears L')
+    unmount()
+    render(<Harness product={{ purchasable: false, releaseLabel: '1 November 2026 at 12:00 CET' }} />)
+    expect(screen.getByTestId('fit')).toHaveTextContent('Model is 1,85 m and wears L')
+  })
+
+  it('tells how far the cart is from free shipping once a piece is added', () => {
+    render(<Harness />)
+    expect(screen.queryByText(/free shipping/)).toBeNull()
+    fireEvent.click(screen.getByRole('radio', { name: 'M' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add to cart' }))
+    expect(screen.getByText('€10.05 away from free shipping.')).toBeInTheDocument()
   })
 
   it('opens the size guide from the size row and shows the model note', () => {

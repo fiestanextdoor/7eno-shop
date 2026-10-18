@@ -28,8 +28,22 @@ export interface Drop {
   tone: 'light' | 'dark'
   /** Lowercase colour names in display order within a product family. */
   colourOrder: string[]
-  /** "Model is 1,85 m and wears L" */
-  modelNote?: string
+  /**
+   * Model notes per product family, first match wins. Shown in the Fit row
+   * on the product page, in the size guide and in the Fit accordion.
+   */
+  fitNotes?: FitNote[]
+}
+
+export interface FitNote {
+  /**
+   * Case-insensitive whole words that must appear in the product name, e.g.
+   * "Relaxed" or "Oversized Hoodie". Omit for a note that applies to every
+   * product of the drop (put it last).
+   */
+  match?: string
+  /** "Sam is 1,86 m and wears M." */
+  note: string
 }
 
 export interface DropClockOptions {
@@ -218,6 +232,14 @@ export function colourLabel(drop: Drop, name: string): string | null {
     .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+/** The model note for a product: the first fitNote whose words are in the name. */
+export function fitNoteFor(drop: Drop, productName: string): string | undefined {
+  const n = comparable(productName)
+  return drop.fitNotes?.find(
+    (f) => !f.match || new RegExp(`\\b${escapeRegExp(comparable(f.match))}\\b`).test(n)
+  )?.note
 }
 
 /** The name without its colour: colours of one product share a family. */

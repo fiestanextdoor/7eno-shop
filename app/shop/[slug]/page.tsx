@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { findBySlug, getShopProducts, isRetiredProductSlug, type ShopProduct } from '@/lib/catalog'
 import { buildColourSiblings } from '@/lib/colour-siblings'
-import { currentTimeMs, formatDropDate, toDropView } from '@/lib/drops'
+import { currentTimeMs, fitNoteFor, formatDropDate, toDropView } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
 import { categoryLabel, productInfoSections } from '@/lib/product-copy'
 import { loadProductMedia } from '@/lib/product-page'
@@ -90,6 +90,7 @@ export default async function ProductPage({ params }: Props) {
 
   const media = await loadProductMedia(match)
   const drop = toDropView(match.drop, now, { preview })
+  const modelNote = fitNoteFor(match.drop, match.name)
   const teaser = match.status === 'upcoming'
 
   // Product structured data: price, availability, return and shipping terms,
@@ -161,11 +162,11 @@ export default async function ProductPage({ params }: Props) {
             ? { category: categoryLabel(match.name), guide: media.sizeGuide }
             : null
         }
-        modelNote={match.drop.modelNote}
+        modelNote={modelNote}
         info={productInfoSections({
           productName: match.name,
           materials: media.materials,
-          modelNote: match.drop.modelNote,
+          modelNote,
           dropTitle: match.drop.title,
           editionLabel: drop.editionLabel,
         })}

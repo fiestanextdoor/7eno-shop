@@ -12,13 +12,26 @@ import type { CartItem } from '@/types/cart'
 import CartLine from './CartLine'
 import styles from './CartDrawer.module.css'
 
+/** Top of the drawer: how far the order is from free shipping (threshold in lib/shipping). */
 function FreeShippingProgress({ total }: { total: number }) {
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total)
   const percent = Math.min(100, Math.round((total / FREE_SHIPPING_THRESHOLD) * 100))
+  const unlocked = remaining === 0
   return (
-    <div className={styles.progress}>
+    <div className={styles.progress} data-unlocked={unlocked ? 'true' : 'false'}>
       <p className={styles.progressText} aria-live="polite">
-        {remaining === 0 ? 'Your order ships free.' : `Add ${formatEuro(remaining)} for free shipping.`}
+        {unlocked ? (
+          <>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7.5l3.2 3L12 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" />
+            </svg>
+            Free shipping unlocked.
+          </>
+        ) : (
+          <>
+            <strong className={styles.amount}>{formatEuro(remaining)}</strong> away from free shipping.
+          </>
+        )}
       </p>
       <div
         className={styles.track}
@@ -74,7 +87,6 @@ export default function CartDrawer() {
   const footer =
     items.length > 0 ? (
       <div className={styles.footer}>
-        <FreeShippingProgress total={discountedTotal} />
         {bundleDiscountCents > 0 && (
           <p className={styles.row}>
             <span>Combi-deal discount</span>
@@ -102,7 +114,9 @@ export default function CartDrawer() {
           </Link>
         </div>
       ) : (
-        <ul className={styles.lines}>
+        <>
+          <FreeShippingProgress total={discountedTotal} />
+          <ul className={styles.lines}>
           {[...bundleGroups.entries()].map(([bundleId, group]) => (
             <li key={`group-${bundleId}`} className={styles.group}>
               <span className={styles.groupTitle}>{group[0].bundleTitle ?? 'Set'}</span>
@@ -110,7 +124,8 @@ export default function CartDrawer() {
             </li>
           ))}
           {standalone.map(renderLine)}
-        </ul>
+          </ul>
+        </>
       )}
     </Drawer>
   )

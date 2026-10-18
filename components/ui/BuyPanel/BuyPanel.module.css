@@ -60,9 +60,35 @@
   justify-content: flex-end;
 }
 
-.modelNote {
+.fit {
+  display: flex;
+  gap: var(--s-3);
+  align-items: baseline;
   margin: 0;
   font-size: var(--fs-small);
+}
+
+.fitLabel {
+  flex: none;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.fitText {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-2);
+}
+
+.nudge {
+  margin: calc(-1 * var(--s-3)) 0 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-align: center;
   color: var(--c-text-muted);
 }
 

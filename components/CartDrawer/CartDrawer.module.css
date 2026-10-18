@@ -36,25 +36,46 @@
 .progress {
   display: grid;
   gap: var(--s-2);
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-0);
+  background: var(--c-surface);
 }
 
 .progressText {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
   margin: 0;
   font-size: var(--fs-small);
 }
 
+.progressText .amount {
+  font-weight: 700;
+}
+
+.progress[data-unlocked='true'] .progressText {
+  color: var(--c-accent-ink);
+}
+
 .track {
-  height: 4px;
+  height: 6px;
   overflow: hidden;
+  border-radius: var(--r-0);
   background: var(--c-stone);
 }
 
 .fill {
   display: block;
   height: 100%;
-  background: var(--c-text);
+  border-radius: inherit;
+  background: var(--c-live);
   transform-origin: left center;
   transition: transform var(--m-base) var(--m-ease);
+}
+
+.progress[data-unlocked='true'] .fill {
+  background: var(--c-accent-ink);
 }
 
 .row {

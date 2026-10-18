@@ -8,11 +8,13 @@ import ColourSiblings from '@/components/ui/ColourSiblings/ColourSiblings'
 import SizeGuideDialog from '@/components/ui/SizeGuideDialog/SizeGuideDialog'
 import SizeSelector from '@/components/ui/SizeSelector/SizeSelector'
 import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
+import { useCartTotals } from '@/hooks/useCartTotals'
 import type { Purchase } from '@/hooks/usePurchase'
 import type { ColourSibling } from '@/lib/colour-siblings'
 import type { DropView } from '@/lib/drops'
 import type { SizeGuide } from '@/lib/printful'
-import type { InfoSection } from '@/lib/product-copy'
+import { formatEuro } from '@/lib/money'
+import { fitFromName, type InfoSection } from '@/lib/product-copy'
 import styles from './BuyPanel.module.css'
 
 export interface BuyPanelProduct {
@@ -64,6 +66,25 @@ export default function BuyPanel({ product, drop, siblings, purchase, sizeGuide,
     />
   ) : null
   const ctaLabel = purchase.added ? 'Added to cart' : purchase.needsSize ? 'Select a size' : 'Add to cart'
+  const cut = fitFromName(product.name)
+  const fit =
+    cut || modelNote ? (
+      <p className={styles.fit} data-testid="fit">
+        <span className={styles.fitLabel}>Fit</span>
+        <span className={styles.fitText}>
+          {cut && <span>{cut}</span>}
+          {modelNote && <span>{modelNote}</span>}
+        </span>
+      </p>
+    ) : null
+  // Display only, like the drawer: the checkout recomputes shipping.
+  const { remainingForFree, subtotal } = useCartTotals()
+  const shippingNudge =
+    purchase.added && subtotal > 0 ? (
+      <p className={styles.nudge} aria-live="polite">
+        {remainingForFree > 0 ? `${formatEuro(remainingForFree)} away from free shipping.` : 'Free shipping unlocked.'}
+      </p>
+    ) : null
 
   return (
     <div className={styles.panel}>
@@ -105,7 +126,7 @@ export default function BuyPanel({ product, drop, siblings, purchase, sizeGuide,
           ) : (
             guide && <div className={styles.guideRow}>{guide}</div>
           )}
-          {modelNote && <p className={styles.modelNote}>{modelNote}</p>}
+          {fit}
 
           {purchase.selectionSoldOut ? (
             <div id={anchors.notify} tabIndex={-1} className={styles.notify}>
@@ -119,20 +140,24 @@ export default function BuyPanel({ product, drop, siblings, purchase, sizeGuide,
               />
             </div>
           ) : (
-            <Button
-              variant="primary"
-              size="lg"
-              className={styles.cta}
-              onClick={purchase.addToCart}
-              disabled={purchase.needsSize}
-            >
-              {ctaLabel}
-            </Button>
+            <>
+              <Button
+                variant="primary"
+                size="lg"
+                className={styles.cta}
+                onClick={purchase.addToCart}
+                disabled={purchase.needsSize}
+              >
+                {ctaLabel}
+              </Button>
+              {shippingNudge}
+            </>
           )}
         </>
       ) : (
         <div className={styles.teaser}>
           {product.releaseLabel && <p className={styles.teaserDate}>Drops {product.releaseLabel}</p>}
+          {fit}
           <WaitlistForm productSlug={product.slug} />
         </div>
       )}

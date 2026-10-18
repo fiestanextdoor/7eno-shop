@@ -3,7 +3,7 @@ import path from 'node:path'
 import {
   DROPS, colourLabel, colourRank, familyKey, formatDropDate, formatDropDay, formatEdition, getDrop,
   getDropBySlug, getDropStatus, getNextDrop, isDropListed, isPurchasable, isVisibleInShop,
-  listDropsNewestFirst, matchDrop, toDropView, type Drop,
+  fitNoteFor, listDropsNewestFirst, matchDrop, toDropView, type Drop,
 } from './drops'
 
 const olympian = getDrop('olympian') as Drop
@@ -14,6 +14,31 @@ const publicFile = (src: string) => existsSync(path.join(process.cwd(), 'public'
 
 const BEFORE_SPORT = at('2026-10-14T10:00:00Z')
 const AFTER_SPORT = at('2026-11-02T10:00:00Z')
+
+describe('fitNoteFor', () => {
+  const withNotes: Drop = {
+    ...sport,
+    fitNotes: [
+      { match: 'Relaxed', note: 'Sam is 1,86 m and wears M.' },
+      { match: 'Oversized Hoodie', note: 'Sam is 1,86 m and wears L.' },
+      { note: 'Model wears M.' },
+    ],
+  }
+
+  it('picks the first note whose words appear in the product name', () => {
+    expect(fitNoteFor(withNotes, 'OLYMPN Sport Relaxed Hoodie Dune')).toBe('Sam is 1,86 m and wears M.')
+    expect(fitNoteFor(withNotes, 'OLYMPN Sport Oversized Hoodie Mocha')).toBe('Sam is 1,86 m and wears L.')
+  })
+
+  it('falls back to a note without match, and matches whole words only', () => {
+    expect(fitNoteFor(withNotes, 'OLYMPN Sport Windbreaker')).toBe('Model wears M.')
+    expect(fitNoteFor({ ...withNotes, fitNotes: [{ match: 'Tee', note: 'x' }] }, 'Olympian Teeth')).toBeUndefined()
+  })
+
+  it('is undefined for a drop without notes', () => {
+    expect(fitNoteFor(olympian, 'Olympian Tee Ocean Unisex')).toBeUndefined()
+  })
+})
 
 describe('drop config', () => {
   it('matches spec section 4 for both editions', () => {

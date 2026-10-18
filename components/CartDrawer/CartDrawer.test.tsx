@@ -34,7 +34,7 @@ describe('CartDrawer', () => {
 
   it('shows how far the order is from free shipping', () => {
     openWith([item()])
-    expect(screen.getByText('Add €30.00 for free shipping.')).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: 'Progress to free shipping' }).previousElementSibling).toHaveTextContent('€30.00 away from free shipping.')
     expect(screen.getByRole('progressbar', { name: 'Progress to free shipping' })).toHaveAttribute('aria-valuenow', '60')
   })
 
@@ -42,7 +42,7 @@ describe('CartDrawer', () => {
     openWith([item()])
     fireEvent.click(within(quantity()).getByRole('button', { name: 'Increase quantity' }))
     expect(quantity()).toHaveTextContent('2')
-    expect(screen.getByText('Your order ships free.')).toBeInTheDocument()
+    expect(screen.getByText('Free shipping unlocked.')).toBeInTheDocument()
     expect(row('Subtotal')).toHaveTextContent('€90.00')
     expect(screen.getByRole('progressbar', { name: 'Progress to free shipping' })).toHaveAttribute('aria-valuenow', '100')
   })
