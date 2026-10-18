@@ -73,13 +73,11 @@
 }
 
 /* Periwinkle behind small navy text is below 4.5:1, so the active chip is
-   navy with cream text and carries the accent as a bar (spec section 2: the
-   accent marks active chips, text is always navy or cream). */
+   navy with cream text. */
 .chip[aria-current='true'] {
   border-color: var(--c-text);
   background: var(--c-text);
   color: var(--c-inverse-text);
-  box-shadow: inset 0 -3px 0 var(--c-accent);
 }
 
 .tools {
