@@ -80,7 +80,7 @@
   padding: 0 var(--s-3);
   border: 1px solid var(--c-border-strong);
   border-radius: var(--r-1);
-  background: var(--c-surface);
+  background: transparent;
   color: var(--c-text);
   font-family: var(--f-body);
   font-size: var(--fs-body);
