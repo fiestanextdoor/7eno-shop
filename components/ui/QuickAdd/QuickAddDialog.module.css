@@ -1,6 +1,8 @@
 .dialog {
   width: min(480px, calc(100vw - 2 * var(--l-gutter)));
   max-height: calc(100vh - 2 * var(--s-6));
+  /* The global reset zeroes every margin; a modal dialog centres with auto. */
+  margin: auto;
   padding: 0;
   border: 0;
   border-radius: var(--r-ui);
