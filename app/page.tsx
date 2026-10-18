@@ -104,7 +104,6 @@ export default async function HomePage() {
         <ProductRow
           key={view.id}
           id={`row-${view.id}`}
-          label={view.editionLabel}
           title={view.title}
           href={view.href}
           tiles={tiles}

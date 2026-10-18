@@ -103,7 +103,7 @@ describe('home', () => {
     const band = document.querySelector('[data-band="social"]') as HTMLElement
     expect(band).not.toBeNull()
     expect(within(band).getByRole('link', { name: '@7enobyabraent' })).toHaveAttribute('href', 'https://www.instagram.com/7enobyabraent/')
-    expect(within(band).getByRole('link', { name: 'TikTok' })).toHaveAttribute('href', 'https://www.tiktok.com/@7enobyabraentertainment')
+    expect(within(band).getByRole('link', { name: '@7enobyabraentertainment' })).toHaveAttribute('href', 'https://www.tiktok.com/@7enobyabraentertainment')
     expect(within(within(band).getByRole('list', { name: 'Latest Instagram posts' })).getAllByRole('link')).toHaveLength(4)
     expect(band.querySelector('video')).toBeNull()
   })

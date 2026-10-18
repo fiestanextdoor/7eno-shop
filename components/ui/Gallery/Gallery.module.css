@@ -13,6 +13,9 @@
   padding: 0;
   list-style: none;
   overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--r-ui);
+  background: var(--c-surface);
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -24,15 +27,13 @@
 
 .track:focus-visible {
   outline: 2px solid var(--c-focus);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
 .slide {
   position: relative;
   flex: 0 0 100%;
   aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--r-ui);
   background: var(--c-surface);
   scroll-snap-align: start;
   scroll-margin-top: calc(var(--l-chrome) + var(--s-4));

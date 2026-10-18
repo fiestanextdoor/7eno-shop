@@ -90,46 +90,55 @@ export interface FilterDrop {
   status?: DropStatus
 }
 
-export function shopHref(query: ShopQuery): string {
+/** Which parts of the query the links carry; a collection page fixes the collection in its path. */
+export interface HrefOptions {
+  base?: string
+  withCollection?: boolean
+}
+
+export function shopHref(query: ShopQuery, { base = '/shop', withCollection = true }: HrefOptions = {}): string {
   const params = new URLSearchParams()
-  if (query.collection) params.set('collection', query.collection)
+  if (withCollection && query.collection) params.set('collection', query.collection)
   if (query.category) params.set('category', query.category)
   if (query.sort !== 'featured') params.set('sort', query.sort)
   const search = params.toString()
-  return search ? `/shop?${search}` : '/shop'
+  return search ? `${base}?${search}` : base
 }
 
 /** Chips for the FilterBar, in the URL-state shape from lib/filter-types.ts. */
-export function buildFilterGroups(query: ShopQuery, drops: readonly FilterDrop[] = DROPS): FilterGroup[] {
+export function buildFilterGroups(query: ShopQuery, drops: readonly FilterDrop[] = DROPS, href: HrefOptions = {}): FilterGroup[] {
   const newestFirst = [...drops].sort((a, b) => b.edition - a.edition)
+  const categoryGroup: FilterGroup = {
+    label: 'Category',
+    items: [
+      { label: 'All', href: shopHref({ ...query, category: null }, href), active: query.category === null },
+      ...CATEGORIES.map((c) => ({
+        label: c.label,
+        href: shopHref({ ...query, category: c.value }, href),
+        active: query.category === c.value,
+      })),
+    ],
+  }
+  // Inside a collection the collection chips make no sense.
+  if (href.withCollection === false) return [categoryGroup]
   return [
     {
       label: 'Collection',
       items: [
-        { label: 'All', href: shopHref({ ...query, collection: null }), active: query.collection === null },
+        { label: 'All', href: shopHref({ ...query, collection: null }, href), active: query.collection === null },
         ...newestFirst.map((d) => ({
           label: d.title,
-          href: shopHref({ ...query, collection: d.id }),
+          href: shopHref({ ...query, collection: d.id }, href),
           active: query.collection === d.id,
         })),
       ],
     },
-    {
-      label: 'Category',
-      items: [
-        { label: 'All', href: shopHref({ ...query, category: null }), active: query.category === null },
-        ...CATEGORIES.map((c) => ({
-          label: c.label,
-          href: shopHref({ ...query, category: c.value }),
-          active: query.category === c.value,
-        })),
-      ],
-    },
+    categoryGroup,
   ]
 }
 
-export function buildSortOptions(query: ShopQuery): SortOption[] {
-  return SORTS.map((s) => ({ value: s.value, label: s.label, href: shopHref({ ...query, sort: s.value }) }))
+export function buildSortOptions(query: ShopQuery, href: HrefOptions = {}): SortOption[] {
+  return SORTS.map((s) => ({ value: s.value, label: s.label, href: shopHref({ ...query, sort: s.value }, href) }))
 }
 
 export function describeShopQuery(query: ShopQuery): { title: string; description: string } {

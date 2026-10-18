@@ -8,7 +8,7 @@ describe('SocialBand', () => {
     const instagram = screen.getByRole('link', { name: '@7enobyabraent' })
     expect(instagram).toHaveAttribute('href', 'https://www.instagram.com/7enobyabraent/')
     expect(instagram).toHaveAttribute('rel', 'noopener noreferrer')
-    expect(screen.getByRole('link', { name: 'TikTok' })).toHaveAttribute('href', 'https://www.tiktok.com/@7enobyabraentertainment')
+    expect(screen.getByRole('link', { name: '@7enobyabraentertainment' })).toHaveAttribute('href', 'https://www.tiktok.com/@7enobyabraentertainment')
     const grid = screen.getByRole('list', { name: 'Latest Instagram posts' })
     const posts = within(grid).getAllByRole('link')
     expect(posts).toHaveLength(4)

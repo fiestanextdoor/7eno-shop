@@ -16,7 +16,8 @@ export interface LineupImage {
 export interface ProductRowProps {
   /** Heading id, also the aria-labelledby of the track. */
   id: string
-  label: string
+  /** Small mono line before the title, e.g. the edition; omitted on the home page. */
+  label?: string
   title: string
   /** "View the collection" link. */
   href: string
@@ -70,7 +71,7 @@ export default function ProductRow({ id, label, title, href, tiles, lineup = [],
   return (
     <section className={styles.row} aria-labelledby={id}>
       <div className={styles.head} data-reveal="up">
-        <p className={styles.label}>{label}</p>
+        {label && <p className={styles.label}>{label}</p>}
         <h2 id={id} className={styles.title}>{title}</h2>
         {count > ROW_VISIBLE && (
           <div className={styles.arrows}>

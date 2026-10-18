@@ -14,6 +14,7 @@ const mockDrops = jest.fn()
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: () => new URLSearchParams(''),
   notFound: () => {
     throw new Error('NEXT_NOT_FOUND')
   },

@@ -64,6 +64,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: var(--l-grid-gap);
   margin: 0;
   padding: 0;
@@ -77,14 +78,14 @@
 .post {
   position: relative;
   display: block;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: var(--post-ratio, 4 / 5);
   overflow: hidden;
   border-radius: var(--r-ui);
   background: var(--c-surface);
 }
 
 .image {
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--m-slow) var(--m-ease-out);
 }
 

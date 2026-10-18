@@ -38,18 +38,22 @@ export function useScrollReveal(routeKey: string): void {
         for (const el of elements) {
           const kind = el.dataset.reveal as RevealKind
           const once = { trigger: el, start: 'top 88%', once: true }
+          // Elements with their own CSS transition on transform (buttons) can
+          // freeze mid-tween; clearing the inline styles afterwards leaves the
+          // stylesheet in charge again.
+          const clean = { clearProps: 'transform,opacity,visibility' }
           switch (kind) {
             case 'hero': {
               // A single wrapper child (DropBlock in the hero): stagger its lines instead.
               const targets = el.children.length === 1 && el.children[0].children.length > 1 ? el.children[0].children : el.children
-              gsap.from(targets, { autoAlpha: 0, y: 36, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.1 })
+              gsap.from(targets, { autoAlpha: 0, y: 36, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.1, ...clean })
               break
             }
             case 'up':
-              gsap.from(el, { autoAlpha: 0, y: 48, duration: 0.9, ease: 'power3.out', scrollTrigger: once })
+              gsap.from(el, { autoAlpha: 0, y: 48, duration: 0.9, ease: 'power3.out', scrollTrigger: once, ...clean })
               break
             case 'title':
-              gsap.from(el, { autoAlpha: 0, y: 72, rotate: -1.5, transformOrigin: 'left bottom', duration: 1.1, ease: 'expo.out', scrollTrigger: once })
+              gsap.from(el, { autoAlpha: 0, y: 72, rotate: -1.5, transformOrigin: 'left bottom', duration: 1.1, ease: 'expo.out', scrollTrigger: once, ...clean })
               break
             case 'media': {
               gsap.from(el, { autoAlpha: 0, scale: 0.92, duration: 1.1, ease: 'power3.out', scrollTrigger: { ...once, start: 'top 90%' } })
@@ -64,7 +68,7 @@ export function useScrollReveal(routeKey: string): void {
               break
             }
             case 'stagger':
-              gsap.from(el.children, { autoAlpha: 0, y: 40, duration: 0.8, stagger: 0.07, ease: 'power3.out', scrollTrigger: { ...once, start: 'top 85%' } })
+              gsap.from(el.children, { autoAlpha: 0, y: 40, duration: 0.8, stagger: 0.07, ease: 'power3.out', scrollTrigger: { ...once, start: 'top 85%' }, ...clean })
               break
           }
         }

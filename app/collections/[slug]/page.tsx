@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import DropBlock from '@/components/ui/DropBlock/DropBlock'
-import ShopView from '@/components/ui/ShopView/ShopView'
+import { Suspense } from 'react'
+import ShopBrowser from '@/components/ui/ShopBrowser/ShopBrowser'
 import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import { DROPS, currentTimeMs, formatEdition, getDropBySlug, isDropListed, toDropView } from '@/lib/drops'
 import { isPreviewSession } from '@/lib/preview-session'
@@ -71,7 +72,9 @@ export default async function CollectionPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <DropBlock drop={view} now={now} as="h1" withIntro withLink={false} />
       {tiles.length > 0 ? (
-        <ShopView filters={[]} sort="featured" sortOptions={[]} tiles={tiles} />
+        <Suspense fallback={null}>
+          <ShopBrowser tiles={tiles} drops={[]} collection={{ id: drop.id, basePath: `/collections/${drop.slug}` }} />
+        </Suspense>
       ) : (
         <section className={styles.lineup} aria-label={`${drop.title} line-up`}>
           <ul className={styles.lineupGrid} data-reveal="stagger">

@@ -105,6 +105,16 @@ describe('links', () => {
     expect(category.items[0].href).toBe('/shop?sort=price-asc')
   })
 
+  it('keeps the links on a collection page, without collection chips', () => {
+    const href = { base: '/collections/olympian', withCollection: false }
+    const groups = buildFilterGroups({ ...ALL, collection: 'olympian', sort: 'price-asc' }, DROPS, href)
+    expect(groups.map((g) => g.label)).toEqual(['Category'])
+    expect(groups[0].items[1].href).toBe('/collections/olympian?category=tees&sort=price-asc')
+    expect(buildSortOptions({ ...ALL, collection: 'olympian' }, href).map((o) => o.href)).toEqual([
+      '/collections/olympian', '/collections/olympian?sort=price-asc', '/collections/olympian?sort=price-desc',
+    ])
+  })
+
   it('offers only the drops it is given as collection chips', () => {
     expect(buildFilterGroups(ALL, [olympian])[0].items.map((i) => i.label)).toEqual(['All', 'Olympian'])
   })

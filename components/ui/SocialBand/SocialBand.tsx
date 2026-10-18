@@ -1,6 +1,7 @@
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import { buttonClasses } from '@/components/ui/Button/Button'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL, TIKTOK_URL, type SocialPost } from '@/lib/social'
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, TIKTOK_HANDLE, TIKTOK_URL, type SocialPost } from '@/lib/social'
 import styles from './SocialBand.module.css'
 
 export interface SocialBandProps {
@@ -51,7 +52,7 @@ export default function SocialBand({ posts }: SocialBandProps) {
             </a>
             <a href={TIKTOK_URL} className={buttonClasses('ghost', 'lg')} target="_blank" rel="noopener noreferrer">
               <TikTokGlyph />
-              TikTok
+              @{TIKTOK_HANDLE}
             </a>
           </div>
         </div>
@@ -59,7 +60,14 @@ export default function SocialBand({ posts }: SocialBandProps) {
           <ul className={styles.grid} data-reveal="stagger" aria-label="Latest Instagram posts">
             {posts.map((post) => (
               <li key={post.id} className={styles.cell}>
-                <a href={post.permalink} className={styles.post} target="_blank" rel="noopener noreferrer">
+                {/* Each post in its own ratio, as in the app; the live feed (no size known) gets the 4:5 feed frame. */}
+                <a
+                  href={post.permalink}
+                  className={styles.post}
+                  style={post.width && post.height ? ({ '--post-ratio': `${post.width} / ${post.height}` } as CSSProperties) : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Image src={post.image} alt={post.alt} fill sizes="(min-width: 1024px) 25vw, 50vw" className={styles.image} />
                   {post.kind === 'video' && (
                     <span className={styles.badge}>

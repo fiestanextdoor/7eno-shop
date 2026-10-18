@@ -6,6 +6,7 @@ import ShopView from '@/components/ui/ShopView/ShopView'
 import {
   applyTileQuery, buildFilterGroups, buildSortOptions, describeShopQuery, parseShopQuery, type FilterDrop, type RawSearchParams,
 } from '@/lib/shop-query'
+import type { DropId } from '@/lib/drops'
 import type { TileProduct } from '@/lib/tiles'
 import styles from './ShopBrowser.module.css'
 
@@ -14,6 +15,8 @@ export interface ShopBrowserProps {
   tiles: TileProduct[]
   /** The listed drops, with their status, for the collection chips and the empty state. */
   drops: FilterDrop[]
+  /** On a collection page: the collection is fixed, links stay on its path and the page has its own heading. */
+  collection?: { id: DropId; basePath: string }
 }
 
 /**
@@ -24,15 +27,16 @@ export interface ShopBrowserProps {
  * The first render still follows the URL, so a shared filter link is right
  * straight from the server.
  */
-export default function ShopBrowser({ tiles, drops }: ShopBrowserProps) {
+export default function ShopBrowser({ tiles, drops, collection }: ShopBrowserProps) {
   const params = useSearchParams()
   const query = useMemo(() => {
     const raw: RawSearchParams = {}
     params.forEach((value, key) => {
       if (!(key in raw)) raw[key] = value
     })
-    return parseShopQuery(raw)
-  }, [params])
+    const parsed = parseShopQuery(raw)
+    return collection ? { ...parsed, collection: collection.id } : parsed
+  }, [params, collection])
 
   const visible = useMemo(() => applyTileQuery(tiles, query), [tiles, query])
   const { title } = describeShopQuery(query)
@@ -42,20 +46,24 @@ export default function ShopBrowser({ tiles, drops }: ShopBrowserProps) {
     ? { href: `/collections/${upcomingDrop.slug}`, label: 'See the drop and join the waitlist' }
     : null
 
+  const href = collection ? { base: collection.basePath, withCollection: false } : {}
+
   const navigate = useCallback((href: string) => {
     window.history.pushState(null, '', href)
   }, [])
 
   return (
     <>
-      <header className={styles.header} data-reveal="hero">
-        <p className={styles.label}>Shop</p>
-        <h1 className={styles.title}>{title}</h1>
-      </header>
+      {!collection && (
+        <header className={styles.header} data-reveal="hero">
+          <p className={styles.label}>Shop</p>
+          <h1 className={styles.title}>{title}</h1>
+        </header>
+      )}
       <ShopView
-        filters={buildFilterGroups(query, drops)}
+        filters={buildFilterGroups(query, drops, href)}
         sort={query.sort}
-        sortOptions={buildSortOptions(query)}
+        sortOptions={buildSortOptions(query, href)}
         tiles={visible}
         emptyMessage="No pieces match these filters yet."
         emptyLink={emptyLink}
