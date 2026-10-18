@@ -25,3 +25,8 @@ Bron: spec sectie 7 (`docs/superpowers/specs/2026-10-13-rebrand-v2-design.md`), 
 
 - [ ] `/collections/olympn-sport` kantelt van klok naar "Live now" binnen een minuut, zonder deploy.
 - [ ] Waitlist-contacten in Resend gemaild met de release.
+
+## Social band (home)
+
+- [ ] TikTok-handle bevestigen (`lib/social.ts`, nu `@7enobyabraent`, zelfde als Instagram).
+- [ ] Optioneel: `INSTAGRAM_ACCESS_TOKEN` in Vercel (Instagram API met Instagram-login, scope `instagram_business_basic`, vereist Business- of Creator-account) zodat de vier nieuwste posts live meelopen. Zonder token staan de vier posts van 18-10-2026 uit `lib/social.ts` erop.

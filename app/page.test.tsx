@@ -98,28 +98,14 @@ describe('home', () => {
     expect(within(band).getByRole('link', { name: 'Shop Olympian' })).toHaveAttribute('href', '/collections/olympian')
   })
 
-  it('has an OLYMPN Sport band with two ads that never preload', async () => {
+  it('has a social band with the Instagram and TikTok profiles and four posts', async () => {
     render(await HomePage())
-    // The hero and the tile row are also named "OLYMPN Sport", so select the band by its data attribute.
-    const band = document.querySelector('[data-band="sport"]') as HTMLElement
+    const band = document.querySelector('[data-band="social"]') as HTMLElement
     expect(band).not.toBeNull()
-    const videos = band.querySelectorAll('video')
-    expect(videos).toHaveLength(2)
-    for (const video of videos) {
-      expect(video).toHaveAttribute('preload', 'none')
-      expect(video.getAttribute('poster')).toMatch(/^\/brand\/ad-[a-z]+-poster\.jpg$/)
-    }
-    expect(within(band).getByText('Edition 02 · Drops 1 November 2026 at 12:00 CET')).toBeInTheDocument()
-    expect(within(band).getByRole('link', { name: 'Explore OLYMPN Sport' })).toHaveAttribute('href', '/collections/olympn-sport')
-  })
-
-  it('teases the OLYMPN Sport band only before the release', async () => {
-    render(await HomePage())
-    expect(screen.getByRole('img', { name: 'Something is coming.' })).toBeInTheDocument()
-    jest.spyOn(Date, 'now').mockReturnValue(AFTER)
-    const { container } = render(await HomePage())
-    expect(within(container).queryByRole('img', { name: 'Something is coming.' })).toBeNull()
-    expect(within(container).getByText('Edition 02 · Live now')).toBeInTheDocument()
+    expect(within(band).getByRole('link', { name: '@7enobyabraent' })).toHaveAttribute('href', 'https://www.instagram.com/7enobyabraent/')
+    expect(within(band).getByRole('link', { name: 'TikTok' })).toHaveAttribute('href', 'https://www.tiktok.com/@7enobyabraent')
+    expect(within(within(band).getByRole('list', { name: 'Latest Instagram posts' })).getAllByRole('link')).toHaveLength(4)
+    expect(band.querySelector('video')).toBeNull()
   })
 
   it('ends with a waitlist strip for every future edition', async () => {

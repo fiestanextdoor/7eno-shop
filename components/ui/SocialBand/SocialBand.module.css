@@ -1,0 +1,122 @@
+.band {
+  margin-top: var(--s-9);
+  padding: var(--s-9) var(--l-gutter);
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+}
+
+.band :focus-visible {
+  outline-color: var(--c-inverse-text);
+}
+
+.inner {
+  display: grid;
+  gap: var(--s-7);
+  max-width: var(--l-max);
+  margin: 0 auto;
+}
+
+.head {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  max-width: 560px;
+}
+
+.label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-live);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-display-italic);
+  font-size: var(--fs-h1);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.text {
+  margin: 0;
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+.buttons a {
+  gap: var(--s-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--l-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cell {
+  min-width: 0;
+}
+
+.post {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: var(--r-ui);
+  background: var(--c-surface);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform var(--m-slow) var(--m-ease-out);
+}
+
+.post:hover .image {
+  transform: scale(1.04);
+}
+
+.badge {
+  position: absolute;
+  top: var(--s-3);
+  left: var(--s-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-1);
+  background: var(--c-inverse-bg);
+  color: var(--c-inverse-text);
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post:hover .image {
+    transform: none;
+  }
+}

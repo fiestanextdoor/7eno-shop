@@ -1,17 +1,15 @@
-import type { CSSProperties } from 'react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import AutoplayVideo from '@/components/ui/AutoplayVideo/AutoplayVideo'
-import { buttonClasses } from '@/components/ui/Button/Button'
 import DropBlock from '@/components/ui/DropBlock/DropBlock'
 import ProductRow from '@/components/ui/ProductRow/ProductRow'
+import SocialBand from '@/components/ui/SocialBand/SocialBand'
 import WaitlistForm from '@/components/ui/WaitlistForm/WaitlistForm'
-import { OLYMPN_SPORT_WORDMARK, SOMETHING_IS_COMING, SPORT_ADS } from '@/lib/brand'
 import { getShopProducts, type ShopProduct } from '@/lib/catalog'
 import {
-  currentTimeMs, getDrop, getNextDrop, isDropListed, listDropsNewestFirst, toDropView, type DropView,
+  currentTimeMs, getDrop, getNextDrop, isDropListed, listDropsNewestFirst, toDropView,
 } from '@/lib/drops'
+import { getInstagramPosts } from '@/lib/instagram'
 import { isPreviewSession } from '@/lib/preview-session'
 import { absoluteUrl } from '@/lib/seo'
 import { toTiles } from '@/lib/tiles'
@@ -53,12 +51,6 @@ const OLYMPIAN_MODELS = [
   { src: '/olympian/olympian-rosa-model.jpg', colour: 'rosa' },
 ]
 
-function statusLine(view: DropView): string {
-  if (view.status === 'upcoming') return `${view.editionLabel} · Drops ${view.startsAtLabel}`
-  if (view.status === 'live') return `${view.editionLabel} · Live now`
-  return `${view.editionLabel} · Released ${view.startsOnLabel}`
-}
-
 export default async function HomePage() {
   const now = currentTimeMs()
   const preview = await isPreviewSession()
@@ -85,9 +77,7 @@ export default async function HomePage() {
 
   const olympian = getDrop('olympian')
   const olympianView = olympian && isDropListed(olympian, now, clock) ? toDropView(olympian, now, clock) : null
-  const sport = getDrop('olympn-sport')
-  const sportView = sport && isDropListed(sport, now, clock) ? toDropView(sport, now, clock) : null
-  const sportTiles = sportView ? (sportView.status === 'upcoming' ? 1 : 0) + SPORT_ADS.length : 0
+  const posts = await getInstagramPosts()
 
   return (
     <main className={styles.page}>
@@ -123,6 +113,8 @@ export default async function HomePage() {
         />
       ))}
 
+      <SocialBand posts={posts} />
+
       {olympian && olympianView && (
         <section className={styles.olyBand} aria-labelledby="olympian-band-title">
           <div className={styles.olyLead}>
@@ -155,45 +147,6 @@ export default async function HomePage() {
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {sportView && (
-        <section className={styles.sportBand} data-band="sport" aria-labelledby="sport-band-title">
-          <div className={styles.sportInner}>
-            <div className={styles.sportHead} data-reveal="up">
-              <h2 id="sport-band-title" className={styles.sportTitle}>
-                <Image
-                  src={OLYMPN_SPORT_WORDMARK.src}
-                  alt="OLYMPN Sport"
-                  width={OLYMPN_SPORT_WORDMARK.width}
-                  height={OLYMPN_SPORT_WORDMARK.height}
-                  sizes="(min-width: 1024px) 560px, 90vw"
-                  className={styles.sportWordmark}
-                />
-              </h2>
-              <p className={styles.sportMeta}>{statusLine(sportView)}</p>
-              <Link href={sportView.href} className={buttonClasses('accent', 'lg')}>Explore OLYMPN Sport</Link>
-            </div>
-            <ul className={styles.sportMedia} data-reveal="stagger" style={{ '--tiles': sportTiles } as CSSProperties}>
-              {sportView.status === 'upcoming' && (
-                <li className={styles.sportTile} data-teaser="true">
-                  <Image
-                    src={SOMETHING_IS_COMING.src}
-                    alt="Something is coming."
-                    fill
-                    sizes="(min-width: 768px) 33vw, 50vw"
-                    className={styles.contain}
-                  />
-                </li>
-              )}
-              {SPORT_ADS.map((ad) => (
-                <li key={ad.src} className={styles.sportTile}>
-                  <AutoplayVideo src={ad.src} poster={ad.poster} label={ad.label} width={ad.width} height={ad.height} />
-                </li>
-              ))}
-            </ul>
-          </div>
         </section>
       )}
 

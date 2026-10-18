@@ -35,6 +35,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'files.cdn.printful.com' },
       { protocol: 'https', hostname: '**.printful.com' },
       { protocol: 'https', hostname: '**.supabase.co' },
+      // Live Instagram feed (lib/instagram) when INSTAGRAM_ACCESS_TOKEN is set.
+      { protocol: 'https', hostname: '**.cdninstagram.com' },
+      { protocol: 'https', hostname: '**.fbcdn.net' },
     ],
   },
   // The collection OG image reads its font and logos from disk at request time

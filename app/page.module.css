@@ -82,10 +82,6 @@
   list-style: none;
 }
 
-.contain {
-  object-fit: contain;
-}
-
 .cover {
   object-fit: cover;
 }
@@ -131,75 +127,6 @@
   background: var(--c-surface);
 }
 
-/* OLYMPN Sport video band */
-.sportBand {
-  margin-top: var(--s-9);
-  padding: var(--s-9) var(--l-gutter);
-  background: var(--c-inverse-bg);
-  color: var(--c-inverse-text);
-}
-
-.sportBand :focus-visible {
-  outline-color: var(--c-inverse-text);
-}
-
-.sportInner {
-  display: grid;
-  gap: var(--s-7);
-  max-width: var(--l-max);
-  margin: 0 auto;
-}
-
-.sportHead {
-  display: grid;
-  justify-items: start;
-  gap: var(--s-4);
-}
-
-.sportTitle {
-  margin: 0;
-  width: min(100%, 560px);
-}
-
-.sportWordmark {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.sportMeta {
-  margin: 0;
-  font-family: var(--f-mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-}
-
-.sportMedia {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--l-grid-gap);
-  max-width: 1080px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.sportTile {
-  position: relative;
-  aspect-ratio: 9 / 16;
-  overflow: hidden;
-  border-radius: var(--r-ui);
-  background: var(--c-inverse-bg);
-}
-
-.sportTile[data-teaser='true'] {
-  grid-column: 1 / -1;
-  aspect-ratio: 1 / 1;
-  background: var(--c-sage);
-}
-
 /* Waitlist strip */
 .waitlist {
   padding: var(--s-9) var(--l-gutter);
@@ -228,14 +155,6 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .sportMedia {
-    grid-template-columns: repeat(var(--tiles, 2), minmax(0, 1fr));
-  }
-
-  .sportTile[data-teaser='true'] {
-    grid-column: auto;
-    aspect-ratio: 9 / 16;
-  }
 }
 
 @media (min-width: 1024px) {
